@@ -1,1 +1,1 @@
-# strategic-supremacy
+# Strategic Supremacy
