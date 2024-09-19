@@ -1,0 +1,11 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "sp.proto";
+option java_outer_classname = "Proto";
+
+package grpc;
+
+service GrpcService {
+}
