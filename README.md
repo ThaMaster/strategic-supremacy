@@ -7,8 +7,18 @@ is to cover the expected learning outcomes of the course and thus needs to handl
 
 ## System Components
 
+This section contains the discussed system components and internal systems that will be implemented. Since
+some of the components has just been mentioned many things can and will change.
+
 ### Different clients in the system
 
+All players connected to the same game will have different roles and act as different clients. For this
+system, there is to exists three different clients:
+
+- **Follower:** Followers will redirect all
+- **Sub-leader** This player will be
+- **Leader:** The leader will be at the top of the hierarchy and act as the source of truth, regularly send out **L1**
+  updates to other clients to fix potential concurrency errors that could have occurred.
 ### Leader election
 
 ### Communication Priority
