@@ -41,13 +41,13 @@ public class AppSettings {
         }
     }
 
-    public static void PrintSettings(){
-        System.out.println("=== Settings ===");
-        System.out.println("HOST_PORT: " + HOST_PORT);
-        System.out.println("NAMING_SERVICE_IP: " + NAMING_SERVICE_IP);
-        System.out.println("NAMING_SERVICE_PORT: " + NAMING_SERVICE_PORT);
-        System.out.println("DEBUG MODE: " + DEBUG);
-        System.out.println("================");
+    public static void PrintSettings() {
+        System.out.println("============AppSettings============");
+        System.out.printf("%-20s %s%n", "HOST_PORT: ", HOST_PORT);
+        System.out.printf("%-20s %s%n", "NAMING_SERVICE_IP:", NAMING_SERVICE_IP);
+        System.out.printf("%-20s %s%n", "NAMING_SERVICE_PORT:", NAMING_SERVICE_PORT);
+        System.out.printf("%-20s %s%n", "DEBUG MODE:", DEBUG);
+        System.out.println("===================================");
     }
 
     private static void setConfigField(String key, String value){
