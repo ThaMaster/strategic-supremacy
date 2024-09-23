@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel;
 
+import se.umu.cs.ads.sp.view.util.UtilView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -9,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener {
 
     public GamePanel() {
+        this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
 
@@ -18,7 +21,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        System.out.println("Clicked '" + e.getButton() + "' at: (" + e.getX() + ", " + e.getY() + ")");
     }
 
     @Override
