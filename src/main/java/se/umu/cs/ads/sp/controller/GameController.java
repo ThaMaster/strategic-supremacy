@@ -20,7 +20,11 @@ public class GameController implements ActionListener {
 
         mainFrame = new MainFrame();
         this.timer = new Timer(1000/FPS, this);
+        //startGame();
+    }
 
+    public void startGame() {
+        this.timer.start();
     }
 
     @Override
@@ -30,10 +34,10 @@ public class GameController implements ActionListener {
     }
 
     private void update() {
-
+        // System.out.println("Updating!");
     }
 
     private void render() {
-
+        // System.out.println("Rendering!");
     }
 }
