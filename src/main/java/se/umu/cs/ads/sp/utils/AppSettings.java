@@ -1,8 +1,7 @@
-package main.java.se.umu.cs.ads.sp.utils;
+package se.umu.cs.ads.sp.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class AppSettings {
@@ -11,47 +10,38 @@ public class AppSettings {
     public static int NAMING_SERVICE_PORT = 1337;
     public static boolean DEBUG = false;
 
-    public static void SetGameConfig(){
+    public static void SetGameConfig() {
         File config = new File("./AppSettings.cfg");
 
-        if(!config.exists()){
+        if (!config.exists()) {
             System.out.println("Could not find config file. " + config.getAbsolutePath());
             return;
         }
 
-        try{
+        try {
             Scanner sc = new Scanner(config);
             int row = 0;
-            while(sc.hasNext()){
-                row++;
-                String[] words = sc.nextLine().split(" ");
-                if(words[0].startsWith("/")){
-                    //Comment
-                    continue;
-                }
-                if(words.length != 2){
-                    System.out.println("Invalid syntax -> " + config.getName() + " row: " + row);
-                    return;
-                }
-                setConfigField(words[0], words[1]);
-
+            while (sc.hasNext()) {
+            row++;
+            String[] words = sc.nextLine().split(" ");
+            if (words[0].startsWith("/")) {
+              // Comment
+              continue;
             }
-        }catch(FileNotFoundException e){
+            if (words.length != 2) {
+              System.out.println("Invalid syntax -> " + config.getName() + " row: " + row);
+              return;
+            }
+            setConfigField(words[0], words[1]);
+            }
+            sc.close();
+        } catch (FileNotFoundException e) {
             System.out.println("Cannot find or open config file found");
         }
     }
 
-    public static void PrintSettings() {
-        System.out.println("============AppSettings============");
-        System.out.printf("%-20s %s%n", "HOST_PORT: ", HOST_PORT);
-        System.out.printf("%-20s %s%n", "NAMING_SERVICE_IP:", NAMING_SERVICE_IP);
-        System.out.printf("%-20s %s%n", "NAMING_SERVICE_PORT:", NAMING_SERVICE_PORT);
-        System.out.printf("%-20s %s%n", "DEBUG MODE:", DEBUG);
-        System.out.println("===================================");
-    }
-
-    private static void setConfigField(String key, String value){
-        switch(key){
+    private static void setConfigField(String key, String value) {
+        switch (key) {
             case "naming_service_ip:":
                 NAMING_SERVICE_IP = value;
                 break;
@@ -68,5 +58,14 @@ public class AppSettings {
                 System.out.println("Unknown config key: " + key);
                 break;
         }
+    }
+
+    public static void PrintSettings() {
+        System.out.println("============AppSettings============");
+        System.out.printf("%-20s %s%n", "HOST_PORT: ", HOST_PORT);
+        System.out.printf("%-20s %s%n", "NAMING_SERVICE_IP:", NAMING_SERVICE_IP);
+        System.out.printf("%-20s %s%n", "NAMING_SERVICE_PORT:", NAMING_SERVICE_PORT);
+        System.out.printf("%-20s %s%n", "DEBUG MODE:", DEBUG);
+        System.out.println("===================================");
     }
 }
