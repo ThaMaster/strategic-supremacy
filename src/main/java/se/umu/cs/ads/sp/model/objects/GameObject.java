@@ -5,7 +5,7 @@ import se.umu.cs.ads.sp.utils.Position;
 
 public abstract class GameObject {
 
-    private Position position;
+    protected Position position;
     private CollisionBox collisionBox;
 
     public void spawn() {

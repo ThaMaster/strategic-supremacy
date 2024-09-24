@@ -52,10 +52,6 @@ public class Map {
         }
     }
 
-    public void getRowLength(int row) {
-        map.get(row).size();
-    }
-
     /**
      * Implement in Milestone 3
      */
