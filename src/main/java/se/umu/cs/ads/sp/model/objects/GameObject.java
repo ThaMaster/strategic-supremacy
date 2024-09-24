@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.model.objects;
 
-import se.umu.cs.ads.sp.model.CollisionBox;
+import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.utils.Position;
 
 public abstract class GameObject {

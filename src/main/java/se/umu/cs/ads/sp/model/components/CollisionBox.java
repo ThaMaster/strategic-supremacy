@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.model;
+package se.umu.cs.ads.sp.model.components;
 
 import java.awt.*;
 import java.awt.geom.Line2D;

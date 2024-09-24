@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.model.map;
 
-import se.umu.cs.ads.sp.model.CollisionBox;
+import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 
 public class TileModel {
