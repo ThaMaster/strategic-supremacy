@@ -30,4 +30,9 @@ public class Position {
         return Math.sqrt(Math.pow((destination.getX() - origin.getX()), 2)
                 + Math.pow((destination.getY() - origin.getY()), 2));
     }
+
+    //Testing purposes
+    public void printPosition(String positionName) {
+        System.out.println(positionName + " (" + x / Constants.TILE_WIDTH + ", " + y / Constants.TILE_WIDTH + ")");
+    }
 }

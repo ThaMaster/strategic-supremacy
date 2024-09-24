@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.model.objects.collectibles;
 
-public class Gold extends Collectible {
+public class Gold extends Collectable {
     private int amount;
 
     public Gold() {

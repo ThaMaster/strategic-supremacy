@@ -1,13 +1,12 @@
 package se.umu.cs.ads.sp.controller;
 
-import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.MainFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class GameController implements ActionListener {
 
@@ -15,19 +14,16 @@ public class GameController implements ActionListener {
 
     private Timer timer;
     private MainFrame mainFrame;
-    private ArrayList<Entity> gameEntities = new ArrayList<>();
+    private ModelManager modelManager;
 
     public GameController() {
 
+        modelManager = new ModelManager(this);
         mainFrame = new MainFrame();
         this.timer = new Timer(1000 / FPS, this);
-
-        Entity newEntity = new Entity(new Position(100, 100));
-        gameEntities.add(newEntity);
-
         mainFrame.getGamePanel().setGameController(this);
 
-        mainFrame.getGamePanel().setEntities(gameEntities);
+        mainFrame.getGamePanel().setEntities(modelManager.getGameEntities());
         startGame();
     }
 
@@ -43,10 +39,8 @@ public class GameController implements ActionListener {
 
     private void update() {
         // System.out.println("Updating!");
-        mainFrame.getGamePanel().updateEntityPositions(gameEntities);
-        for (Entity entity : gameEntities) {
-            entity.update();
-        }
+        modelManager.update();
+        mainFrame.getGamePanel().updateEntityPositions(modelManager.getGameEntities());
     }
 
     private void render() {
@@ -58,6 +52,10 @@ public class GameController implements ActionListener {
     }
 
     public void setEntityPosition(Position newPos) {
-        this.gameEntities.get(0).setDestination(newPos);
+        modelManager.setEntityPosition(newPos);
+    }
+
+    public void setSelection(Position clickLocation){
+        modelManager.setSelection(clickLocation);
     }
 }
