@@ -15,11 +15,16 @@ some of the components has just been mentioned many things can and will change.
 All players connected to the same game will have different roles and act as different clients. For this
 system, there is to exists three different clients:
 
-- **Follower:** Followers will redirect all
-- **Sub-leader** This player will be
+- **Follower:** Followers will redirect all messages that is supposed to be to the leader to their assigned sub-leader.
+- **Sub-leader** This client will act as a regular follower, but will instead also forward the messages retrieved from
+  their followers to their assigned leader or sub-leader.
 - **Leader:** The leader will be at the top of the hierarchy and act as the source of truth, regularly send out **L1**
   updates to other clients to fix potential concurrency errors that could have occurred.
+
+
 ### Leader election
+
+Some type of raft algorithm.
 
 ### Communication Priority
 
@@ -27,9 +32,11 @@ All messages that are sent throughout the system needs to be filtered in some wa
 important information takes priority over other messages. Therefore, each message will also include a **Priority**. 
 There will exist three types of priority that can be assigned to a message:
 
-- **High Priority:** 
-- **Medium Priority:**
-- **Low Priority:** 
+- **High Priority:** These messages will contain information that is vital for the game to stay consistent. This is 
+  things like a players score in the game, a unit has died or similar messages.
+- **Medium Priority:** Medium priority messages contains information that should be prioritized over low priority. 
+  should these be used remains to be seen.
+- **Low Priority:** All other messages that is not of either high or medium are considered low priority.
 
 Depending on the update event which the message represent, the priority of the message will dictate if the leader should
 overwrite its current information and restart its timer for the **L1** timer, see image below for illustration.
