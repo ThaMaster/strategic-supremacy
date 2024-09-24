@@ -8,12 +8,10 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener {
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
     private GameController gController;
     private ArrayList<EntityView> entities;
@@ -27,6 +25,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
+        this.setFocusable(true);  // Ensure the panel can receive key events
+        this.addKeyListener(this); // Add KeyListener
     }
 
     @Override
@@ -35,11 +35,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mousePressed(MouseEvent e) {
-
-        if(e.getButton() == MouseEvent.BUTTON1) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
             gController.setSelection(new Position(e.getX(), e.getY()));
-        }
-        else if (e.getButton() == MouseEvent.BUTTON3) {
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
             gController.setEntityPosition(new Position(e.getX(), e.getY()));
         }
     }
@@ -91,5 +89,31 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void setGameController(GameController gc) {
         this.gController = gc;
+    }
+
+    // KeyListener methods
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // Not used
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_1:
+                gController.setSelection(0);
+                break;
+            case KeyEvent.VK_2:
+                gController.setSelection(1);
+                break;
+            case KeyEvent.VK_3:
+                gController.setSelection(2);
+                break;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // Not used
     }
 }

@@ -67,6 +67,10 @@ public class ModelManager {
         }
     }
 
+    public void setSelection(int selectedUnit){
+        this.selectedUnit = selectedUnit;
+    }
+
     private int getClosestHitUnit(ArrayList<Entity> hitEntities, Position clickLocation){
         double closestDistance = Double.MAX_VALUE;
         Entity closestEntity = hitEntities.get(0);

@@ -58,4 +58,8 @@ public class GameController implements ActionListener {
     public void setSelection(Position clickLocation){
         modelManager.setSelection(clickLocation);
     }
+
+    public void setSelection(int entityId){
+        modelManager.setSelection(entityId);
+    }
 }
