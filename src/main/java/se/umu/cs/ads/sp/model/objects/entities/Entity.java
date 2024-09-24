@@ -45,11 +45,18 @@ public class Entity extends GameObject {
     }
 
     public void move() {
+
+        if (Position.distance(this.position, destination) <= speed) {
+            this.position = destination;
+            this.state = EntityState.IDLE;
+            return;
+        }
+
         int deltaX = position.getX() - destination.getX();
         int deltaY = position.getY() - destination.getY();
 
-        double scaleX = 1;
-        double scaleY = 1;
+//        double scaleX = 1;
+//        double scaleY = 1;
 
        /* if (Math.abs(deltaX) > Math.abs(deltaY)) {
             scaleY = (double) (deltaY / deltaX);
@@ -60,21 +67,25 @@ public class Entity extends GameObject {
         int newX = position.getX();
         int newY = position.getY();
 
-        if (deltaX > 0) {
-            // Move right
-            newX -= (int) (speed * scaleX);
-
+        if(Math.abs(deltaX) <= speed) {
+            newX = destination.getX();
+        } else if (deltaX > 0) {
+            // Move Right
+            newX -= speed;
         } else if (deltaX < 0) {
             // Move left
-            newX += (int) (speed * scaleX);
+            newX += speed;
+
         }
 
-        if (deltaY > 0) {
+        if(Math.abs(deltaY) <= speed) {
+            newY = destination.getY();
+        } else if (deltaY > 0) {
             // Move up
-            newY -= (int) (speed * scaleY);
+            newY -= speed;
         } else if (deltaY < 0) {
             // Move down
-            newY += (int) (speed * scaleY);
+            newY += speed;
         }
 
         this.position = new Position(newX, newY);

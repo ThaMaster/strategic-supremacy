@@ -25,4 +25,9 @@ public class Position {
     public void setY(int y) {
         this.y = y;
     }
+
+    public static double distance(Position origin, Position destination) {
+        return Math.sqrt(Math.pow((destination.getX() - origin.getX()), 2)
+                + Math.pow((destination.getY() - origin.getY()), 2));
+    }
 }

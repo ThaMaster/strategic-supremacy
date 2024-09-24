@@ -31,12 +31,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("Setting next position: (" + e.getX() + ", " + e.getY() + ")");
-        gController.setEntityPosition(new Position(e.getX(), e.getY()));
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        gController.setEntityPosition(new Position(e.getX(), e.getY()));
     }
 
     @Override
@@ -75,6 +74,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             EntityView newEntity = new EntityView();
             newEntity.setPosition(entity.getPosition());
             this.entities.add(newEntity);
+        }
+    }
+
+    public void updateEntityPositions(ArrayList<Entity> entities) {
+        for(int i = 0; i < entities.size(); i++) {
+            this.entities.get(i).setPosition(entities.get(i).getPosition());
         }
     }
 
