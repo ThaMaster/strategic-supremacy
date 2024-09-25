@@ -13,14 +13,15 @@ allow players change these bindings. For now, the below table summarizes the bin
 | Key                    | Function                                     |
 |------------------------|----------------------------------------------|
 | **1**                  | Selects the first of the three player units  |
-| **2**                  | Selects the second of the three player units |                                  |
-| **3**                  | Selects the third of the three player units  |   
+| **2**                  | Selects the second of the three player units |
+| **3**                  | Selects the third of the three player units  |
 | **ARROW_UP**           | Moves the camera upwards                     |
 | **ARROW_DOWN**         | Moves the camera downwards                   |
 | **ARROW_LEFT**         | Moves the camera to the left                 |
 | **ARROW_RIGHT**        | Moves the camera to the right                |
 | **RIGHT_MOUSE_BUTTON** | Selects a unit                               |
 | **LEFT_MOUSE_BUTTON**  | Moves a unit                                 |
+| **S**                  | Stops the currently selected unit            |
 
 ## System Components
 

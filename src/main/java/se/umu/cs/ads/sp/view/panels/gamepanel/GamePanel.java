@@ -52,8 +52,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             entities.get(gController.getSelectedUnit()).setSelected(false);
             gController.setSelection(new Position(worldX, worldY));
             entities.get(gController.getSelectedUnit()).setSelected(true);
+
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            gController.setEntityPosition(new Position(worldX, worldY));
+            gController.setEntityDestination(new Position(worldX, worldY));
         }
     }
 
@@ -102,6 +103,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 break;
             case KeyEvent.VK_3:
                 gController.setSelection(2);
+                break;
+            case KeyEvent.VK_S:
+                gController.stopSelectedEntity();
                 break;
             case KeyEvent.VK_RIGHT:
                 cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);

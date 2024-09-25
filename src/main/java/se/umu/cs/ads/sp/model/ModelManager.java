@@ -21,10 +21,10 @@ public class ModelManager {
 
         map.loadMap("maps/map1.txt");
 
-
         Entity firstUnit = new Entity(0, new Position(100, 100), map);
         Entity secondUnit = new Entity(1, new Position(300, 400), map);
         Entity thirdUnit = new Entity(2, new Position(500, 100), map);
+
         gameEntities.add(firstUnit);
         gameEntities.add(secondUnit);
         gameEntities.add(thirdUnit);
@@ -41,8 +41,10 @@ public class ModelManager {
         return gameEntities;
     }
 
-    public void setEntityPosition(Position newPosition) {
-        gameEntities.get(selectedUnit).setDestination(newPosition);
+    public void setEntityDestination(Position newPosition) {
+        if(!(newPosition.getX() < 0) && !(newPosition.getY() < 0)) {
+            gameEntities.get(selectedUnit).setDestination(newPosition);
+        }
     }
 
     public void setSelection(Position clickLocation) {
@@ -85,5 +87,10 @@ public class ModelManager {
 
     public Map getMap() {
         return this.map;
+    }
+
+    public void stopSelectedEntity() {
+        Entity unit = gameEntities.get(selectedUnit);
+        unit.setDestination(unit.getPosition());
     }
 }

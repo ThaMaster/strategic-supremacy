@@ -25,13 +25,6 @@ public class Entity extends GameObject {
         return ID;
     }
 
-    public void setDestination(Position newDestination) {
-        if (!position.equals(newDestination)) {
-            this.destination = newDestination;
-            this.state = EntityState.RUNNING;
-        }
-    }
-
     public void setSpeed(int newSpeed) {
         this.speed = newSpeed;
     }
@@ -100,5 +93,10 @@ public class Entity extends GameObject {
 
     public Position getDestination() {
         return this.destination;
+    }
+
+    public void setDestination(Position newDestination) {
+        this.destination = newDestination;
+        this.state = EntityState.RUNNING;
     }
 }

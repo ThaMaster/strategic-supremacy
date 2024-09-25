@@ -58,8 +58,8 @@ public class GameController implements ActionListener {
         });
     }
 
-    public void setEntityPosition(Position newPos) {
-        modelManager.setEntityPosition(newPos);
+    public void setEntityDestination(Position newPos) {
+        modelManager.setEntityDestination(newPos);
     }
 
     public void setSelection(Position clickLocation){
@@ -72,5 +72,9 @@ public class GameController implements ActionListener {
 
     public int getSelectedUnit() {
         return modelManager.getSelectedUnit();
+    }
+
+    public void stopSelectedEntity() {
+        modelManager.stopSelectedEntity();
     }
 }
