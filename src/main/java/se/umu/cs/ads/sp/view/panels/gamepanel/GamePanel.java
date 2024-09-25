@@ -191,4 +191,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
         cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
     }
+
+    public void setCameraWorldPosition(int xAmount, int yAmount){
+        cameraWorldPosition.setX(xAmount);
+        cameraWorldPosition.setY(yAmount);
+    }
 }

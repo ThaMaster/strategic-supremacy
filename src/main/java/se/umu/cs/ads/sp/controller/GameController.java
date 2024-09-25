@@ -89,6 +89,8 @@ public class GameController implements ActionListener {
 
     public void setSelection(int entityId){
         modelManager.setSelection(entityId);
+        Position newCameraPos = modelManager.getGameEntities().get(entityId).getPosition();
+        mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos.getX(), newCameraPos.getY());
     }
 
     public int getSelectedUnit() {
