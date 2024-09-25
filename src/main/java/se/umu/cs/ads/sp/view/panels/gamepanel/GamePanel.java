@@ -14,6 +14,9 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
+    // TODO: Handle the camera world position in a better way, how i do not know...
+    private Position cameraWorldPosition;
+
     private TileManager tileManager;
     private GameController gController;
     private ArrayList<EntityView> entities;
@@ -22,6 +25,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
+
+        this.cameraWorldPosition = new Position((UtilView.screenWidth / 2), (UtilView.screenHeight / 2));
 
         this.tileManager = tm;
         entities = new ArrayList<>();
@@ -39,12 +44,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mousePressed(MouseEvent e) {
+        // Convert the mouse screen coordinates to world coordinates.
+        int worldX = e.getX() - UtilView.screenX + cameraWorldPosition.getX();
+        int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
+
         if (e.getButton() == MouseEvent.BUTTON1) {
             entities.get(gController.getSelectedUnit()).setSelected(false);
-            gController.setSelection(new Position(e.getX(), e.getY()));
+            gController.setSelection(new Position(worldX, worldY));
             entities.get(gController.getSelectedUnit()).setSelected(true);
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            gController.setEntityPosition(new Position(e.getX(), e.getY()));
+            gController.setEntityPosition(new Position(worldX, worldY));
         }
     }
 
@@ -92,11 +101,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             case KeyEvent.VK_3:
                 gController.setSelection(2);
                 break;
+            case KeyEvent.VK_RIGHT:
+                cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
+                break;
+            case KeyEvent.VK_LEFT:
+                cameraWorldPosition.setX(cameraWorldPosition.getX() - 10);
+                break;
+            case KeyEvent.VK_UP:
+                cameraWorldPosition.setY(cameraWorldPosition.getY() - 10);
+                break;
+            case KeyEvent.VK_DOWN:
+                cameraWorldPosition.setY(cameraWorldPosition.getY() + 10);
+                break;
             default:
                 break;
         }
         entities.get(gController.getSelectedUnit()).setSelected(true);
-
     }
 
     @Override
@@ -110,10 +130,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         Graphics2D g2d = (Graphics2D) g;
 
-        tileManager.draw(g2d);
+        tileManager.draw(g2d, cameraWorldPosition);
 
         for (EntityView entity : entities) {
-            entity.draw(g2d);
+            entity.draw(g2d, cameraWorldPosition);
         }
     }
 

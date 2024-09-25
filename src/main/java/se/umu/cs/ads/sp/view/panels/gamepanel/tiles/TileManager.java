@@ -1,8 +1,7 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel.tiles;
 
-import org.checkerframework.checker.units.qual.A;
-import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.map.TileModel;
+import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
@@ -28,28 +27,31 @@ public class TileManager {
 
     public void setMap(ArrayList<ArrayList<TileModel>> modelMap) {
         viewMap = new ArrayList<>();
-        for(int y = 0; y < modelMap.size(); y++) {
+        for (int y = 0; y < modelMap.size(); y++) {
             viewMap.add(new ArrayList<>());
-            for(int x = 0; x < modelMap.get(y).size(); x++) {
+            for (int x = 0; x < modelMap.get(y).size(); x++) {
                 viewMap.get(y).add(modelMap.get(y).get(x).getType());
             }
         }
     }
 
-    public void draw(Graphics2D g2d) {
-        for(int y = 0; y < viewMap.size(); y++) {
-            for(int x = 0; x < viewMap.size(); x++) {
+    public void draw(Graphics2D g2d, Position cameraWorldPosition) {
+        for (int y = 0; y < viewMap.size(); y++) {
+            for (int x = 0; x < viewMap.size(); x++) {
                 int worldX = x * UtilView.tileSize;
                 int worldY = y * UtilView.tileSize;
                 if (insideScreen(worldX, worldY)) {
                     TileType type = viewMap.get(y).get(x);
-                    g2d.drawImage(tileMap.get(type).getImage(), worldX, worldY, UtilView.tileSize, UtilView.tileSize, null);
+                    int screenX = worldX - cameraWorldPosition.getX() + UtilView.screenX;
+                    int screenY = worldY - cameraWorldPosition.getY() + UtilView.screenY;
+                    g2d.drawImage(tileMap.get(type).getImage(), screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
                 }
             }
         }
     }
 
     public boolean insideScreen(int worldX, int worldY) {
+        // Make sure to return false so nothing is rendered outside the screen.
         return true;
     }
 

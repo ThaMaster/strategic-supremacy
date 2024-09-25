@@ -35,4 +35,9 @@ public class Position {
     public void printPosition(String positionName) {
         System.out.println(positionName + " (" + x / Constants.TILE_WIDTH + ", " + y / Constants.TILE_WIDTH + ")");
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }

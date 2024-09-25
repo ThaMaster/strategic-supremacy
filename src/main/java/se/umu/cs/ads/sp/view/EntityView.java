@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animator;
+import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
@@ -37,18 +38,23 @@ public class EntityView {
         this.state = newState;
     }
 
-    public void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, Position cameraWorldPosition) {
         if (selected) {
             g2d.setColor(Color.GREEN);
         } else {
             g2d.setColor(Color.RED);
         }
 
+        int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
+        int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
+
         if (state == EntityState.RUNNING) {
-            g2d.drawLine(position.getX(), position.getY(), destination.getX(), destination.getY());
+            int desScreenX = destination.getX() - cameraWorldPosition.getX() + UtilView.screenX;
+            int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
+            g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
         }
 
         // Will be replaced with image later
-        g2d.fillRect(position.getX() - 8, position.getY() - 8, 16, 16);
+        g2d.fillRect(posScreenX - 8, posScreenY - 8, 16, 16);
     }
 }

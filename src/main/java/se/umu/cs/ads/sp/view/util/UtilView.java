@@ -11,4 +11,8 @@ public class UtilView {
     public static final int maxScreenRow = 10;
     public static final int screenWidth = tileSize * maxScreenCol;
     public static final int screenHeight = tileSize * maxScreenRow;
+
+    public static final int screenX = screenWidth/2 - tileSize/2;
+    public static final int screenY = screenHeight/2 - tileSize/2;
+
 }
