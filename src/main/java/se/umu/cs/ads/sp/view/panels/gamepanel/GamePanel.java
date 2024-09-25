@@ -75,11 +75,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void mouseDragged(MouseEvent e) {
         // Not used yet
+
+        // Maybe be able to drag a box to select multiple units?
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        // Not used
+        // Not used yet
     }
 
     // KeyListener methods

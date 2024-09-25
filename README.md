@@ -5,6 +5,23 @@
 This git repository represents a project in the _Advanced Distributed Systems_ course at _Umeå University_. The project
 is to cover the expected learning outcomes of the course and thus needs to handle a certain degree of complex problems.
 
+## Key Bindings
+
+This section contains all the different key bindings that are present in the game. These could be implemented further to
+allow players change these bindings. For now, the below table summarizes the bindings:
+
+| Key                    | Function                                     |
+|------------------------|----------------------------------------------|
+| **1**                  | Selects the first of the three player units  |
+| **2**                  | Selects the second of the three player units |                                  |
+| **3**                  | Selects the third of the three player units  |   
+| **ARROW_UP**           | Moves the camera upwards                     |
+| **ARROW_DOWN**         | Moves the camera downwards                   |
+| **ARROW_LEFT**         | Moves the camera to the left                 |
+| **ARROW_RIGHT**        | Moves the camera to the right                |
+| **RIGHT_MOUSE_BUTTON** | Selects a unit                               |
+| **LEFT_MOUSE_BUTTON**  | Moves a unit                                 |
+
 ## System Components
 
 This section contains the discussed system components and internal systems that will be implemented. Since
