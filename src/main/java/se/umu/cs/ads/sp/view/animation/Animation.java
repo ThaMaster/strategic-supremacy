@@ -1,13 +1,11 @@
 package se.umu.cs.ads.sp.view.animation;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Animation {
 
     private final String name;
-
     private final ArrayList<BufferedImage> frames;
 
     private int currentFrame;
@@ -15,6 +13,8 @@ public class Animation {
 
     private int frameDelay;
     private int frameTimer;
+
+    private boolean oneShot = false;
 
     public Animation(String name, ArrayList<BufferedImage> frames, int frameDelay) {
         this.name = name;
@@ -25,15 +25,20 @@ public class Animation {
         this.frameTimer = 0;
     }
 
-    // 10 frames
-    // 3
-
     public void update() {
+        if ((oneShot && currentFrame == totalFrames - 1)) {
+            return;
+        }
+
         frameTimer++;
-        if(frameTimer >= frameDelay) {
+        if (frameTimer >= frameDelay) {
             frameTimer = 0;
             currentFrame = (currentFrame + 1) % totalFrames;
         }
+    }
+
+    public void setOneShot(boolean bool) {
+        this.oneShot = bool;
     }
 
     public String getName() {

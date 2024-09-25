@@ -2,12 +2,18 @@ package se.umu.cs.ads.sp.model.objects;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 
 public abstract class GameObject {
 
     protected Position position;
-    private CollisionBox collisionBox;
+    protected CollisionBox collisionBox;
+
+    public GameObject(Position pos) {
+        this.position = pos;
+        collisionBox = new CollisionBox(pos.getX(), pos.getY(), Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
+    }
 
     public void spawn(Map map) {
         map.setInhabitant(this, position);

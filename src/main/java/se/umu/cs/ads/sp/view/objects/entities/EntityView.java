@@ -3,30 +3,26 @@ package se.umu.cs.ads.sp.view.objects.entities;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animator;
+import se.umu.cs.ads.sp.view.objects.ObjectView;
 
 import java.awt.*;
 
 
-public abstract class EntityView {
+public abstract class EntityView extends ObjectView {
 
-    protected Position position;
     protected Position destination;
 
     protected EntityState state;
-    protected Animator animator;
 
     protected boolean selected = false;
 
-    public EntityView() {
+    public EntityView(Position pos) {
+        super(pos);
         this.animator = new Animator();
     }
 
     public void setSelected(boolean b) {
         this.selected = b;
-    }
-
-    public void setPosition(Position newPosition) {
-        this.position = newPosition;
     }
 
     public void setDestination(Position newDestination) {
@@ -43,7 +39,4 @@ public abstract class EntityView {
     public void update() {
         this.animator.update();
     }
-
-    protected abstract void initAnimator();
-    public abstract void draw(Graphics2D g2d, Position cameraWorldPosition);
 }

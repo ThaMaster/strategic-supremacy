@@ -14,6 +14,7 @@ public class Animator {
     private Animation currentAnimation;
 
     private boolean flipped = false;
+    private boolean paused = false;
 
     public Animator() {
         this.animations = new HashMap<>();
@@ -33,7 +34,7 @@ public class Animator {
 
     public void update() {
         // Change animation frame
-        if(currentAnimation != null) {
+        if(currentAnimation != null && !paused) {
             currentAnimation.update();
         }
     }
@@ -52,5 +53,13 @@ public class Animator {
                 g2d.drawImage(frame, pos.getX(), pos.getY(), frame.getWidth(), frame.getHeight(), null);
             }
         }
+    }
+
+    public void start() {
+        this.paused = false;
+    }
+
+    public void pause() {
+        this.paused = true;
     }
 }

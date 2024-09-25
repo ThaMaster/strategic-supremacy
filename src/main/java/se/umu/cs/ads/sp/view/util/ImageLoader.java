@@ -46,4 +46,12 @@ public class ImageLoader {
             return null;
         }
     }
+
+    public static ArrayList<BufferedImage> loadMultipleImages(String folderPath, String imageName, int amount) {
+        ArrayList<BufferedImage> images = new ArrayList<>();
+        for (int i = 1; i <= amount; i++) {
+            images.add(ImageLoader.loadImage(folderPath + "/" + imageName + i + ".png"));
+        }
+        return images;
+    }
 }

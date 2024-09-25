@@ -1,8 +1,10 @@
 package se.umu.cs.ads.sp.model;
 
-import se.umu.cs.ads.sp.controller.GameController;
+import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.model.map.TileModel;
+import se.umu.cs.ads.sp.model.objects.collectables.Chest;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
+import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
@@ -12,8 +14,10 @@ import java.util.ArrayList;
 public class ModelManager {
 
     private ArrayList<Entity> gameEntities = new ArrayList<>();
+    private ArrayList<Collectable> collectables = new ArrayList<>();
     private Map map;
     private int selectedUnit = 0;
+    private int collidedCollectable = -1;
 
     public ModelManager() {
         map = new Map();
@@ -27,8 +31,12 @@ public class ModelManager {
         gameEntities.add(firstUnit);
         gameEntities.add(secondUnit);
         gameEntities.add(thirdUnit);
-    }
 
+        Position chestPosition = new Position(200, 100);
+        Chest firstChest = new Chest(chestPosition, new Gold(chestPosition));
+
+        collectables.add(firstChest);
+    }
 
     public void update() {
         for (Entity entity : gameEntities) {
@@ -40,10 +48,13 @@ public class ModelManager {
         return gameEntities;
     }
 
+    public ArrayList<Collectable> getCollectables() {
+        return collectables;
+    }
+
     public void setEntityDestination(Position newPosition) {
         // Check that the new destination is within the map.
         gameEntities.get(selectedUnit).setDestination(newPosition);
-
     }
 
     public void setSelection(Position clickLocation) {
@@ -97,10 +108,14 @@ public class ModelManager {
         int row = position.getY() / Constants.TILE_WIDTH;
         int col = position.getX() / Constants.TILE_HEIGHT;
 
-        if(!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
+        if (!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
             return !map.getModelMap().get(row).get(col).hasCollision();
         } else {
             return false;
         }
+    }
+
+    public void setCollidedCollectable(int i) {
+        this.collidedCollectable = i;
     }
 }

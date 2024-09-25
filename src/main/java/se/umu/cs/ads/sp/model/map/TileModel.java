@@ -2,7 +2,7 @@ package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectibles.Collectable;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 

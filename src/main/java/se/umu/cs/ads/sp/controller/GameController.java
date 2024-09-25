@@ -2,6 +2,8 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.map.TileModel;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
+import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
@@ -35,6 +37,7 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().setGameController(this);
 
         mainFrame.getGamePanel().setEntities(modelManager.getGameEntities());
+        mainFrame.getGamePanel().setCollectables(modelManager.getCollectables());
         startGame();
     }
 
@@ -51,8 +54,21 @@ public class GameController implements ActionListener {
     private void update() {
         modelManager.update();
 
+        for(Entity entity : modelManager.getGameEntities()) {
+            for (int i = 0; i < modelManager.getCollectables().size(); i++) {
+                Collectable collectable = modelManager.getCollectables().get(i);
+                if (entity.getCollisionBox().checkCollision(collectable.getCollisionBox())) {
+                    collectable.pickUp();
+                    mainFrame.getGamePanel().performPickUp(i);
+                }
+            }
+        }
+
         mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
 
+        mainFrame.getGamePanel().updateCollectables();
+
+        // Check where to move the camera.
         if(cameraPanningDirection != Direction.NONE) {
             switch (cameraPanningDirection) {
                 case NORTH:

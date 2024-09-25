@@ -1,9 +1,12 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel;
 
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
+import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
@@ -22,6 +25,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private TileManager tileManager;
     private GameController gController;
     private ArrayList<EntityView> entities;
+    private ArrayList<CollectableView> collectables;
 
     private final int edgeThreshold = 50;
 
@@ -34,6 +38,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         this.tileManager = tm;
         entities = new ArrayList<>();
+        collectables = new ArrayList<>();
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -158,19 +163,42 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         Graphics2D g2d = (Graphics2D) g;
 
+        // Draw tile set
         tileManager.draw(g2d, cameraWorldPosition);
 
+        // Draw collectables
+        for (CollectableView collectableView : collectables) {
+            collectableView.draw(g2d, cameraWorldPosition);
+        }
+
+        // Draw entities
         for (EntityView entity : entities) {
             entity.draw(g2d, cameraWorldPosition);
         }
+
+
     }
 
     public void setEntities(ArrayList<Entity> entities) {
         this.entities.clear();
         for (Entity entity : entities) {
-            EntityView newEntity = new PlayerUnitView();
-            newEntity.setPosition(entity.getPosition());
+            EntityView newEntity = new PlayerUnitView(entity.getPosition());
             this.entities.add(newEntity);
+        }
+    }
+
+    public void setCollectables(ArrayList<Collectable> collectables) {
+        this.collectables.clear();
+        for (Collectable collectable : collectables) {
+            CollectableView newCollectable = new ChestView(collectable.getPosition());
+            System.out.println(newCollectable.getPosition());
+            this.collectables.add(newCollectable);
+        }
+    }
+
+    public void updateCollectables() {
+        for(CollectableView collectableView : collectables) {
+            collectableView.update();
         }
     }
 
@@ -192,8 +220,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
     }
 
-    public void setCameraWorldPosition(int xAmount, int yAmount){
+    public void setCameraWorldPosition(int xAmount, int yAmount) {
         cameraWorldPosition.setX(xAmount);
         cameraWorldPosition.setY(yAmount);
+    }
+
+    public void performPickUp(int collectable) {
+        this.collectables.get(collectable).pickup();
     }
 }

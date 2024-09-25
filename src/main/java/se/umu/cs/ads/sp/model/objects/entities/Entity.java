@@ -15,6 +15,7 @@ public class Entity extends GameObject {
     private Map map;
 
     public Entity(int ID, Position startPos, Map map) {
+        super(startPos);
         this.ID = ID;
         this.position = startPos;
         this.state = EntityState.IDLE;
@@ -75,6 +76,7 @@ public class Entity extends GameObject {
         }
 
         this.position = new Position(newX, newY);
+        this.collisionBox.getCollisionShape().setLocation(newX, newY);
         map.setInhabitant(this, position);
     }
 
