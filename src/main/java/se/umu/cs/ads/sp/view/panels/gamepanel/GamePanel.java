@@ -3,7 +3,8 @@ package se.umu.cs.ads.sp.view.panels.gamepanel;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.view.EntityView;
+import se.umu.cs.ads.sp.view.objects.entities.EntityView;
+import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
@@ -146,7 +147,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void setEntities(ArrayList<Entity> entities) {
         this.entities.clear();
         for (Entity entity : entities) {
-            EntityView newEntity = new EntityView();
+            EntityView newEntity = new PlayerUnitView();
             newEntity.setPosition(entity.getPosition());
             this.entities.add(newEntity);
         }
@@ -157,6 +158,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             this.entities.get(i).setEntityState(entities.get(i).getState());
             this.entities.get(i).setPosition(entities.get(i).getPosition());
             this.entities.get(i).setDestination(entities.get(i).getDestination());
+            this.entities.get(i).update();
         }
     }
 

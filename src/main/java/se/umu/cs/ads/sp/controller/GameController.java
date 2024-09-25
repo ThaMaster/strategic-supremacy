@@ -21,7 +21,7 @@ public class GameController implements ActionListener {
 
     public GameController() {
 
-        modelManager = new ModelManager(this);
+        modelManager = new ModelManager();
         tileManager = new TileManager();
         tileManager.setMap(modelManager.getMap().getModelMap());
 

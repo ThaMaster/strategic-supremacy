@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.view.animation;
 
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -21,8 +23,8 @@ public class Animator {
         return this.currentAnimation;
     }
 
-    public void addAnimation(String animationName, Animation animation) {
-        this.animations.put(animationName, animation);
+    public void addAnimation(Animation animation) {
+        this.animations.put(animation.getName(), animation);
     }
 
     public void changeAnimation(String animationName) {

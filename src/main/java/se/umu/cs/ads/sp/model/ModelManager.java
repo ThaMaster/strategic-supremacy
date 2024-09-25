@@ -11,12 +11,10 @@ import java.util.ArrayList;
 public class ModelManager {
 
     private ArrayList<Entity> gameEntities = new ArrayList<>();
-    private GameController gameController;
     private Map map;
     private int selectedUnit = 0;
 
-    public ModelManager(GameController gameController) {
-        this.gameController = gameController;
+    public ModelManager() {
         map = new Map();
 
         map.loadMap("maps/map1.txt");

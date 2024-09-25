@@ -8,14 +8,5 @@ public class PlayerUnit extends Entity {
 
     public PlayerUnit(int ID, Position startPos, Map map) {
         super(ID, startPos, map);
-
-    }
-
-    public void setStartingPosition() {
-
-    }
-
-    public void move(int x, int y) {
-
     }
 }
