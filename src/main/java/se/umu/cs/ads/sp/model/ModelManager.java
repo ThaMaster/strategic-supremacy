@@ -82,4 +82,8 @@ public class ModelManager {
     public int getSelectedUnit() {
         return selectedUnit;
     }
+
+    public Map getMap() {
+        return this.map;
+    }
 }

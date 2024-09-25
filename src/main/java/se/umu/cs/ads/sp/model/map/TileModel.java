@@ -4,15 +4,13 @@ import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectibles.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
-import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
-
-import java.util.ArrayList;
 
 public class TileModel {
 
     private TileType type;
 
+    // This only allows one entity on a tile even though multiple can be there?
     Entity entity;
     Collectable collectable;
 
@@ -23,7 +21,7 @@ public class TileModel {
         initTile(type);
     }
 
-    private void initTile(int type){
+    private void initTile(int type) {
         //Switch type
         switch (type) {
             case 0:
@@ -53,10 +51,10 @@ public class TileModel {
         return this.type;
     }
 
-    public GameObject getInhabitant(){
-        if(entity != null){
+    public GameObject getInhabitant() {
+        if (entity != null) {
             return entity;
-        }else if(collectable != null){
+        } else if (collectable != null) {
             return collectable;
         }
         return null;
@@ -70,10 +68,10 @@ public class TileModel {
         collectable = null;
     }
 
-    public void setInhabitant(GameObject inhabitant){
-        if(inhabitant instanceof Entity){
+    public void setInhabitant(GameObject inhabitant) {
+        if (inhabitant instanceof Entity) {
             entity = (Entity) inhabitant;
-        }else if(inhabitant instanceof Collectable){
+        } else if (inhabitant instanceof Collectable) {
             collectable = (Collectable) inhabitant;
         }
     }

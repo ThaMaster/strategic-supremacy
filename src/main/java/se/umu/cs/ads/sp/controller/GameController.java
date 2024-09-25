@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.controller;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.MainFrame;
+import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,12 +15,18 @@ public class GameController implements ActionListener {
 
     private Timer timer;
     private MainFrame mainFrame;
+
     private ModelManager modelManager;
+    private TileManager tileManager;
 
     public GameController() {
 
         modelManager = new ModelManager(this);
-        mainFrame = new MainFrame();
+        tileManager = new TileManager();
+        tileManager.setMap(modelManager.getMap().getModelMap());
+
+        // TODO: Fix the initialization of the tile manager (should not be passed in the constructor of the main frame)
+        mainFrame = new MainFrame(tileManager);
         this.timer = new Timer(1000 / FPS, this);
         mainFrame.getGamePanel().setGameController(this);
 

@@ -1,15 +1,14 @@
 package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -46,7 +45,6 @@ public class Map {
                 }
                 row++;
             }
-
             this.rows = map.size();
             this.cols = map.get(0).size();
 
@@ -57,7 +55,7 @@ public class Map {
     }
 
     public void setInhabitant(GameObject object, Position position) {
-        map.get(position.getY() / Constants.TILE_WIDTH).get(position.getX() / Constants.TILE_WIDTH).setInhabitant(object);
+        map.get(position.getY() / Constants.TILE_HEIGHT).get(position.getX() / Constants.TILE_WIDTH).setInhabitant(object);
     }
 
     public GameObject getInhabitant(Position position) {
@@ -80,5 +78,9 @@ public class Map {
 
         // Then load the map
         // loadMap();
+    }
+
+    public ArrayList<ArrayList<TileModel>> getModelMap() {
+        return this.map;
     }
 }

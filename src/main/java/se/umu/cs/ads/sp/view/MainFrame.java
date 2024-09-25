@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.view;
 
 import jdk.jshell.execution.Util;
 import se.umu.cs.ads.sp.view.panels.gamepanel.GamePanel;
+import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
@@ -12,13 +13,13 @@ public class MainFrame extends JFrame {
 
     private GamePanel gamePanel;
 
-    public MainFrame() {
+    public MainFrame(TileManager tm) {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setTitle("Strategic Supremacy");
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
-        this.gamePanel = new GamePanel();
+        this.gamePanel = new GamePanel(tm);
 
         setupFrame();
 
