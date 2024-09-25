@@ -4,18 +4,22 @@ import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
+import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
@@ -26,10 +30,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private GameController gController;
     private ArrayList<EntityView> entities;
     private ArrayList<CollectableView> collectables;
-
+    private SoundManager soundManager;
     private final int edgeThreshold = 50;
 
     public GamePanel(TileManager tm) {
+        this.soundManager = new SoundManager();
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
@@ -64,6 +69,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             gController.setEntityDestination(new Position(worldX, worldY));
+
+            //30 % chance we play move sound
+            if(Utils.getRandomSuccess(60)){
+                soundManager.playMove();
+            }
         }
     }
 
@@ -227,5 +237,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void performPickUp(int collectable) {
         this.collectables.get(collectable).pickup();
+        if(!this.collectables.get(collectable).hasPlayedSoundFx){
+            soundManager.play(SoundFX.OPEN_CHEST);
+            this.collectables.get(collectable).hasPlayedSoundFx = true;
+        }
     }
 }
