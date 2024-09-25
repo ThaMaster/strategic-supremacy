@@ -150,3 +150,20 @@ After completing _Milestone 5_ the project will have achieved:
 
 - Implemented **NPCs** that is controlled by an evenly distribution of players.
   - How should this communication be handled, like units or their own algorithm?
+
+## Assets
+
+This section contains the assets that was not made but rather used from other creators which of course needs to be 
+credited for their work.
+
+### Flag sprites
+
+The flag was made by _ankousse26_ which can be found [here](https://ankousse26.itch.io/).
+
+### Chest sprites
+
+The different sprites for the chest was made by _Francisco Téllez_ which can be found [here](https://franjatesa.itch.io/).
+
+### The tile sprites
+
+All the tiles used in this project was created by _SciGho_ which can be found [here](https://ninjikin.itch.io/).
