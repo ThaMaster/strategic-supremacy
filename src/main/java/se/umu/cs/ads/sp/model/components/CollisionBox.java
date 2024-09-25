@@ -5,12 +5,8 @@ import java.awt.geom.Line2D;
 
 public class CollisionBox {
     private Rectangle collisionBox;
-    private int xOffset;
-    private int yOffest;
 
     public CollisionBox(int x, int y, int width, int height) {
-        this.xOffset = x;
-        this.yOffest = y;
         this.collisionBox = new Rectangle(x, y, width, height);
     }
 

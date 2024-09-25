@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
 
@@ -18,6 +19,8 @@ public class GameController implements ActionListener {
 
     private ModelManager modelManager;
     private TileManager tileManager;
+
+    private Direction cameraPanningDirection = Direction.NONE;
 
     public GameController() {
 
@@ -47,8 +50,26 @@ public class GameController implements ActionListener {
     private void update() {
         modelManager.update();
 
-        // Updates
         mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
+
+        if(cameraPanningDirection != Direction.NONE) {
+            switch (cameraPanningDirection) {
+                case NORTH:
+                    mainFrame.getGamePanel().moveCamera(0, -5);
+                    break;
+                case SOUTH:
+                    mainFrame.getGamePanel().moveCamera(0, 5);
+                    break;
+                case WEST:
+                    mainFrame.getGamePanel().moveCamera(-5, 0);
+                    break;
+                case EAST:
+                    mainFrame.getGamePanel().moveCamera(5, 0);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void render() {
@@ -76,5 +97,9 @@ public class GameController implements ActionListener {
 
     public void stopSelectedEntity() {
         modelManager.stopSelectedEntity();
+    }
+
+    public void setCameraPanningDirection(Direction dir) {
+        this.cameraPanningDirection = dir;
     }
 }

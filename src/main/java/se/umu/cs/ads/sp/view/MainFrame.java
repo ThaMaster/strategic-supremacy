@@ -39,7 +39,6 @@ public class MainFrame extends JFrame {
 
         // Add additional panels below...
         // layeredPane.add(anotherPanel, JLayeredPane.PALETTE_LAYER);
-
     }
 
     public GamePanel getGamePanel() {

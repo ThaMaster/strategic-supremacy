@@ -46,7 +46,6 @@ public class PlayerUnitView extends EntityView {
     protected void initAnimator() {
         this.animator.addAnimation(new Animation("idle", getIdleImages(), 7));
         this.animator.addAnimation(new Animation("running", getRunningImages(), 7));
-
     }
 
     @Override

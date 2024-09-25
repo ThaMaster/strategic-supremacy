@@ -29,6 +29,7 @@ public class TileModel {
                 break;
             case 1:
                 this.type = TileType.STONE;
+                hasCollision = true;
                 break;
             case 2:
                 this.type = TileType.WATER;

@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.view.panels.gamepanel;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
@@ -21,6 +22,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private TileManager tileManager;
     private GameController gController;
     private ArrayList<EntityView> entities;
+
+    private final int edgeThreshold = 50;
 
     public GamePanel(TileManager tm) {
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
@@ -83,7 +86,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        // Not used yet
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+
+        // Get the size of the panel (or the component)
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+
+        // Check if the mouse is within the edgeThreshold from the edge
+        if (mouseX < edgeThreshold) {
+            gController.setCameraPanningDirection(Direction.WEST);
+        } else if (mouseX > panelWidth - edgeThreshold) {
+            gController.setCameraPanningDirection(Direction.EAST);
+        } else if (mouseY < edgeThreshold) {
+            gController.setCameraPanningDirection(Direction.NORTH);
+        } else if (mouseY > panelHeight - edgeThreshold) {
+            gController.setCameraPanningDirection(Direction.SOUTH);
+        } else {
+            gController.setCameraPanningDirection(Direction.NONE);
+        }
     }
 
     // KeyListener methods
@@ -164,5 +185,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void setGameController(GameController gc) {
         this.gController = gc;
+    }
+
+    public void moveCamera(int xAmount, int yAmount) {
+        cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
+        cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
     }
 }
