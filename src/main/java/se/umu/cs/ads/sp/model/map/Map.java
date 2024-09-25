@@ -9,18 +9,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 
 public class Map {
 
-    private HashMap<Integer, TileModel> tileMap;
+    // Now we store a whole object for every tile even though they are the same, did we not decide to not do this?
     private ArrayList<ArrayList<TileModel>> map;
 
     private int cols;
     private int rows;
 
     public Map() {
-        this.tileMap = new HashMap<>();
         this.map = new ArrayList<>();
         initTiles();
     }
@@ -36,16 +35,23 @@ public class Map {
 
             String line;
             int row = 0;
+            int maxCol = 0;
+            int currentCols;
             while ((line = br.readLine()) != null) {
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
                 for (String number : numbers) {
                     map.get(row).add(new TileModel(Integer.parseInt(number), Constants.TILE_WIDTH, Constants.TILE_HEIGHT));
                 }
+                currentCols = map.get(row).size();
+                if (currentCols > maxCol) {
+                    maxCol = currentCols;
+                }
                 row++;
             }
-            this.rows = map.size();
-            this.cols = map.get(0).size();
+            System.out.println(row);
+            this.rows = row;
+            this.cols = maxCol;
 
         } catch (IOException e) {
             System.out.println("ERROR");
@@ -81,5 +87,13 @@ public class Map {
 
     public ArrayList<ArrayList<TileModel>> getModelMap() {
         return this.map;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
+    public int getRows() {
+        return rows;
     }
 }

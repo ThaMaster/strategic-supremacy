@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.model;
 
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.map.Map;
+import se.umu.cs.ads.sp.model.map.TileModel;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
@@ -40,9 +41,9 @@ public class ModelManager {
     }
 
     public void setEntityDestination(Position newPosition) {
-        if(!(newPosition.getX() < 0) && !(newPosition.getY() < 0)) {
-            gameEntities.get(selectedUnit).setDestination(newPosition);
-        }
+        // Check that the new destination is within the map.
+        gameEntities.get(selectedUnit).setDestination(newPosition);
+
     }
 
     public void setSelection(Position clickLocation) {
@@ -90,5 +91,17 @@ public class ModelManager {
     public void stopSelectedEntity() {
         Entity unit = gameEntities.get(selectedUnit);
         unit.setDestination(unit.getPosition());
+    }
+
+    public boolean isWalkable(Position position) {
+        int newX = position.getX();
+        int newY = position.getY();
+        int row = newY / Constants.TILE_WIDTH;
+        int col = newX / Constants.TILE_HEIGHT;
+        return !((newX < 0) &&
+                !(newY < 0) &&
+                !(col > map.getCols()) &&
+                !(row > map.getRows())) &&
+                !map.getModelMap().get(row).get(col).hasCollision();
     }
 }

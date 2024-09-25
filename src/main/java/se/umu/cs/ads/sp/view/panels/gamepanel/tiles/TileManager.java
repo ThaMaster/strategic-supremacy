@@ -27,9 +27,11 @@ public class TileManager {
 
     public void setMap(ArrayList<ArrayList<TileModel>> modelMap) {
         viewMap = new ArrayList<>();
-        for (int y = 0; y < modelMap.size(); y++) {
+        int y = 0;
+        int x = 0;
+        for (y = 0; y < modelMap.size(); y++) {
             viewMap.add(new ArrayList<>());
-            for (int x = 0; x < modelMap.get(y).size(); x++) {
+            for (x = 0; x < modelMap.get(y).size(); x++) {
                 viewMap.get(y).add(modelMap.get(y).get(x).getType());
             }
         }
@@ -37,7 +39,7 @@ public class TileManager {
 
     public void draw(Graphics2D g2d, Position cameraWorldPosition) {
         for (int y = 0; y < viewMap.size(); y++) {
-            for (int x = 0; x < viewMap.size(); x++) {
+            for (int x = 0; x < viewMap.get(y).size(); x++) {
                 int worldX = x * UtilView.tileSize;
                 int worldY = y * UtilView.tileSize;
                 if (insideScreen(worldX, worldY)) {

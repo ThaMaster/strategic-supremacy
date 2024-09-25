@@ -10,9 +10,9 @@ public class TileModel {
 
     private TileType type;
 
-    // This only allows one entity on a tile even though multiple can be there?
-    Entity entity;
-    Collectable collectable;
+    // Why add entities to tiles, multiple entities can be on a tile atm?
+    private Entity entity;
+    private Collectable collectable;
 
     private CollisionBox collisionBox;
     private boolean hasCollision = false;
@@ -38,10 +38,6 @@ public class TileModel {
                 this.type = TileType.UNKNOWN;
                 break;
         }
-    }
-
-    public void enableCollision(boolean enable) {
-        this.hasCollision = enable;
     }
 
     public boolean hasCollision() {

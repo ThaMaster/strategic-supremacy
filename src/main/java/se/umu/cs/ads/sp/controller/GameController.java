@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
+import se.umu.cs.ads.sp.model.map.TileModel;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
@@ -80,7 +81,9 @@ public class GameController implements ActionListener {
     }
 
     public void setEntityDestination(Position newPos) {
-        modelManager.setEntityDestination(newPos);
+        if(modelManager.isWalkable(newPos)) {
+            modelManager.setEntityDestination(newPos);
+        }
     }
 
     public void setSelection(Position clickLocation){
