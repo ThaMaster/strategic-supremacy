@@ -93,4 +93,12 @@ public class Entity extends GameObject {
         this.position = new Position(newX, newY);
         map.setInhabitant(this, position);
     }
+
+    public EntityState getState() {
+        return this.state;
+    }
+
+    public Position getDestination() {
+        return this.destination;
+    }
 }

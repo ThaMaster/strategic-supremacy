@@ -38,13 +38,13 @@ public class GameController implements ActionListener {
     }
 
     private void update() {
-        // System.out.println("Updating!");
         modelManager.update();
-        mainFrame.getGamePanel().updateEntityPositions(modelManager.getGameEntities());
+
+        // Updates
+        mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
     }
 
     private void render() {
-        // System.out.println("Rendering!");
         SwingUtilities.invokeLater(() -> {
             mainFrame.getGamePanel().invalidate();
             mainFrame.getGamePanel().repaint();
@@ -61,5 +61,9 @@ public class GameController implements ActionListener {
 
     public void setSelection(int entityId){
         modelManager.setSelection(entityId);
+    }
+
+    public int getSelectedUnit() {
+        return modelManager.getSelectedUnit();
     }
 }

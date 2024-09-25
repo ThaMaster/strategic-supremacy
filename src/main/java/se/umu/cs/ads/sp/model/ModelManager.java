@@ -18,7 +18,9 @@ public class ModelManager {
     public ModelManager(GameController gameController) {
         this.gameController = gameController;
         map = new Map();
-        map.loadMap("maps\\map1.txt");
+
+        map.loadMap("maps/map1.txt");
+
 
         Entity firstUnit = new Entity(0, new Position(100, 100), map);
         Entity secondUnit = new Entity(1, new Position(300, 400), map);
@@ -29,7 +31,7 @@ public class ModelManager {
     }
 
 
-    public void update(){
+    public void update() {
         for (Entity entity : gameEntities) {
             entity.update();
         }
@@ -39,47 +41,45 @@ public class ModelManager {
         return gameEntities;
     }
 
-    public void setEntityPosition(Position newPosition){
+    public void setEntityPosition(Position newPosition) {
         gameEntities.get(selectedUnit).setDestination(newPosition);
     }
 
-    public void setSelection(Position clickLocation){
-        /*
-            Entity clickedEntity = (Entity) map.getInhabitant(clickLocation);
-
-            for (Entity entity : gameEntities) {
-                if(clickedEntity.equals(entity)){
-                    selectedUnit = entity.getID();
-                }
-            }
-         */
+    public void setSelection(Position clickLocation) {
         ArrayList<Entity> hitEntities = new ArrayList<>();
         for (Entity entity : gameEntities) {
-            if(Position.distance(entity.getPosition(), clickLocation) / Constants.ENTITY_WIDTH <= 1){
+            if (Position.distance(entity.getPosition(), clickLocation) / Constants.ENTITY_WIDTH <= 1) {
                 hitEntities.add(entity);
             }
         }
-        if(hitEntities.size() == 1){
-            selectedUnit = hitEntities.get(0).getID();
-        }else{
-            //Multiple entities were clicked. Get the entity with the closest distance from the click
-            selectedUnit = getClosestHitUnit(hitEntities, clickLocation);
+
+        if (!hitEntities.isEmpty()) {
+            if (hitEntities.size() == 1) {
+                selectedUnit = hitEntities.get(0).getID();
+            } else {
+                //Multiple entities were clicked. Get the entity with the closest distance from the click
+                selectedUnit = getClosestHitUnit(hitEntities, clickLocation);
+            }
         }
     }
 
-    public void setSelection(int selectedUnit){
+    public void setSelection(int selectedUnit) {
         this.selectedUnit = selectedUnit;
     }
 
-    private int getClosestHitUnit(ArrayList<Entity> hitEntities, Position clickLocation){
+    private int getClosestHitUnit(ArrayList<Entity> hitEntities, Position clickLocation) {
         double closestDistance = Double.MAX_VALUE;
         Entity closestEntity = hitEntities.get(0);
-        for(Entity entity : hitEntities){
-            if(Position.distance(entity.getPosition(), clickLocation) < closestDistance){
+        for (Entity entity : hitEntities) {
+            if (Position.distance(entity.getPosition(), clickLocation) < closestDistance) {
                 closestDistance = Position.distance(entity.getPosition(), clickLocation);
                 closestEntity = entity;
             }
         }
         return closestEntity.getID();
+    }
+
+    public int getSelectedUnit() {
+        return selectedUnit;
     }
 }

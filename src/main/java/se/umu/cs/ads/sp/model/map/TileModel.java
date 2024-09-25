@@ -25,7 +25,20 @@ public class TileModel {
 
     private void initTile(int type){
         //Switch type
-        this.type = TileType.GRASS;
+        switch (type) {
+            case 0:
+                this.type = TileType.GRASS;
+                break;
+            case 1:
+                this.type = TileType.STONE;
+                break;
+            case 2:
+                this.type = TileType.WATER;
+                break;
+            default:
+                this.type = TileType.UNKNOWN;
+                break;
+        }
     }
 
     public void enableCollision(boolean enable) {

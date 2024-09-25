@@ -36,7 +36,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
+            entities.get(gController.getSelectedUnit()).setSelected(false);
             gController.setSelection(new Position(e.getX(), e.getY()));
+            entities.get(gController.getSelectedUnit()).setSelected(true);
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             gController.setEntityPosition(new Position(e.getX(), e.getY()));
         }
@@ -81,9 +83,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void updateEntityPositions(ArrayList<Entity> entities) {
+    public void updateEntityViews(ArrayList<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
+            this.entities.get(i).setEntityState(entities.get(i).getState());
             this.entities.get(i).setPosition(entities.get(i).getPosition());
+            this.entities.get(i).setDestination(entities.get(i).getDestination());
         }
     }
 
@@ -99,6 +103,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void keyPressed(KeyEvent e) {
+        entities.get(gController.getSelectedUnit()).setSelected(false);
         switch (e.getKeyCode()) {
             case KeyEvent.VK_1:
                 gController.setSelection(0);
@@ -109,11 +114,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             case KeyEvent.VK_3:
                 gController.setSelection(2);
                 break;
+            default:
+                break;
         }
+        entities.get(gController.getSelectedUnit()).setSelected(true);
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         // Not used
+    }
+
+    public void handleSelection(Position selectionPosition) {
+
     }
 }

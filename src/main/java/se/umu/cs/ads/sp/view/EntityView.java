@@ -1,39 +1,54 @@
 package se.umu.cs.ads.sp.view;
 
-import se.umu.cs.ads.sp.utils.Constants;
+import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animator;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 
 public class EntityView {
 
+    private boolean selected = false;
     private Position position;
+    private Position destination;
+
+    private EntityState state;
     private Animator animator;
 
-    //Temp
-    private ArrayList<Color> colors = new ArrayList<>();
-    private final Color color;
-
     public EntityView() {
-
-        colors.add(Color.GREEN);
-        colors.add(Color.RED);
-        colors.add(Color.BLUE);
-
-        color = colors.get((int) (Math.random() * 3));
-
         this.animator = new Animator();
+    }
+
+    public void setSelected(boolean b) {
+        this.selected = b;
     }
 
     public void setPosition(Position newPosition) {
         this.position = newPosition;
     }
 
+    public void setDestination(Position newDestination) {
+        this.destination = newDestination;
+    }
+
+    public void setEntityState(EntityState newState) {
+        this.state = newState;
+    }
+
     public void draw(Graphics2D g2d) {
-        g2d.setColor(color);
-        g2d.fillRect(position.getX(), position.getY(), 16, 16);
+        if (selected) {
+            g2d.setColor(Color.GREEN);
+        } else {
+            g2d.setColor(Color.RED);
+        }
+
+        if (state == EntityState.RUNNING) {
+            g2d.drawLine(position.getX(), position.getY(), destination.getX(), destination.getY());
+        }
+
+        // Will be replaced with image later
+        g2d.fillRect(position.getX() - 8, position.getY() - 8, 16, 16);
     }
 }
