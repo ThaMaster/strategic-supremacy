@@ -94,14 +94,13 @@ public class ModelManager {
     }
 
     public boolean isWalkable(Position position) {
-        int newX = position.getX();
-        int newY = position.getY();
-        int row = newY / Constants.TILE_WIDTH;
-        int col = newX / Constants.TILE_HEIGHT;
-        return !((newX < 0) &&
-                !(newY < 0) &&
-                !(col > map.getCols()) &&
-                !(row > map.getRows())) &&
-                !map.getModelMap().get(row).get(col).hasCollision();
+        int row = position.getY() / Constants.TILE_WIDTH;
+        int col = position.getX() / Constants.TILE_HEIGHT;
+
+        if(!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
+            return !map.getModelMap().get(row).get(col).hasCollision();
+        } else {
+            return false;
+        }
     }
 }

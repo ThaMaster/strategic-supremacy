@@ -49,7 +49,6 @@ public class Map {
                 }
                 row++;
             }
-            System.out.println(row);
             this.rows = row;
             this.cols = maxCol;
 
