@@ -13,4 +13,9 @@ public class Flag extends Collectable {
 
         destroy();
     }
+
+    @Override
+    public void getReward() {
+
+    }
 }

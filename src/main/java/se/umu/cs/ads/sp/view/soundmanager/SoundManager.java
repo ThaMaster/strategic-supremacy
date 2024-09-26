@@ -14,7 +14,7 @@ public class SoundManager {
         init();
     }
 
-    public static void play(String soundFx) {
+    public void play(String soundFx) {
         String soundPath = sounds.get(soundFx);
         if (soundPath != null) {
             try {

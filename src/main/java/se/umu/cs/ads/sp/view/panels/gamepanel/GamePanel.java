@@ -19,7 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
@@ -29,9 +29,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private TileManager tileManager;
     private GameController gController;
     private ArrayList<EntityView> entities;
-    private ArrayList<CollectableView> collectables;
+    //private ArrayList<CollectableView> collectables;
+    private HashMap<Integer, CollectableView> collectables;
     private SoundManager soundManager;
     private final int edgeThreshold = 50;
+
+    private Point startDragPoint;
+    private Point endDragPoint;
+
 
     public GamePanel(TileManager tm) {
         this.soundManager = new SoundManager();
@@ -43,7 +48,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         this.tileManager = tm;
         entities = new ArrayList<>();
-        collectables = new ArrayList<>();
+        collectables = new HashMap<>();
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -53,7 +58,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        // Not used
+
     }
 
     @Override
@@ -63,15 +68,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            entities.get(gController.getSelectedUnit()).setSelected(false);
-            gController.setSelection(new Position(worldX, worldY));
-            entities.get(gController.getSelectedUnit()).setSelected(true);
-
+            //entities.get(gController.getSelectedUnit()).setSelected(false);
+           // gController.setSelection(new Position(worldX, worldY));
+            //entities.get(gController.getSelectedUnit()).setSelected(true);
+            startDragPoint = e.getPoint();
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             gController.setEntityDestination(new Position(worldX, worldY));
 
             //30 % chance we play move sound
-            if(Utils.getRandomSuccess(60)){
+            if(Utils.getRandomSuccess(80)){
                 soundManager.playMove();
             }
         }
@@ -79,7 +84,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // Not used
+        if(startDragPoint != null && endDragPoint != null) {
+            int x = Math.min(startDragPoint.x, endDragPoint.x);
+            int y = Math.min(startDragPoint.y, endDragPoint.y);
+            int width = Math.abs(startDragPoint.x - endDragPoint.x);
+            int height = Math.abs(startDragPoint.y - endDragPoint.y);
+            Rectangle area = new Rectangle(x - UtilView.screenX + cameraWorldPosition.getX(),y - UtilView.screenY + cameraWorldPosition.getY(),width,height);
+            gController.setSelectedUnit(area);
+        }
+
+        startDragPoint = null;
+        endDragPoint = null;
+        repaint();
     }
 
     @Override
@@ -94,9 +110,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        // Not used yet
-
-        // Maybe be able to drag a box to select multiple units?
+        if(e.getButton() != 0){
+            return;
+        }
+        endDragPoint = e.getPoint();
+        repaint();
     }
 
     @Override
@@ -108,6 +126,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         int panelWidth = getWidth();
         int panelHeight = getHeight();
 
+       // System.out.println("mouse x <- " + mouseX);
+      //  System.out.println("panelWidth - edgeTreshold = " + (panelWidth-edgeThreshold));
         // Check if the mouse is within the edgeThreshold from the edge
         if (mouseX < edgeThreshold) {
             gController.setCameraPanningDirection(Direction.WEST);
@@ -177,13 +197,30 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         tileManager.draw(g2d, cameraWorldPosition);
 
         // Draw collectables
-        for (CollectableView collectableView : collectables) {
+        for (CollectableView collectableView : collectables.values()) {
             collectableView.draw(g2d, cameraWorldPosition);
         }
 
         // Draw entities
         for (EntityView entity : entities) {
             entity.draw(g2d, cameraWorldPosition);
+        }
+
+        if (startDragPoint != null && endDragPoint != null) {
+            int x = Math.min(startDragPoint.x, endDragPoint.x);
+            int y = Math.min(startDragPoint.y, endDragPoint.y);
+            int width = Math.abs(startDragPoint.x - endDragPoint.x);
+            int height = Math.abs(startDragPoint.y - endDragPoint.y);
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+
+            //fill
+            g2d.setColor(Color.ORANGE);
+            g2d.fillRect(x, y, width, height);
+
+            //Border
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            g2d.setColor(Color.ORANGE);
+            g2d.drawRect(x, y, width, height);
         }
 
 
@@ -202,14 +239,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (Collectable collectable : collectables) {
             CollectableView newCollectable = new ChestView(collectable.getPosition());
             System.out.println(newCollectable.getPosition());
-            this.collectables.add(newCollectable);
+            this.collectables.put(0, newCollectable);
+            //this.collectables.add(newCollectable);
         }
     }
 
     public void updateCollectables() {
-        for(CollectableView collectableView : collectables) {
-            collectableView.update();
+        for(CollectableView collectable : collectables.values()) {
+            collectable.update();
         }
+        /*for(CollectableView collectableView : collectables) {
+            collectableView.update();
+        }*/
     }
 
     public void updateEntityViews(ArrayList<Entity> entities) {

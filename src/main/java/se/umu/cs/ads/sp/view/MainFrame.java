@@ -22,17 +22,16 @@ public class MainFrame extends JFrame {
         this.gamePanel = new GamePanel(tm);
 
         setupFrame();
-
         this.pack();
         this.setSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
     }
 
     private void setupFrame() {
         layeredPane = new JLayeredPane();
         this.setContentPane(layeredPane);
-
         // Add game panel to the layered pane
         gamePanel.setBounds(0, 0, UtilView.screenWidth, UtilView.screenHeight);
         layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER);

@@ -10,6 +10,7 @@ import se.umu.cs.ads.sp.view.MainFrame;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,9 +25,7 @@ public class GameController implements ActionListener {
     private TileManager tileManager;
 
     private Direction cameraPanningDirection = Direction.NONE;
-
     public GameController() {
-
         modelManager = new ModelManager();
         tileManager = new TileManager();
         tileManager.setMap(modelManager.getMap().getModelMap());
@@ -52,36 +51,32 @@ public class GameController implements ActionListener {
     }
 
     private void update() {
-        modelManager.update();
 
+        modelManager.update();
         for(Entity entity : modelManager.getGameEntities()) {
-            for (int i = 0; i < modelManager.getCollectables().size(); i++) {
-                Collectable collectable = modelManager.getCollectables().get(i);
-                if (entity.getCollisionBox().checkCollision(collectable.getCollisionBox())) {
-                    collectable.pickUp();
-                    mainFrame.getGamePanel().performPickUp(i);
-                }
+            for(Integer collected : entity.getCollected()){
+                mainFrame.getGamePanel().performPickUp(collected);
             }
+            entity.getCollected().clear();
         }
 
         mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
-
         mainFrame.getGamePanel().updateCollectables();
 
         // Check where to move the camera.
         if(cameraPanningDirection != Direction.NONE) {
             switch (cameraPanningDirection) {
                 case NORTH:
-                    mainFrame.getGamePanel().moveCamera(0, -5);
+                    mainFrame.getGamePanel().moveCamera(0, -10);
                     break;
                 case SOUTH:
-                    mainFrame.getGamePanel().moveCamera(0, 5);
+                    mainFrame.getGamePanel().moveCamera(0, 10);
                     break;
                 case WEST:
-                    mainFrame.getGamePanel().moveCamera(-5, 0);
+                    mainFrame.getGamePanel().moveCamera(-10, 0);
                     break;
                 case EAST:
-                    mainFrame.getGamePanel().moveCamera(5, 0);
+                    mainFrame.getGamePanel().moveCamera(10, 0);
                     break;
                 default:
                     break;
@@ -122,5 +117,9 @@ public class GameController implements ActionListener {
 
     public void setCameraPanningDirection(Direction dir) {
         this.cameraPanningDirection = dir;
+    }
+
+    public void setSelectedUnit(Rectangle area){
+        this.modelManager.setSelectedUnit(area);
     }
 }

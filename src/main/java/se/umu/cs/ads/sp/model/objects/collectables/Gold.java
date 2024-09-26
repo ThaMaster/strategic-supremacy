@@ -14,4 +14,9 @@ public class Gold extends Collectable {
     public void pickUp() {
         destroy();
     }
+
+    @Override
+    public void getReward() {
+
+    }
 }

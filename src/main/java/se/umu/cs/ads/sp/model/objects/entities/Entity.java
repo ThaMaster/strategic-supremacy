@@ -2,9 +2,12 @@ package se.umu.cs.ads.sp.model.objects.entities;
 
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
+
+import java.util.ArrayList;
 
 public class Entity extends GameObject {
     private final int ID;
@@ -13,13 +16,14 @@ public class Entity extends GameObject {
     private Position destination;
     private int speed;
     private Map map;
-
+    private ArrayList<Integer> collected;
     public Entity(int ID, Position startPos, Map map) {
         super(startPos);
         this.ID = ID;
         this.position = startPos;
         this.state = EntityState.IDLE;
         this.speed = 2;
+        collected = new ArrayList<>();
 
         // Should entities contain the map and spawn in themselves?
         this.map = map;
@@ -77,7 +81,23 @@ public class Entity extends GameObject {
 
         this.position = new Position(newX, newY);
         this.collisionBox.getCollisionShape().setLocation(newX, newY);
-        map.setInhabitant(this, position);
+
+        checkCollision();
+    }
+
+    public void checkCollision() {
+        ArrayList<Position> corners = this.getCollisionBox().getCorners();
+        for(Position corner : corners) {
+            GameObject coll = map.getInhabitant(corner);
+            if(coll instanceof Collectable collectable) {
+                this.collected.add(0);
+                collectable.getReward();
+            }
+        }
+    }
+
+    public ArrayList<Integer> getCollected(){
+        return this.collected;
     }
 
     public EntityState getState() {

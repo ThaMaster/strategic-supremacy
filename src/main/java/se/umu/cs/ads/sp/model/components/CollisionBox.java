@@ -1,7 +1,11 @@
 package se.umu.cs.ads.sp.model.components;
 
+import se.umu.cs.ads.sp.utils.Position;
+
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CollisionBox {
     private Rectangle collisionBox;
@@ -20,5 +24,14 @@ public class CollisionBox {
 
     public Rectangle getCollisionShape() {
         return this.collisionBox;
+    }
+
+    public ArrayList<Position> getCorners(){
+        return new ArrayList<>(List.of(
+                new Position(collisionBox.x, collisionBox.y),
+                new Position(collisionBox.x + collisionBox.width, collisionBox.y),
+                new Position(collisionBox.x, collisionBox.y + collisionBox.height),
+                new Position(collisionBox.x + collisionBox.width, collisionBox.y + collisionBox.height)
+        ));
     }
 }
