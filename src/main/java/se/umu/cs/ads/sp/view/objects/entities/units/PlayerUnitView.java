@@ -21,24 +21,17 @@ public class PlayerUnitView extends EntityView {
 
     @Override
     public void draw(Graphics2D g2d, Position cameraWorldPosition) {
-        if (selected) {
-            g2d.setColor(Color.GREEN);
-        } else {
-            g2d.setColor(Color.RED);
-        }
-
         int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
         int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
 
-        if (state == EntityState.RUNNING) {
+        if (state == EntityState.RUNNING && selected) {
+            g2d.setColor(Color.GREEN);
             int desScreenX = destination.getX() - cameraWorldPosition.getX() + UtilView.screenX;
             int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
             g2d.fillRect(desScreenX-4, desScreenY -4, 8, 8);
         }
 
-        // Will be replaced with image later
-        g2d.fillRect(posScreenX-8, posScreenY-8,16, 16);
         this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
     }
 
