@@ -78,12 +78,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             for (long key : gController.getSelectedUnits()) {
                 gameEntitiesView.get(key).setSelected(false);
             }
-
             startDragPoint = e.getPoint();
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             boolean allowedDestination = gController.setEntityDestination(new Position(worldX, worldY));
 
-            if (allowedDestination) {
+            if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
                 //30 % chance we play move sound
                 if (Utils.getRandomSuccess(80)) {
                     soundManager.playMove();

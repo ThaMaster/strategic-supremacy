@@ -92,12 +92,7 @@ public class GameController implements ActionListener {
     }
 
     public boolean setEntityDestination(Position newPos) {
-        if (modelManager.isWalkable(newPos)) {
-            modelManager.setEntityDestination(newPos);
-            return true;
-        }
-
-        return false;
+        return modelManager.setEntityDestination(newPos);
     }
 
     public void setSelection(Position clickLocation) {

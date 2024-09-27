@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model;
 
+import jdk.jshell.execution.Util;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -8,6 +9,7 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,6 +42,15 @@ public class ModelManager {
         gameEntities.put(secondUnit.getId(), secondUnit);
         gameEntities.put(thirdUnit.getId(), thirdUnit);
 
+
+        PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
+        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(800, 400), map);
+        PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
+
+        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
+        gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
+
         Position chestPosition = new Position(200, 100);
         Chest firstChest = new Chest(chestPosition, new Gold(chestPosition), map);
         collectables.put(firstChest.getId(), firstChest);
@@ -60,10 +71,15 @@ public class ModelManager {
         return collectables;
     }
 
-    public void setEntityDestination(Position newPosition) {
-        for (Long unit : selectedUnits) {
-            myEntities.get(unit).setDestination(newPosition);
+    public boolean setEntityDestination(Position newPosition) {
+        if (isWalkable(newPosition)) {
+            // Slightly randomise the units so they do not get the EXACT same position.
+            for (Long unit : selectedUnits) {
+                myEntities.get(unit).setDestination(newPosition);
+            }
+            return true;
         }
+        return false;
     }
 
     public void setSelection(Position clickLocation) {
@@ -78,7 +94,7 @@ public class ModelManager {
 
         if (hitEntities.size() == 1) {
             selectedUnits.add(hitEntities.get(0).getId());
-        } else {
+        } else if(hitEntities.size() > 1) {
             //Multiple entities were clicked. Get the entity with the closest distance from the click
             selectedUnits.add(getClosestHitUnit(hitEntities, clickLocation));
         }
