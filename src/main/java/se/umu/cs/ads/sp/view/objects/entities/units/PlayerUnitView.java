@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class PlayerUnitView extends EntityView {
 
-    public PlayerUnitView(Position pos) {
-        super(pos);
+    public PlayerUnitView(long id, Position pos) {
+        super(id, pos);
         initAnimator();
     }
 

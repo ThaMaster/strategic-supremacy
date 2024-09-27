@@ -1,8 +1,6 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.map.TileModel;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
@@ -25,6 +23,7 @@ public class GameController implements ActionListener {
     private TileManager tileManager;
 
     private Direction cameraPanningDirection = Direction.NONE;
+
     public GameController() {
         modelManager = new ModelManager();
         tileManager = new TileManager();
@@ -53,8 +52,8 @@ public class GameController implements ActionListener {
     private void update() {
 
         modelManager.update();
-        for(Entity entity : modelManager.getGameEntities()) {
-            for(Integer collected : entity.getCollected()){
+        for (Entity entity : modelManager.getGameEntities().values()) {
+            for (Long collected : entity.getCollected()) {
                 mainFrame.getGamePanel().performPickUp(collected);
             }
             entity.getCollected().clear();
@@ -64,7 +63,7 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().updateCollectables();
 
         // Check where to move the camera.
-        if(cameraPanningDirection != Direction.NONE) {
+        if (cameraPanningDirection != Direction.NONE) {
             switch (cameraPanningDirection) {
                 case NORTH:
                     mainFrame.getGamePanel().moveCamera(0, -10);
@@ -92,23 +91,23 @@ public class GameController implements ActionListener {
     }
 
     public void setEntityDestination(Position newPos) {
-        if(modelManager.isWalkable(newPos)) {
+        if (modelManager.isWalkable(newPos)) {
             modelManager.setEntityDestination(newPos);
         }
     }
 
-    public void setSelection(Position clickLocation){
+    public void setSelection(Position clickLocation) {
         modelManager.setSelection(clickLocation);
     }
 
-    public void setSelection(int entityId){
+    public void setSelection(long entityId) {
         modelManager.setSelection(entityId);
         Position newCameraPos = modelManager.getGameEntities().get(entityId).getPosition();
         mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos.getX(), newCameraPos.getY());
     }
 
-    public int getSelectedUnit() {
-        return modelManager.getSelectedUnit();
+    public long getSelectedUnit() {
+        return modelManager.getSelectedUnits();
     }
 
     public void stopSelectedEntity() {
@@ -119,7 +118,7 @@ public class GameController implements ActionListener {
         this.cameraPanningDirection = dir;
     }
 
-    public void setSelectedUnit(Rectangle area){
-        this.modelManager.setSelectedUnit(area);
+    public void setSelectedUnit(Rectangle area) {
+        this.modelManager.setSelectedUnits(area);
     }
 }

@@ -5,9 +5,6 @@ import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animator;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
 
-import java.awt.*;
-
-
 public abstract class EntityView extends ObjectView {
 
     protected Position destination;
@@ -16,8 +13,8 @@ public abstract class EntityView extends ObjectView {
 
     protected boolean selected = false;
 
-    public EntityView(Position pos) {
-        super(pos);
+    public EntityView(long id, Position pos) {
+        super(id, pos);
         this.animator = new Animator();
     }
 
@@ -26,7 +23,7 @@ public abstract class EntityView extends ObjectView {
     }
 
     public void setDestination(Position newDestination) {
-        if(newDestination != null && newDestination != position) {
+        if (newDestination != null && newDestination != position) {
             animator.setFlipped(position.getX() < newDestination.getX());
         }
         this.destination = newDestination;

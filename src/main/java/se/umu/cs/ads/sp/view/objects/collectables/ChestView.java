@@ -10,8 +10,8 @@ import java.awt.*;
 
 public class ChestView extends CollectableView {
 
-    public ChestView(Position pos) {
-        super(pos);
+    public ChestView(long id, Position pos) {
+        super(id, pos);
         initAnimator();
         this.animator.changeAnimation("opening");
         this.animator.pause();

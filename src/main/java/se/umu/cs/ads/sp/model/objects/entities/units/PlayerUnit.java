@@ -6,7 +6,7 @@ import se.umu.cs.ads.sp.utils.Position;
 
 public class PlayerUnit extends Entity {
 
-    public PlayerUnit(int ID, Position startPos, Map map) {
-        super(ID, startPos, map);
+    public PlayerUnit(Position startPos, Map map) {
+        super(startPos, map);
     }
 }

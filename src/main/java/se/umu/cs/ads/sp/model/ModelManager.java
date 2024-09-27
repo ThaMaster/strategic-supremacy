@@ -1,71 +1,66 @@
 package se.umu.cs.ads.sp.model;
 
-import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 public class ModelManager {
 
-    private ArrayList<Entity> gameEntities = new ArrayList<>();
-    private ArrayList<Collectable> collectables = new ArrayList<>();
-    private ArrayList<Integer> selectedUnit = new ArrayList<>();
+    // Maybe also use hashmap here?
+    private HashMap<Long, Entity> gameEntities = new HashMap<>();
+    private HashMap<Long, Collectable> collectables = new HashMap<>();
+    private ArrayList<Long> selectedUnits = new ArrayList<>();
     private Map map;
-    private int collidedCollectable = -1;
-
 
     public ModelManager() {
         map = new Map();
-        selectedUnit = new ArrayList<>();
         map.loadMap("maps/map1.txt");
 
-        Entity firstUnit = new Entity(0, new Position(100, 100), map);
-        Entity secondUnit = new Entity(1, new Position(300, 400), map);
-        Entity thirdUnit = new Entity(2, new Position(500, 100), map);
-        selectedUnit.add(0);
-        gameEntities.add(firstUnit);
-        gameEntities.add(secondUnit);
-        gameEntities.add(thirdUnit);
+        Entity firstUnit = new Entity(new Position(100, 100), map);
+        Entity secondUnit = new Entity(new Position(300, 400), map);
+        Entity thirdUnit = new Entity(new Position(500, 100), map);
+        gameEntities.put(firstUnit.getId(), firstUnit);
+        gameEntities.put(secondUnit.getId(), secondUnit);
+        gameEntities.put(thirdUnit.getId(), thirdUnit);
 
         Position chestPosition = new Position(200, 100);
         Chest firstChest = new Chest(chestPosition, new Gold(chestPosition), map);
-        collectables.add(firstChest);
+        collectables.put(firstChest.getId(), firstChest);
     }
 
     public void update() {
-        for (Entity entity : gameEntities) {
+        for (Entity entity : gameEntities.values()) {
             entity.update();
         }
     }
 
-    public ArrayList<Entity> getGameEntities() {
+    public HashMap<Long, Entity> getGameEntities() {
         return gameEntities;
     }
 
-    public ArrayList<Collectable> getCollectables() {
-
+    public HashMap<Long, Collectable> getCollectables() {
         return collectables;
     }
 
     public void setEntityDestination(Position newPosition) {
-        for(Integer unit : selectedUnit) {
+        for (Long unit : selectedUnits) {
             gameEntities.get(unit).setDestination(newPosition);
         }
     }
 
     public void setSelection(Position clickLocation) {
         ArrayList<Entity> hitEntities = new ArrayList<>();
-        int prevSelectedUnit = selectedUnit.get(0);
-        selectedUnit.clear();
-        for (Entity entity : gameEntities) {
+        long prevSelectedUnit = selectedUnits.get(0);
+        selectedUnits.clear();
+        for (Entity entity : gameEntities.values()) {
             if (Position.distance(entity.getPosition(), clickLocation) / Constants.ENTITY_WIDTH <= 1) {
                 hitEntities.add(entity);
             }
@@ -73,22 +68,22 @@ public class ModelManager {
 
         if (!hitEntities.isEmpty()) {
             if (hitEntities.size() == 1) {
-                selectedUnit.add(hitEntities.get(0).getID());
+                selectedUnits.add(hitEntities.get(0).getId());
             } else {
                 //Multiple entities were clicked. Get the entity with the closest distance from the click
-                selectedUnit.add(getClosestHitUnit(hitEntities, clickLocation));
+                selectedUnits.add(getClosestHitUnit(hitEntities, clickLocation));
             }
-        }else{
-            selectedUnit.add(prevSelectedUnit);
+        } else {
+            selectedUnits.add(prevSelectedUnit);
         }
     }
 
-    public void setSelection(int selectedUnit) {
-        this.selectedUnit.clear();
-        this.selectedUnit.add(selectedUnit);
+    public void setSelection(long selectedUnit) {
+        this.selectedUnits.clear();
+        this.selectedUnits.add(selectedUnit);
     }
 
-    private int getClosestHitUnit(ArrayList<Entity> hitEntities, Position clickLocation) {
+    private long getClosestHitUnit(ArrayList<Entity> hitEntities, Position clickLocation) {
         double closestDistance = Double.MAX_VALUE;
         Entity closestEntity = hitEntities.get(0);
         for (Entity entity : hitEntities) {
@@ -97,11 +92,11 @@ public class ModelManager {
                 closestEntity = entity;
             }
         }
-        return closestEntity.getID();
+        return closestEntity.getId();
     }
 
-    public int getSelectedUnit() {
-        return this.selectedUnit.get(0);
+    public long getSelectedUnits() {
+        return this.selectedUnits.get(0);
     }
 
     public Map getMap() {
@@ -109,7 +104,7 @@ public class ModelManager {
     }
 
     public void stopSelectedEntity() {
-        Entity unit = gameEntities.get(this.selectedUnit.get(0));
+        Entity unit = gameEntities.get(this.selectedUnits.get(0));
         unit.setDestination(unit.getPosition());
     }
 
@@ -124,23 +119,19 @@ public class ModelManager {
         }
     }
 
-    public void setSelectedUnit(Rectangle area){
-        ArrayList<Integer> hitEntities = new ArrayList<>();
-        for(Entity entity : gameEntities) {
-
-            if(entity.getCollisionBox().getCollisionShape().intersects(area)){
-                hitEntities.add(entity.getID());
-
+    public void setSelectedUnits(Rectangle area) {
+        ArrayList<Long> hitEntities = new ArrayList<>();
+        for (Entity entity : gameEntities.values()) {
+            entity.setSelected(false);
+            if (entity.getCollisionBox().getCollisionShape().intersects(area)) {
+                hitEntities.add(entity.getId());
+                entity.setSelected(true);
             }
 
         }
-        if(!hitEntities.isEmpty()){
-            selectedUnit.clear();
-            selectedUnit = hitEntities;
+        if (!hitEntities.isEmpty()) {
+            selectedUnits.clear();
+            selectedUnits = hitEntities;
         }
-    }
-
-    public void setCollidedCollectable(int i) {
-        this.collidedCollectable = i;
     }
 }

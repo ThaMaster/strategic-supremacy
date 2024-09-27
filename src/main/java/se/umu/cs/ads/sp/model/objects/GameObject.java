@@ -4,28 +4,31 @@ import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 
 public abstract class GameObject {
-    protected Integer id;
+
+    protected final long id;
     protected Position position;
     protected CollisionBox collisionBox;
 
-
-    public Integer getId(){
-        return id;
-    }
     public GameObject(Position pos) {
+        // Should the object generate it or should you need to input it to the constructor?
+        this.id = Utils.generateId();
         this.position = pos;
         collisionBox = new CollisionBox(pos.getX(), pos.getY(), Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
     }
 
     public void spawn(Map map) {
         map.setInhabitant(this, position);
-        System.out.println("I spawned");
     }
 
     public void destroy() {
         // Remove the object from game.
+    }
+
+    public long getId() {
+        return this.id;
     }
 
     public CollisionBox getCollisionBox() {

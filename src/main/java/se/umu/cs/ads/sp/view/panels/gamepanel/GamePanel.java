@@ -28,9 +28,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     private TileManager tileManager;
     private GameController gController;
-    private ArrayList<EntityView> entities;
-    //private ArrayList<CollectableView> collectables;
-    private HashMap<Integer, CollectableView> collectables;
+    private HashMap<Long, EntityView> entities = new HashMap<>();
+    private HashMap<Long, CollectableView> collectables = new HashMap<>();
     private SoundManager soundManager;
     private final int edgeThreshold = 50;
 
@@ -47,8 +46,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.cameraWorldPosition = new Position((UtilView.screenWidth / 2), (UtilView.screenHeight / 2));
 
         this.tileManager = tm;
-        entities = new ArrayList<>();
-        collectables = new HashMap<>();
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -69,14 +66,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             //entities.get(gController.getSelectedUnit()).setSelected(false);
-           // gController.setSelection(new Position(worldX, worldY));
+            // gController.setSelection(new Position(worldX, worldY));
             //entities.get(gController.getSelectedUnit()).setSelected(true);
             startDragPoint = e.getPoint();
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             gController.setEntityDestination(new Position(worldX, worldY));
 
             //30 % chance we play move sound
-            if(Utils.getRandomSuccess(80)){
+            if (Utils.getRandomSuccess(80)) {
                 soundManager.playMove();
             }
         }
@@ -84,12 +81,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(startDragPoint != null && endDragPoint != null) {
+        if (startDragPoint != null && endDragPoint != null) {
             int x = Math.min(startDragPoint.x, endDragPoint.x);
             int y = Math.min(startDragPoint.y, endDragPoint.y);
             int width = Math.abs(startDragPoint.x - endDragPoint.x);
             int height = Math.abs(startDragPoint.y - endDragPoint.y);
-            Rectangle area = new Rectangle(x - UtilView.screenX + cameraWorldPosition.getX(),y - UtilView.screenY + cameraWorldPosition.getY(),width,height);
+            Rectangle area = new Rectangle(x - UtilView.screenX + cameraWorldPosition.getX(), y - UtilView.screenY + cameraWorldPosition.getY(), width, height);
             gController.setSelectedUnit(area);
         }
 
@@ -110,7 +107,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(e.getButton() != 0){
+        if (e.getButton() != 0) {
             return;
         }
         endDragPoint = e.getPoint();
@@ -126,8 +123,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         int panelWidth = getWidth();
         int panelHeight = getHeight();
 
-       // System.out.println("mouse x <- " + mouseX);
-      //  System.out.println("panelWidth - edgeTreshold = " + (panelWidth-edgeThreshold));
+        // System.out.println("mouse x <- " + mouseX);
+        //  System.out.println("panelWidth - edgeTreshold = " + (panelWidth-edgeThreshold));
         // Check if the mouse is within the edgeThreshold from the edge
         if (mouseX < edgeThreshold) {
             gController.setCameraPanningDirection(Direction.WEST);
@@ -202,63 +199,63 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         // Draw entities
-        for (EntityView entity : entities) {
+        for (EntityView entity : entities.values()) {
             entity.draw(g2d, cameraWorldPosition);
         }
 
+        // Draw selection box
         if (startDragPoint != null && endDragPoint != null) {
-            int x = Math.min(startDragPoint.x, endDragPoint.x);
-            int y = Math.min(startDragPoint.y, endDragPoint.y);
-            int width = Math.abs(startDragPoint.x - endDragPoint.x);
-            int height = Math.abs(startDragPoint.y - endDragPoint.y);
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
-
-            //fill
-            g2d.setColor(Color.ORANGE);
-            g2d.fillRect(x, y, width, height);
-
-            //Border
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-            g2d.setColor(Color.ORANGE);
-            g2d.drawRect(x, y, width, height);
+            drawDragBox(g2d);
         }
-
-
     }
 
-    public void setEntities(ArrayList<Entity> entities) {
+    private void drawDragBox(Graphics2D g2d) {
+        int x = Math.min(startDragPoint.x, endDragPoint.x);
+        int y = Math.min(startDragPoint.y, endDragPoint.y);
+        int width = Math.abs(startDragPoint.x - endDragPoint.x);
+        int height = Math.abs(startDragPoint.y - endDragPoint.y);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+
+        // fill
+        g2d.setColor(Color.ORANGE);
+        g2d.fillRect(x, y, width, height);
+
+        // Border
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        g2d.setColor(Color.ORANGE);
+        g2d.drawRect(x, y, width, height);
+    }
+
+    public void setEntities(HashMap<Long, Entity> entities) {
         this.entities.clear();
-        for (Entity entity : entities) {
-            EntityView newEntity = new PlayerUnitView(entity.getPosition());
-            this.entities.add(newEntity);
+        for (Entity entity : entities.values()) {
+            EntityView newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
+            newEntity.setSelected(entity.isSelected());
+            this.entities.put(newEntity.getId(), newEntity);
         }
     }
 
-    public void setCollectables(ArrayList<Collectable> collectables) {
+    public void setCollectables(HashMap<Long, Collectable> collectables) {
         this.collectables.clear();
-        for (Collectable collectable : collectables) {
-            CollectableView newCollectable = new ChestView(collectable.getPosition());
-            System.out.println(newCollectable.getPosition());
-            this.collectables.put(0, newCollectable);
-            //this.collectables.add(newCollectable);
+        for (Collectable collectable : collectables.values()) {
+            CollectableView newCollectable = new ChestView(collectable.getId(), collectable.getPosition());
+            this.collectables.put(collectable.getId(), newCollectable);
         }
     }
 
     public void updateCollectables() {
-        for(CollectableView collectable : collectables.values()) {
+        for (CollectableView collectable : collectables.values()) {
             collectable.update();
         }
-        /*for(CollectableView collectableView : collectables) {
-            collectableView.update();
-        }*/
     }
 
-    public void updateEntityViews(ArrayList<Entity> entities) {
-        for (int i = 0; i < entities.size(); i++) {
-            this.entities.get(i).setEntityState(entities.get(i).getState());
-            this.entities.get(i).setPosition(entities.get(i).getPosition());
-            this.entities.get(i).setDestination(entities.get(i).getDestination());
-            this.entities.get(i).update();
+    public void updateEntityViews(HashMap<Long, Entity> entities) {
+        for (Entity entityModel : entities.values()) {
+            this.entities.get(entityModel.getId()).setEntityState(entityModel.getState());
+            this.entities.get(entityModel.getId()).setPosition(entityModel.getPosition());
+            this.entities.get(entityModel.getId()).setDestination(entityModel.getDestination());
+            this.entities.get(entityModel.getId()).setSelected(entityModel.isSelected());
+            this.entities.get(entityModel.getId()).update();
         }
     }
 
@@ -276,9 +273,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         cameraWorldPosition.setY(yAmount);
     }
 
-    public void performPickUp(int collectable) {
+    public void performPickUp(long collectable) {
         this.collectables.get(collectable).pickup();
-        if(!this.collectables.get(collectable).hasPlayedSoundFx){
+        if (!this.collectables.get(collectable).hasPlayedSoundFx) {
             soundManager.play(SoundFX.OPEN_CHEST);
             this.collectables.get(collectable).hasPlayedSoundFx = true;
         }

@@ -10,16 +10,16 @@ import se.umu.cs.ads.sp.utils.enums.EntityState;
 import java.util.ArrayList;
 
 public class Entity extends GameObject {
-    private final int ID;
 
     private EntityState state;
     private Position destination;
     private int speed;
     private Map map;
-    private ArrayList<Integer> collected;
-    public Entity(int ID, Position startPos, Map map) {
+    private ArrayList<Long> collected;
+    private boolean selected = false;
+
+    public Entity(Position startPos, Map map) {
         super(startPos);
-        this.ID = ID;
         this.position = startPos;
         this.state = EntityState.IDLE;
         this.speed = 2;
@@ -28,10 +28,6 @@ public class Entity extends GameObject {
         // Should entities contain the map and spawn in themselves?
         this.map = map;
         spawn(map);
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public void update() {
@@ -87,16 +83,24 @@ public class Entity extends GameObject {
 
     public void checkCollision() {
         ArrayList<Position> corners = this.getCollisionBox().getCorners();
-        for(Position corner : corners) {
+        for (Position corner : corners) {
             GameObject coll = map.getInhabitant(corner);
-            if(coll instanceof Collectable collectable) {
-                this.collected.add(0);
+            if (coll instanceof Collectable collectable) {
+                this.collected.add(collectable.getId());
                 collectable.getReward();
             }
         }
     }
 
-    public ArrayList<Integer> getCollected(){
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean select) {
+        this.selected = select;
+    }
+
+    public ArrayList<Long> getCollected() {
         return this.collected;
     }
 

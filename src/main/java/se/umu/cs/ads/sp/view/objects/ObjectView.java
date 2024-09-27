@@ -10,13 +10,20 @@ public abstract class ObjectView {
     protected Position position;
     protected Animator animator;
 
-    public ObjectView(Position pos) {
+    protected final long id;
+
+    public ObjectView(long id, Position pos) {
+        this.id = id;
         position = pos;
         animator = new Animator();
     }
 
     public Position getPosition() {
         return position;
+    }
+
+    public long getId() {
+        return this.id;
     }
 
     public void setPosition(Position newPosition) {
