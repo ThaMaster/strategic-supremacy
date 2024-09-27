@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class GameController implements ActionListener {
 
@@ -90,10 +91,13 @@ public class GameController implements ActionListener {
         });
     }
 
-    public void setEntityDestination(Position newPos) {
+    public boolean setEntityDestination(Position newPos) {
         if (modelManager.isWalkable(newPos)) {
             modelManager.setEntityDestination(newPos);
+            return true;
         }
+
+        return false;
     }
 
     public void setSelection(Position clickLocation) {
@@ -106,12 +110,12 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos.getX(), newCameraPos.getY());
     }
 
-    public long getSelectedUnit() {
+    public ArrayList<Long> getSelectedUnits() {
         return modelManager.getSelectedUnits();
     }
 
-    public void stopSelectedEntity() {
-        modelManager.stopSelectedEntity();
+    public void stopSelectedEntities() {
+        modelManager.stopSelectedEntities();
     }
 
     public void setCameraPanningDirection(Direction dir) {

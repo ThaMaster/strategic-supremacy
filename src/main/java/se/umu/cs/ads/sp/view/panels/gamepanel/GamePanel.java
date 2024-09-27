@@ -18,7 +18,6 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
@@ -28,7 +27,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     private TileManager tileManager;
     private GameController gController;
-    private HashMap<Long, EntityView> entities = new HashMap<>();
+    private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
     private HashMap<Long, CollectableView> collectables = new HashMap<>();
     private SoundManager soundManager;
     private final int edgeThreshold = 50;
@@ -55,7 +54,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // Only select a single unit if the user clicked
+        // Convert the mouse screen coordinates to world coordinates.
+        int worldX = e.getX() - UtilView.screenX + cameraWorldPosition.getX();
+        int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
 
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            gController.setSelection(new Position(worldX, worldY));
+
+            for (long key : gController.getSelectedUnits()) {
+                gameEntitiesView.get(key).setSelected(true);
+            }
+        }
     }
 
     @Override
@@ -65,16 +75,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            //entities.get(gController.getSelectedUnit()).setSelected(false);
-            // gController.setSelection(new Position(worldX, worldY));
-            //entities.get(gController.getSelectedUnit()).setSelected(true);
+            for (long key : gController.getSelectedUnits()) {
+                gameEntitiesView.get(key).setSelected(false);
+            }
+
             startDragPoint = e.getPoint();
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            gController.setEntityDestination(new Position(worldX, worldY));
+            boolean allowedDestination = gController.setEntityDestination(new Position(worldX, worldY));
 
-            //30 % chance we play move sound
-            if (Utils.getRandomSuccess(80)) {
-                soundManager.playMove();
+            if (allowedDestination) {
+                //30 % chance we play move sound
+                if (Utils.getRandomSuccess(80)) {
+                    soundManager.playMove();
+                }
             }
         }
     }
@@ -123,8 +136,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         int panelWidth = getWidth();
         int panelHeight = getHeight();
 
-        // System.out.println("mouse x <- " + mouseX);
-        //  System.out.println("panelWidth - edgeTreshold = " + (panelWidth-edgeThreshold));
         // Check if the mouse is within the edgeThreshold from the edge
         if (mouseX < edgeThreshold) {
             gController.setCameraPanningDirection(Direction.WEST);
@@ -147,7 +158,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void keyPressed(KeyEvent e) {
-        entities.get(gController.getSelectedUnit()).setSelected(false);
+        for (long unitIds : gController.getSelectedUnits()) {
+            gameEntitiesView.get(unitIds).setSelected(false);
+        }
         switch (e.getKeyCode()) {
             case KeyEvent.VK_1:
                 gController.setSelection(0);
@@ -159,7 +172,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 gController.setSelection(2);
                 break;
             case KeyEvent.VK_S:
-                gController.stopSelectedEntity();
+                gController.stopSelectedEntities();
                 break;
             case KeyEvent.VK_RIGHT:
                 cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
@@ -176,7 +189,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             default:
                 break;
         }
-        entities.get(gController.getSelectedUnit()).setSelected(true);
     }
 
     @Override
@@ -199,7 +211,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         // Draw entities
-        for (EntityView entity : entities.values()) {
+        for (EntityView entity : gameEntitiesView.values()) {
             entity.draw(g2d, cameraWorldPosition);
         }
 
@@ -227,11 +239,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setEntities(HashMap<Long, Entity> entities) {
-        this.entities.clear();
+        this.gameEntitiesView.clear();
         for (Entity entity : entities.values()) {
             EntityView newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
             newEntity.setSelected(entity.isSelected());
-            this.entities.put(newEntity.getId(), newEntity);
+            this.gameEntitiesView.put(newEntity.getId(), newEntity);
         }
     }
 
@@ -251,11 +263,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void updateEntityViews(HashMap<Long, Entity> entities) {
         for (Entity entityModel : entities.values()) {
-            this.entities.get(entityModel.getId()).setEntityState(entityModel.getState());
-            this.entities.get(entityModel.getId()).setPosition(entityModel.getPosition());
-            this.entities.get(entityModel.getId()).setDestination(entityModel.getDestination());
-            this.entities.get(entityModel.getId()).setSelected(entityModel.isSelected());
-            this.entities.get(entityModel.getId()).update();
+            this.gameEntitiesView.get(entityModel.getId()).setEntityState(entityModel.getState());
+            this.gameEntitiesView.get(entityModel.getId()).setPosition(entityModel.getPosition());
+            this.gameEntitiesView.get(entityModel.getId()).setDestination(entityModel.getDestination());
+            this.gameEntitiesView.get(entityModel.getId()).setSelected(entityModel.isSelected());
+            this.gameEntitiesView.get(entityModel.getId()).update();
         }
     }
 
