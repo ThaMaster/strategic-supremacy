@@ -309,7 +309,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void performPickUp(long collectable, String reward) {
-        System.out.println("Performing pick up, we have size now " + this.collectables.size());
+
         if(!this.collectables.containsKey(collectable)){
             return;
         }

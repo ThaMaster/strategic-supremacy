@@ -40,17 +40,17 @@ public class ModelManager {
 
         // Maybe totally separate this?
         gameEntities.put(firstUnit.getId(), firstUnit);
-        gameEntities.put(secondUnit.getId(), secondUnit);
-        gameEntities.put(thirdUnit.getId(), thirdUnit);
+        //gameEntities.put(secondUnit.getId(), secondUnit);
+        //gameEntities.put(thirdUnit.getId(), thirdUnit);
 
 
         PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
         PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
         PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
 
-        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
-        gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
-        gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
+        //gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
+        //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
 
         spawnChest(new Position(600,450), new Reward(10, Reward.RewardType.POINT));
         spawnChest(new Position(500, 500), new Reward(2, Reward.RewardType.MOVEMENT));
@@ -87,7 +87,6 @@ public class ModelManager {
     }
 
     public boolean setEntityDestination(Position newPosition) {
-        newPosition.printPosition("Initial");
         if (isWalkable(newPosition)) {
             // Slightly randomise the units so they do not get the EXACT same position.
             for (Long unit : selectedUnits) {

@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.objects.entities;
 
+import se.umu.cs.ads.sp.model.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -9,13 +10,12 @@ import se.umu.cs.ads.sp.utils.enums.EntityState;
 
 import java.util.ArrayList;
 
-public class Entity extends GameObject {
+public abstract class Entity extends GameObject {
 
-    private EntityState state;
+    protected EntityState state;
     private Position destination;
     private int speed;
-    private Map map;
-    private ArrayList<Collectable> collected;
+    protected Map map;
     private boolean selected = false;
 
     public Entity(Position startPos, Map map) {
@@ -23,33 +23,15 @@ public class Entity extends GameObject {
         this.position = startPos;
         this.state = EntityState.IDLE;
         this.speed = 2;
-        collected = new ArrayList<>();
 
         // Should entities contain the map and spawn in themselves?
         this.map = map;
         spawn(map);
     }
 
-    public void update() {
-        switch (state) {
-            case IDLE:
-                break;
-            case RUNNING:
-                move();
-                break;
-            case ATTACKING:
-                break;
-            case TAKING_DAMAGE:
-                break;
-            default:
-                break;
-        }
-
-        // Do other things
-    }
+    public abstract void update();
 
     public void move() {
-
         // Check if the speed is greater than the distance left
         if (Position.distance(this.position, destination) <= speed) {
             this.position = destination;
@@ -77,25 +59,9 @@ public class Entity extends GameObject {
 
         this.position = new Position(newX, newY);
         this.collisionBox.getCollisionShape().setLocation(newX, newY);
-
-        checkCollision();
     }
 
-    public void checkCollision() {
-        ArrayList<Position> corners = this.getCollisionBox().getCorners();
-        for (Position corner : corners) {
-            ArrayList<GameObject> coll = map.getInhabitants(corner);
-            for(int i = coll.size()-1; i >= 0; i--) {
-                if (coll.get(i) instanceof Collectable collectable) {
-                    if(this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())){
-                        this.collected.add(collectable);
-                        collectable.pickUp(map); //This removes the collectable from the map
-                    }
-                }
-            }
-        }
-    }
-
+    
     public boolean isSelected() {
         return selected;
     }
@@ -104,9 +70,6 @@ public class Entity extends GameObject {
         this.selected = select;
     }
 
-    public ArrayList<Collectable> getCollected() {
-        return this.collected;
-    }
 
     public EntityState getState() {
         return this.state;

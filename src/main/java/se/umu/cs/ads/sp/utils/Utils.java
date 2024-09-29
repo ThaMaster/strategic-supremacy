@@ -3,9 +3,7 @@ package se.umu.cs.ads.sp.utils;
 import java.util.Random;
 
 public class Utils {
-
     private static long currentId = 0;
-
     public static long generateId() {
         return currentId++;
     }
