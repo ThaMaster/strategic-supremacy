@@ -85,6 +85,9 @@ public class SoundManager {
 
             audioSrc = getClass().getClassLoader().getResource("audio/move6.wav");
             sounds.put(SoundFX.MOVE_6, audioSrc != null ? audioSrc.toExternalForm() : null);
+
+            audioSrc = getClass().getClassLoader().getResource("audio/gold.wav");
+            sounds.put(SoundFX.GOLD, audioSrc != null ? audioSrc.toExternalForm() : null);
         }catch(NullPointerException e){
             System.out.println("Could not load audio file");
         }

@@ -23,8 +23,8 @@ public abstract class GameObject {
         map.setInhabitant(this, position);
     }
 
-    public void destroy() {
-        // Remove the object from game.
+    public void destroy(Map map) {
+        map.removeInhabitant(this, position);
     }
 
     public long getId() {

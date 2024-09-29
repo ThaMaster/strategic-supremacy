@@ -6,13 +6,13 @@ import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 
+import java.util.ArrayList;
+
 public class TileModel {
 
     private TileType type;
 
-    // Why add entities to tiles, multiple entities can be on a tile atm?
-    private Entity entity;
-    private Collectable collectable;
+    ArrayList<GameObject> inhabitants = new ArrayList<>();
 
     private CollisionBox collisionBox;
     private boolean hasCollision = false;
@@ -48,31 +48,17 @@ public class TileModel {
         return this.type;
     }
 
-    public GameObject getInhabitant() {
-        if (entity != null) {
-            return entity;
-        } else if (collectable != null) {
-            return collectable;
-        }
-        return null;
+    public ArrayList<GameObject> getInhabitants() {
+        return inhabitants;
     }
 
-    public void removeInhabitant() {
-        entity = null;
-    }
-
-    public void removeCollectable() {
-        collectable = null;
+    public void removeInhabitant(Long id) {
+        inhabitants.removeIf(gameObject -> gameObject.getId() == id);
     }
 
     public void setInhabitant(GameObject inhabitant) {
-        if (inhabitant instanceof Entity) {
-            entity = (Entity) inhabitant;
-        } else if (inhabitant instanceof Collectable) {
-            collectable = (Collectable) inhabitant;
+        if(!inhabitants.contains(inhabitant)) {
+            inhabitants.add(inhabitant);
         }
     }
-
-
-
 }

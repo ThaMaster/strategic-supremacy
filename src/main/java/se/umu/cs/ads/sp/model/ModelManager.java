@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
+import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
@@ -44,16 +45,30 @@ public class ModelManager {
 
 
         PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
-        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(800, 400), map);
+        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
         PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
 
         gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
         gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
         gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
 
-        Position chestPosition = new Position(200, 100);
-        Chest firstChest = new Chest(chestPosition, new Gold(chestPosition), map);
-        collectables.put(firstChest.getId(), firstChest);
+        spawnChest(new Position(600,450), new Reward(10, Reward.RewardType.POINT));
+        spawnChest(new Position(500, 500), new Reward(2, Reward.RewardType.MOVEMENT));
+        spawnGold(new Position(400, 250));
+        spawnGold(new Position(450, 250));
+        spawnGold(new Position(500, 250));
+    }
+
+    private void spawnChest(Position spawnPosition, Reward reward){
+        Chest chest = new Chest(spawnPosition, map);
+        chest.setReward(reward);
+        collectables.put(chest.getId(), chest);
+    }
+
+    private void spawnGold(Position spawnPosition){
+        Gold coin = new Gold(spawnPosition, map);
+        coin.setReward(new Reward(10, Reward.RewardType.GOLD));
+        collectables.put(coin.getId(), coin);
     }
 
     public void update() {

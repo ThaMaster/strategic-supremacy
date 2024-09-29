@@ -8,14 +8,4 @@ public class Flag extends Collectable {
         super(pos);
     }
 
-    @Override
-    public void pickUp() {
-
-        destroy();
-    }
-
-    @Override
-    public void getReward() {
-
-    }
 }

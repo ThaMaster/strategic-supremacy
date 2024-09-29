@@ -1,13 +1,18 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel;
 
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
+import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
+import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
@@ -18,6 +23,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
@@ -35,13 +41,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private Point startDragPoint;
     private Point endDragPoint;
 
+    private ArrayList<TextAnimation> textAnimations = new ArrayList<>();
 
     public GamePanel(TileManager tm) {
         this.soundManager = new SoundManager();
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-
         this.cameraWorldPosition = new Position((UtilView.screenWidth / 2), (UtilView.screenHeight / 2));
 
         this.tileManager = tm;
@@ -214,6 +220,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             entity.draw(g2d, cameraWorldPosition);
         }
 
+        for (TextAnimation animation : textAnimations){
+            if(animation.hasCompleted()){
+                this.textAnimations.remove(animation);
+                this.remove(animation);
+                break;
+            }
+            animation.update();
+        }
+
         // Draw selection box
         if (startDragPoint != null && endDragPoint != null) {
             drawDragBox(g2d);
@@ -248,9 +263,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
         this.collectables.clear();
+        CollectableView newCollectable = null;
         for (Collectable collectable : collectables.values()) {
-            CollectableView newCollectable = new ChestView(collectable.getId(), collectable.getPosition());
-            this.collectables.put(collectable.getId(), newCollectable);
+            if(collectable instanceof Chest) {
+                newCollectable = new ChestView(collectable.getId(), collectable.getPosition());
+            }
+            else if(collectable instanceof Gold){
+                collectable.getPosition().printPosition("Gold");
+                newCollectable = new GoldView(collectable.getId(), collectable.getPosition());
+            }
+            if(newCollectable != null) {
+                this.collectables.put(collectable.getId(), newCollectable);
+            }
         }
     }
 
@@ -284,11 +308,30 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         cameraWorldPosition.setY(yAmount);
     }
 
-    public void performPickUp(long collectable) {
-        this.collectables.get(collectable).pickup();
-        if (!this.collectables.get(collectable).hasPlayedSoundFx) {
-            soundManager.play(SoundFX.OPEN_CHEST);
-            this.collectables.get(collectable).hasPlayedSoundFx = true;
+    public void performPickUp(long collectable, String reward) {
+        System.out.println("Performing pick up, we have size now " + this.collectables.size());
+        if(!this.collectables.containsKey(collectable)){
+            return;
         }
+        if(this.collectables.get(collectable).hasBeenCollected()){
+            return;
+        }
+
+        CollectableView collectableView = this.collectables.get(collectable);
+        collectableView.pickup();
+
+        if(collectableView instanceof ChestView){
+            soundManager.play(SoundFX.OPEN_CHEST);
+        }else if(collectableView instanceof GoldView){
+            soundManager.play(SoundFX.GOLD);
+            this.collectables.remove(collectable);
+        }
+
+        TextAnimation newAnim = new TextAnimation(reward);
+        this.textAnimations.add(newAnim);
+        this.add(newAnim);
+        this.revalidate();
+        this.repaint();
+
     }
 }

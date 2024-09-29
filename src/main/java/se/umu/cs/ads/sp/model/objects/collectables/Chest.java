@@ -7,35 +7,14 @@ import se.umu.cs.ads.sp.utils.Position;
 public class Chest extends Collectable {
 
     private boolean open = false;
-    private final GameObject containingItem;
 
-    //woifnaoif reward;
-
-    public Chest(Position pos, GameObject item, Map map) {
+    public Chest(Position pos, Map map) {
         super(pos);
-        this.containingItem = item;
         this.spawn(map);
     }
 
     @Override
-    public void pickUp() {
+    public void pickUp(Map map) {
         open = true;
     }
-
-    public GameObject collectItem() {
-        if(!open) {
-            return containingItem;
-        }
-        return null;
-    }
-
-    @Override
-    public void getReward(){
-        if(!hasBeenCollected){
-            hasBeenCollected = true;
-            System.out.println("You got 50 G");
-        }
-    }
-
-
 }

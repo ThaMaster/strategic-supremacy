@@ -8,13 +8,13 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
-public class ChestView extends CollectableView {
+public class GoldView extends CollectableView {
 
-    public ChestView(long id, Position pos) {
+    public GoldView(long id, Position pos) {
         super(id, pos);
         initAnimator();
         this.animator.changeAnimation("opening");
-        this.animator.pause();
+        //this.animator.pause();
     }
 
     @Override
@@ -25,13 +25,11 @@ public class ChestView extends CollectableView {
     @Override
     public void pickup() {
         this.hasBeenPickedUp = true;
-        animator.start();
     }
 
     @Override
     protected void initAnimator() {
-        Animation openingAnimation = new Animation("opening", ImageLoader.loadMultipleImages("/sprites/collectables/chests", "wodden_chest", 4), 7);
-        openingAnimation.setOneShot(true);
+        Animation openingAnimation = new Animation("opening", ImageLoader.loadMultipleImages("/sprites/collectables/coins", "coin", 5), 7);
         this.animator.addAnimation(openingAnimation);
     }
 

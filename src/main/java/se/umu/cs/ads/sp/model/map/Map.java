@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 
@@ -62,16 +63,16 @@ public class Map {
         map.get(position.getY() / Constants.TILE_HEIGHT).get(position.getX() / Constants.TILE_WIDTH).setInhabitant(object);
     }
 
-    public GameObject getInhabitant(Position position) {
+    public ArrayList<GameObject> getInhabitants(Position position) {
         int row = position.getY() / Constants.TILE_WIDTH;
         int col = position.getX() / Constants.TILE_HEIGHT;
-        return map.get(row).get(col).getInhabitant();
+        return map.get(row).get(col).getInhabitants();
     }
 
-    public void removeInhabitant(Position position) {
+    public void removeInhabitant(GameObject inhabitant, Position position) {
         int row = position.getY() / Constants.TILE_WIDTH;
         int col = position.getX() / Constants.TILE_HEIGHT;
-        map.get(row).get(col).removeInhabitant();
+        map.get(row).get(col).removeInhabitant(inhabitant.getId());
     }
 
     /**

@@ -11,5 +11,6 @@ public class SoundFX {
     public static String MOVE_4 = "MOVE_4";
     public static String MOVE_5 = "MOVE_5";
     public static String MOVE_6 = "MOVE_6";
+    public static String GOLD = "GOLD";
 
 }

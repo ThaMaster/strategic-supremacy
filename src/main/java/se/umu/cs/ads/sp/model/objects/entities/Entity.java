@@ -15,7 +15,7 @@ public class Entity extends GameObject {
     private Position destination;
     private int speed;
     private Map map;
-    private ArrayList<Long> collected;
+    private ArrayList<Collectable> collected;
     private boolean selected = false;
 
     public Entity(Position startPos, Map map) {
@@ -84,10 +84,14 @@ public class Entity extends GameObject {
     public void checkCollision() {
         ArrayList<Position> corners = this.getCollisionBox().getCorners();
         for (Position corner : corners) {
-            GameObject coll = map.getInhabitant(corner);
-            if (coll instanceof Collectable collectable) {
-                this.collected.add(collectable.getId());
-                collectable.getReward();
+            ArrayList<GameObject> coll = map.getInhabitants(corner);
+            for(int i = coll.size()-1; i >= 0; i--) {
+                if (coll.get(i) instanceof Collectable collectable) {
+                    if(this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())){
+                        this.collected.add(collectable);
+                        collectable.pickUp(map); //This removes the collectable from the map
+                    }
+                }
             }
         }
     }
@@ -100,7 +104,7 @@ public class Entity extends GameObject {
         this.selected = select;
     }
 
-    public ArrayList<Long> getCollected() {
+    public ArrayList<Collectable> getCollected() {
         return this.collected;
     }
 
