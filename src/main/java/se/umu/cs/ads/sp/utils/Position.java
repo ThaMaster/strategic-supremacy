@@ -33,7 +33,7 @@ public class Position {
 
     //Testing purposes
     public void printPosition(String positionName) {
-        System.out.println(positionName + " (" + x / Constants.TILE_WIDTH + ", " + y / Constants.TILE_WIDTH + ")");
+        System.out.println(positionName + " (" + x  +", " + y + ")");
     }
 
     @Override

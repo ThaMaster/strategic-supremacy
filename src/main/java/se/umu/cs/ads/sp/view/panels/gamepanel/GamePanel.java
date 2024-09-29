@@ -89,7 +89,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             boolean allowedDestination = gController.setEntityDestination(new Position(worldX, worldY));
 
             if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
-                //30 % chance we play move sound
+                //20 % chance we play move sound
                 if (Utils.getRandomSuccess(80)) {
                     soundManager.playMove();
                 }
