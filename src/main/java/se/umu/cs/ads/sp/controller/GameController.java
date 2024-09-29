@@ -1,9 +1,7 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
-import se.umu.cs.ads.sp.model.objects.entities.Entity;
-import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
@@ -55,15 +53,12 @@ public class GameController implements ActionListener {
     private void update() {
 
         modelManager.update();
-        for (Entity entity : modelManager.getGameEntities().values()) {
-            if(entity instanceof PlayerUnit){
-                PlayerUnit playerUnit = (PlayerUnit) entity;
-                for (Collectable collected : playerUnit.getCollected()) {
-                    mainFrame.getGamePanel().performPickUp(collected.getId(), collected.getReward().toString());
-                }
-                playerUnit.getCollected().clear();
-            }
+
+        for (UpdateEvent event : modelManager.getEvents()) {
+            mainFrame.getGamePanel().addEvent(event);
+            //mainFrame.getGamePanel().performPickUp(event);
         }
+        modelManager.clearEvents();
 
         mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
         mainFrame.getGamePanel().updateCollectables();

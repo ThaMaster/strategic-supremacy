@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model;
 
-import jdk.jshell.execution.Util;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -10,7 +9,9 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 
 public class ModelManager {
 
+    private int currentGold;
+    private int currentPoints;
     // My entities that I can control
     private HashMap<Long, Entity> myEntities = new HashMap<>();
 
@@ -25,12 +28,13 @@ public class ModelManager {
     private HashMap<Long, Entity> gameEntities = new HashMap<>();
     private HashMap<Long, Collectable> collectables = new HashMap<>();
     private ArrayList<Long> selectedUnits = new ArrayList<>();
-    private Map map;
+    private final Map map;
+    private ArrayList<UpdateEvent> events;
 
     public ModelManager() {
         map = new Map();
         map.loadMap("maps/map1.txt");
-
+        events = new ArrayList<>();
         PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
         PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
         PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
@@ -76,6 +80,30 @@ public class ModelManager {
         for (Entity entity : gameEntities.values()) {
             entity.update();
         }
+
+        for (Entity entity : getGameEntities().values()) {
+            if(entity instanceof PlayerUnit playerUnit){
+                for (Collectable collected : playerUnit.getCollected()) {
+                    //Should do here for example increment gold, points, add buffs depending on collected
+
+                    if(collected instanceof Chest chest){
+                        events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.CHEST_PICK_UP));
+                    }
+                    else if(collected instanceof Gold gold){
+                        events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+                    }
+                }
+                playerUnit.getCollected().clear();
+            }
+        }
+    }
+
+    public ArrayList<UpdateEvent> getEvents() {
+        return events;
+    }
+
+    public void clearEvents(){
+        this.events.clear();
     }
 
     public HashMap<Long, Entity> getGameEntities() {

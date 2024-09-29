@@ -8,8 +8,10 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
@@ -352,6 +354,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         TextAnimation newAnim = new TextAnimation(reward);
+        this.textAnimations.add(newAnim);
+        this.add(newAnim);
+        this.revalidate();
+        this.repaint();
+
+    }
+
+    public void addEvent(UpdateEvent event){
+        if(!this.collectables.containsKey(event.getId())){
+            //Not a registered collectable. Could be random info or mining gold
+            if(textAnimations.contains(event)){
+                return;
+            }
+            TextAnimation textAnim = new TextAnimation(event.getEvent());
+            if(event.getType() == EventType.GOLD_PICK_UP){
+                soundManager.play(SoundFX.GOLD);
+            }
+            this.textAnimations.add(textAnim);
+            this.add(textAnim);
+            return;
+        }
+        System.out.println("Collect!");
+        //It's a registered collectable
+        if(this.collectables.get(event.getId()).hasBeenCollected()){
+            return;
+        }
+
+        CollectableView collectableView = this.collectables.get(event.getId());
+        collectableView.pickup();
+
+        if(collectableView instanceof ChestView){
+            soundManager.play(SoundFX.OPEN_CHEST);
+        }else if(collectableView instanceof GoldView){
+            soundManager.play(SoundFX.GOLD);
+            this.collectables.remove(event.getId());
+        }
+
+        TextAnimation newAnim = new TextAnimation(event.getEvent());
         this.textAnimations.add(newAnim);
         this.add(newAnim);
         this.revalidate();
