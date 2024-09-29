@@ -6,6 +6,7 @@ import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
@@ -183,6 +184,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
                 break;
             case KeyEvent.VK_LEFT:
+                if(cameraWorldPosition.getX() < 0)
+                    return;
                 cameraWorldPosition.setX(cameraWorldPosition.getX() - 10);
                 break;
             case KeyEvent.VK_UP:
@@ -299,8 +302,29 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void moveCamera(int xAmount, int yAmount) {
-        cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
-        cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
+        if(canMoveCameraHorizontaly(xAmount)){
+            cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
+        }
+        if(canMoveCameraVertically(yAmount)){
+            cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
+        }
+    }
+    private boolean canMoveCameraVertically(int yAmount){
+        if(cameraWorldPosition.getY() + yAmount < 0){
+            return false;
+        }
+        if((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumCols())){
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean canMoveCameraHorizontaly(int xAmount){
+        if(cameraWorldPosition.getX() + xAmount < 0){
+            return false;
+        }
+        return cameraWorldPosition.getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumRows();
     }
 
     public void setCameraWorldPosition(int xAmount, int yAmount) {

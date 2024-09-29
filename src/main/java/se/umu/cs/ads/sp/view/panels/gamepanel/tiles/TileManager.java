@@ -14,6 +14,8 @@ public class TileManager {
     private HashMap<TileType, TileView> tileMap;
     private ArrayList<ArrayList<TileType>> viewMap;
 
+    private int numCols;
+    private int numRows;
     public TileManager() {
         this.tileMap = new HashMap<>();
         initTiles();
@@ -29,12 +31,26 @@ public class TileManager {
         viewMap = new ArrayList<>();
         int y = 0;
         int x = 0;
+        int longestRow = 0;
         for (y = 0; y < modelMap.size(); y++) {
             viewMap.add(new ArrayList<>());
             for (x = 0; x < modelMap.get(y).size(); x++) {
                 viewMap.get(y).add(modelMap.get(y).get(x).getType());
+                if(x > longestRow) {
+                    longestRow = x;
+                }
             }
         }
+        numCols = modelMap.size();
+        numRows = longestRow;
+    }
+
+    public int getNumCols() {
+        return numCols;
+    }
+
+    public int getNumRows() {
+        return numRows;
     }
 
     public void draw(Graphics2D g2d, Position cameraWorldPosition) {
