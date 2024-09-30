@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollisionBox {
+
     private Rectangle collisionBox;
 
-    public CollisionBox(int x, int y, int width, int height) {
-        this.collisionBox = new Rectangle(x, y, width, height);
+    public CollisionBox(Position pos, int width, int height) {
+        this.collisionBox = new Rectangle(pos.getX()-width/2, pos.getY()-height/2, width, height);
     }
 
     public boolean checkCollision(CollisionBox box) {

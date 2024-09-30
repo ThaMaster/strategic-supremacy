@@ -4,5 +4,6 @@ public enum EntityState {
     IDLE,
     RUNNING,
     ATTACKING,
-    TAKING_DAMAGE
+    TAKING_DAMAGE,
+    DEAD
 }

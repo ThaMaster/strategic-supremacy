@@ -31,7 +31,9 @@ public abstract class ObjectView {
     }
 
     public abstract void update();
+
     public abstract void draw(Graphics2D g2d, Position cameraWorldPosition);
+
     protected abstract void initAnimator();
 
 }

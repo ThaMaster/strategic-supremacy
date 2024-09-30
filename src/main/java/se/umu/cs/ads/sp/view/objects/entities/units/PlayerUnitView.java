@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class PlayerUnitView extends EntityView {
-
     public PlayerUnitView(long id, Position pos) {
         super(id, pos);
         initAnimator();
@@ -30,9 +29,13 @@ public class PlayerUnitView extends EntityView {
             int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
             g2d.fillRect(desScreenX-4, desScreenY -4, 8, 8);
+            g2d.drawRect(posScreenX-Constants.ENTITY_WIDTH/2, posScreenY-Constants.ENTITY_HEIGHT/2, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
+            g2d.setColor(Color.RED);
+            g2d.drawRect(posScreenX-(attackRange/2), posScreenY-(attackRange/2), attackRange, attackRange);
         }
 
         this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
+
     }
 
     @Override
@@ -49,6 +52,8 @@ public class PlayerUnitView extends EntityView {
                 break;
             case RUNNING:
                 this.animator.changeAnimation("running");
+                break;
+            case DEAD:
                 break;
             default:
                 break;

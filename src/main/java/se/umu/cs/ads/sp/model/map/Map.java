@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.model.map;
 
+import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Map {
 
@@ -42,7 +41,7 @@ public class Map {
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
                 for (String number : numbers) {
-                    map.get(row).add(new TileModel(Integer.parseInt(number), Constants.TILE_WIDTH, Constants.TILE_HEIGHT));
+                    map.get(row).add(new TileModel(Integer.parseInt(number)));
                 }
                 currentCols = map.get(row).size();
                 if (currentCols > maxCol) {
@@ -64,9 +63,40 @@ public class Map {
     }
 
     public ArrayList<GameObject> getInhabitants(Position position) {
-        int row = position.getY() / Constants.TILE_WIDTH;
-        int col = position.getX() / Constants.TILE_HEIGHT;
+        int row = position.getY() / Constants.TILE_HEIGHT;
+        int col = position.getX() / Constants.TILE_WIDTH;
         return map.get(row).get(col).getInhabitants();
+    }
+
+    /**
+     * Function for getting all the inhabitants from a whole collision box and not just the corners.
+     * @param cBox The collision box to check.
+     * @return the inhabitants
+     */
+    public ArrayList<GameObject> getInhabitants(CollisionBox cBox) {
+        ArrayList<GameObject> inhabitants = new ArrayList<>();
+        ArrayList<Position> corners = cBox.getCorners();
+        Position topLeft = corners.get(0);
+        Position topRight = corners.get(1);
+        Position bottomLeft = corners.get(2);
+
+        int col = topLeft.getX() / Constants.TILE_WIDTH;
+        int colEnd = topRight.getX() / Constants.TILE_WIDTH;
+        int row = topLeft.getY() / Constants.TILE_HEIGHT;
+        int rowEnd = bottomLeft.getY() / Constants.TILE_HEIGHT;
+
+        System.out.println("col -> " + col);
+        System.out.println("colEnd -> " + colEnd);
+        System.out.println("row -> " + row);
+        System.out.println("rowEnd -> " + rowEnd);
+
+        for(int y = row-1; y >= 0 && y < rowEnd && y < map.size(); y++) {
+            for(int x = col-1; x >= 0 && x < colEnd && x < map.get(y).size(); x++) {
+                inhabitants.addAll(map.get(y).get(x).getInhabitants());
+            }
+        }
+        System.out.println("inhabitants -> " + inhabitants.size());
+        return inhabitants;
     }
 
     public void removeInhabitant(GameObject inhabitant, Position position) {

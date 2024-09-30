@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.model;
 
 import se.umu.cs.ads.sp.model.map.Map;
+import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
@@ -26,21 +27,23 @@ public class ModelManager {
 
     // Other entities that I cannot control
     private HashMap<Long, Entity> gameEntities = new HashMap<>();
+
+    // All collectables
     private HashMap<Long, Collectable> collectables = new HashMap<>();
+
     private ArrayList<Long> selectedUnits = new ArrayList<>();
+    private ArrayList<UpdateEvent> events = new ArrayList<>();
     private final Map map;
-    private ArrayList<UpdateEvent> events;
 
     public ModelManager() {
         map = new Map();
         map.loadMap("maps/map1.txt");
-        events = new ArrayList<>();
         PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
-        PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
-        PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
+        //PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
+        //PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
         myEntities.put(firstUnit.getId(), firstUnit);
-        myEntities.put(secondUnit.getId(), secondUnit);
-        myEntities.put(thirdUnit.getId(), thirdUnit);
+        //myEntities.put(secondUnit.getId(), secondUnit);
+        //myEntities.put(thirdUnit.getId(), thirdUnit);
 
         // Maybe totally separate this?
         gameEntities.put(firstUnit.getId(), firstUnit);
@@ -49,10 +52,10 @@ public class ModelManager {
 
 
         PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
-        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
-        PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
+        //PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
+        //PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
 
-        //gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
         //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
         //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
 
@@ -118,6 +121,7 @@ public class ModelManager {
         if (isWalkable(newPosition)) {
             // Slightly randomise the units so they do not get the EXACT same position.
             for (Long unit : selectedUnits) {
+
                 myEntities.get(unit).setDestination(newPosition);
                 do{
                     newPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
@@ -180,14 +184,30 @@ public class ModelManager {
     }
 
     public boolean isWalkable(Position position) {
+        if (!(position.getY() < 0 || position.getX() < 0)) {
+            int row = position.getY() / Constants.TILE_WIDTH;
+            int col = position.getX() / Constants.TILE_HEIGHT;
+            if (!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
+                return !map.getModelMap().get(row).get(col).hasCollision();
+            }
+        }
+        return false;
+    }
+
+    public long containsEnemies(Position position) {
+        // Function for checking if you clicked on an enemy?
         int row = position.getY() / Constants.TILE_WIDTH;
         int col = position.getX() / Constants.TILE_HEIGHT;
 
         if (!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
-            return !map.getModelMap().get(row).get(col).hasCollision();
-        } else {
-            return false;
+            for(GameObject object : map.getModelMap().get(row).get(col).getInhabitants()) {
+                if (object instanceof Entity entity && gameEntities.containsKey(entity.getId()) && !myEntities.containsKey(entity.getId())) {
+                    return entity.getId();
+                }
+            }
         }
+
+        return -1;
     }
 
     public void setSelectedUnits(Rectangle area) {

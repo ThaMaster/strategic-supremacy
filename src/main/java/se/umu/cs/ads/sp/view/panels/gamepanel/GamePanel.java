@@ -96,6 +96,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 if (Utils.getRandomSuccess(80)) {
                     soundManager.playMove();
                 }
+
             }
         }
     }
@@ -295,6 +296,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             this.gameEntitiesView.get(entityModel.getId()).setPosition(entityModel.getPosition());
             this.gameEntitiesView.get(entityModel.getId()).setDestination(entityModel.getDestination());
             this.gameEntitiesView.get(entityModel.getId()).setSelected(entityModel.isSelected());
+            this.gameEntitiesView.get(entityModel.getId()).setAttackRange(entityModel.getAttackRange());
             this.gameEntitiesView.get(entityModel.getId()).update();
         }
     }

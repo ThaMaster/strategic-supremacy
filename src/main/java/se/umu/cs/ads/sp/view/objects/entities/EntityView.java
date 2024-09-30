@@ -8,8 +8,8 @@ import se.umu.cs.ads.sp.view.objects.ObjectView;
 public abstract class EntityView extends ObjectView {
 
     protected Position destination;
-
     protected EntityState state;
+    protected int attackRange = 0;
 
     protected boolean selected = false;
 
@@ -36,4 +36,10 @@ public abstract class EntityView extends ObjectView {
     public void update() {
         this.animator.update();
     }
+
+    public void setAttackRange(int newRange) {
+        this.attackRange = newRange;
+    }
+
+
 }

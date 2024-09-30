@@ -1,31 +1,40 @@
 package se.umu.cs.ads.sp.model.objects.entities;
 
-import se.umu.cs.ads.sp.model.Cooldown;
+import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 
-import java.util.ArrayList;
-
 public abstract class Entity extends GameObject {
 
+    protected int maxHp;
+    protected int baseHp;
+    protected int currentHp;
+
+    protected int speed;
+
+    protected CollisionBox attackBox;
+    protected int attackRange;
+
     protected EntityState state;
-    private Position destination;
-    private int speed;
     protected Map map;
+
+    private Position destination;
     private boolean selected = false;
+
+    protected long targetId = -1;
 
     public Entity(Position startPos, Map map) {
         super(startPos);
         this.position = startPos;
         this.state = EntityState.IDLE;
         this.speed = 2;
-
-        // Should entities contain the map and spawn in themselves?
+        this.baseHp = 100;
         this.map = map;
+        // Place the hitbox around the entity rather than
+        this.collisionBox = new CollisionBox(position, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
         spawn(map);
     }
 
@@ -61,7 +70,6 @@ public abstract class Entity extends GameObject {
         this.collisionBox.getCollisionShape().setLocation(newX, newY);
     }
 
-    
     public boolean isSelected() {
         return selected;
     }
@@ -70,25 +78,50 @@ public abstract class Entity extends GameObject {
         this.selected = select;
     }
 
-
     public EntityState getState() {
         return this.state;
-    }
-
-    public Position getDestination() {
-        return this.destination;
-    }
-
-    public void setSpeed(int newSpeed) {
-        this.speed = newSpeed;
     }
 
     public int getSpeed() {
         return this.speed;
     }
 
+    public void setSpeed(int newSpeed) {
+        this.speed = newSpeed;
+    }
+
+    public Position getDestination() {
+        return this.destination;
+    }
+
+    public void setAttackDestination(Position newDestination, long target) {
+        this.destination = newDestination;
+        this.targetId = target;
+        this.state = EntityState.ATTACKING;
+    }
+
     public void setDestination(Position newDestination) {
         this.destination = newDestination;
         this.state = EntityState.RUNNING;
+    }
+
+    public void setMaxHp(int hp) {
+        this.maxHp = hp;
+    }
+
+    public int getCurrentHp() {
+        return this.currentHp;
+    }
+
+    public void takeDamage(int damage) {
+        this.state = EntityState.TAKING_DAMAGE;
+        this.currentHp -= damage;
+        if (currentHp <= 0) {
+            this.state = EntityState.DEAD;
+        }
+    }
+
+    public int getAttackRange() {
+        return attackRange;
     }
 }
