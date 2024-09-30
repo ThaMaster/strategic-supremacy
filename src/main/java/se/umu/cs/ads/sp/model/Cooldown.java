@@ -2,7 +2,7 @@ package se.umu.cs.ads.sp.model;
 
 public class Cooldown {
 
-    private final long cooldown; // Cooldown duration in milliseconds
+    private final long cooldown;
     private long cooldownStartTime;
 
     public Cooldown(long cooldown) {
@@ -10,11 +10,11 @@ public class Cooldown {
     }
 
     public void start() {
-        cooldownStartTime = System.currentTimeMillis(); // Set the start time
+        cooldownStartTime = System.currentTimeMillis();
     }
 
     public void reset() {
-        start(); // Reset the cooldown by starting it again
+        start();
     }
 
     public boolean hasElapsed() {

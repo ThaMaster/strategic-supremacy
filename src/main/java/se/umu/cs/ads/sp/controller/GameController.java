@@ -34,7 +34,6 @@ public class GameController implements ActionListener {
         mainFrame = new MainFrame(tileManager);
         this.timer = new Timer(1000 / FPS, this);
         mainFrame.getGamePanel().setGameController(this);
-
         mainFrame.getGamePanel().setEntities(modelManager.getGameEntities());
         mainFrame.getGamePanel().setCollectables(modelManager.getCollectables());
         startGame();
@@ -51,7 +50,6 @@ public class GameController implements ActionListener {
     }
 
     private void update() {
-
         modelManager.update();
 
         for (UpdateEvent event : modelManager.getEvents()) {

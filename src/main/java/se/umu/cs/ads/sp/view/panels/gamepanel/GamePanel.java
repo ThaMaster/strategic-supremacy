@@ -13,6 +13,7 @@ import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
+import se.umu.cs.ads.sp.view.objects.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
@@ -45,6 +46,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private Point endDragPoint;
 
     private ArrayList<TextAnimation> textAnimations = new ArrayList<>();
+    private EnvironmentView goldPile;
 
     public GamePanel(TileManager tm) {
         this.soundManager = new SoundManager();
@@ -59,6 +61,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.addMouseMotionListener(this);
         this.setFocusable(true);  // Ensure the panel can receive key events
         this.addKeyListener(this); // Add KeyListener
+        this.goldPile = new EnvironmentView(52, new Position(200,200));
     }
 
     @Override
@@ -219,11 +222,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (CollectableView collectableView : collectables.values()) {
             collectableView.draw(g2d, cameraWorldPosition);
         }
-
+        this.goldPile.draw(g2d, cameraWorldPosition);
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
             entity.draw(g2d, cameraWorldPosition);
         }
+
+
 
         for (TextAnimation animation : textAnimations){
             if(animation.hasCompleted()){
@@ -364,18 +369,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void addEvent(UpdateEvent event){
         if(!this.collectables.containsKey(event.getId())){
             //Not a registered collectable. Could be random info or mining gold
-            if(textAnimations.contains(event)){
-                return;
-            }
+            System.out.println(event.getEvent());
             TextAnimation textAnim = new TextAnimation(event.getEvent());
             if(event.getType() == EventType.GOLD_PICK_UP){
                 soundManager.play(SoundFX.GOLD);
             }
             this.textAnimations.add(textAnim);
             this.add(textAnim);
+            this.revalidate();
+            this.repaint();
             return;
         }
-        System.out.println("Collect!");
         //It's a registered collectable
         if(this.collectables.get(event.getId()).hasBeenCollected()){
             return;

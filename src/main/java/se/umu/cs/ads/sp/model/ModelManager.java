@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.model;
 
 import se.umu.cs.ads.sp.model.map.Map;
+import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.GoldMine;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
@@ -21,6 +23,8 @@ public class ModelManager {
 
     private int currentGold;
     private int currentPoints;
+    private final Map map;
+
     // My entities that I can control
     private HashMap<Long, Entity> myEntities = new HashMap<>();
 
@@ -28,14 +32,16 @@ public class ModelManager {
     private HashMap<Long, Entity> gameEntities = new HashMap<>();
     private HashMap<Long, Collectable> collectables = new HashMap<>();
     private ArrayList<Long> selectedUnits = new ArrayList<>();
-    private final Map map;
     private ArrayList<UpdateEvent> events;
+    private ArrayList<GameObject> environment;
 
     public ModelManager() {
+        System.out.println(1);
         map = new Map();
         map.loadMap("maps/map1.txt");
+        System.out.println(2);
         events = new ArrayList<>();
-        PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
+        PlayerUnit firstUnit = new PlayerUnit(new Position(200, 200), map);
         PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
         PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
         myEntities.put(firstUnit.getId(), firstUnit);
@@ -44,23 +50,24 @@ public class ModelManager {
 
         // Maybe totally separate this?
         gameEntities.put(firstUnit.getId(), firstUnit);
-        //gameEntities.put(secondUnit.getId(), secondUnit);
-        //gameEntities.put(thirdUnit.getId(), thirdUnit);
+        gameEntities.put(secondUnit.getId(), secondUnit);
+        gameEntities.put(thirdUnit.getId(), thirdUnit);
 
 
         PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
         PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
         PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
 
-        //gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
-        //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
-        //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
+        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
+        gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
 
         spawnChest(new Position(600,450), new Reward(10, Reward.RewardType.POINT));
         spawnChest(new Position(500, 500), new Reward(2, Reward.RewardType.MOVEMENT));
         spawnGold(new Position(400, 250));
         spawnGold(new Position(450, 250));
         spawnGold(new Position(500, 250));
+        spawnGoldMine(new Position(200,200));
     }
 
     private void spawnChest(Position spawnPosition, Reward reward){
@@ -73,6 +80,11 @@ public class ModelManager {
         Gold coin = new Gold(spawnPosition, map);
         coin.setReward(new Reward(10, Reward.RewardType.GOLD));
         collectables.put(coin.getId(), coin);
+    }
+
+    private void spawnGoldMine(Position spawnPosition){
+        GoldMine goldMine = new GoldMine(spawnPosition,10);
+        goldMine.spawn(map);
     }
 
     public void update() {
@@ -90,6 +102,7 @@ public class ModelManager {
                         events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.CHEST_PICK_UP));
                     }
                     else if(collected instanceof Gold gold){
+                        System.out.println("adding gold to event");
                         events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
                     }
                 }

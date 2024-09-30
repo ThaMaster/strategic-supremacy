@@ -52,7 +52,6 @@ public class Map {
             }
             this.rows = row;
             this.cols = maxCol;
-
         } catch (IOException e) {
             System.out.println("ERROR");
             e.printStackTrace();

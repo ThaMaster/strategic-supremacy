@@ -3,11 +3,13 @@ package se.umu.cs.ads.sp.model.objects.entities.units;
 import se.umu.cs.ads.sp.model.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.GoldMine;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.EntityState;
 
 import java.util.ArrayList;
 
@@ -16,10 +18,12 @@ public class PlayerUnit extends Entity {
     private ArrayList<Collectable> collected;
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;
+    private GoldMine goldMine;
 
     public PlayerUnit(Position startPos, Map map) {
         super(startPos, map);
         collected = new ArrayList<>();
+        miningCooldown = new Cooldown(3);
     }
 
     @Override
@@ -35,6 +39,16 @@ public class PlayerUnit extends Entity {
                 break;
             case TAKING_DAMAGE:
                 break;
+            case MINING:
+                if(miningCooldown.hasElapsed() && this.goldMine.hasResourceLeft()){
+                    Collectable coin = new Gold(this.position, map);
+                    goldMine.harvestGold(1);
+                    coin.setReward(new Reward(1, Reward.RewardType.GOLD));
+                    this.collected.add(coin);
+                    coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
+                    miningCooldown.reset();
+                }
+                break;
             default:
                 break;
         }
@@ -49,14 +63,29 @@ public class PlayerUnit extends Entity {
                     if(this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())){
                         this.collected.add(collectable);
                         collectable.pickUp(map); //This removes the collectable from the map
+                        continue;
                     }
+                }
+                if(this.position.equals(getDestination()) && coll.get(i) instanceof GoldMine) {
+                    //Have reached destination and I am next to a goldmine, start mining :)
+                    goldMine = (GoldMine) coll.get(i);
+                    startMining();
                 }
             }
         }
     }
 
+
     public ArrayList<Collectable> getCollected() {
         return this.collected;
+    }
+
+    private void startMining(){
+        if(this.state == EntityState.MINING){
+            return;
+        }
+        this.state = EntityState.MINING;
+        miningCooldown.start();
     }
 
 }
