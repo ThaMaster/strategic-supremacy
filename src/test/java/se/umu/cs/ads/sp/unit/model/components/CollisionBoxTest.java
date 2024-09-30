@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
+import se.umu.cs.ads.sp.utils.Position;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -17,7 +18,7 @@ public class CollisionBoxTest {
     public void beforeMethod() {
         // Do setup for testing...
         // This method is mostly used for integration testing
-        cBox = new CollisionBox(0, 0, 10, 10);
+        cBox = new CollisionBox(new Position(0, 0), 10, 10);
     }
 
     @After
@@ -28,7 +29,7 @@ public class CollisionBoxTest {
 
     @Test
     public void createCollisionBoxWithCorrectAttributesTest() {
-        CollisionBox newCollisionBox = new CollisionBox(5, 5, 2, 2);
+        CollisionBox newCollisionBox = new CollisionBox(new Position(5, 5), 2, 2);
         Rectangle rectangle = new Rectangle(5, 5, 2, 2);
         Assert.assertEquals(newCollisionBox.getCollisionShape(), rectangle);
     }
@@ -53,25 +54,25 @@ public class CollisionBoxTest {
 
     @Test
     public void checkIntersectingCollisionBoxTest() {
-        CollisionBox cBox2 = new CollisionBox(5, 5, 10, 10);
+        CollisionBox cBox2 = new CollisionBox(new Position(5, 5), 10, 10);
         Assert.assertTrue(cBox.checkCollision(cBox2));
     }
 
     @Test
     public void checkInternalCollisionBoxTest() {
-        CollisionBox cBox2 = new CollisionBox(2, 2, 8, 8);
+        CollisionBox cBox2 = new CollisionBox(new Position(2, 2), 8, 8);
         Assert.assertTrue(cBox.checkCollision(cBox2));
     }
 
     @Test
     public void checkNonIntersectingCollisionBoxTest() {
-        CollisionBox cBox2 = new CollisionBox(20, 20, 10, 10);
+        CollisionBox cBox2 = new CollisionBox(new Position(20, 20), 10, 10);
         Assert.assertFalse(cBox.checkCollision(cBox2));
     }
 
     @Test
     public void checkLargerCollisionBoxTest() {
-        CollisionBox cBox2 = new CollisionBox(-5, -5, 20, 20);
+        CollisionBox cBox2 = new CollisionBox(new Position(-5, -5), 20, 20);
         Assert.assertTrue(cBox.checkCollision(cBox2));
     }
 }

@@ -16,7 +16,7 @@ public abstract class GameObject {
         // Should the object generate it or should you need to input it to the constructor?
         this.id = Utils.generateId();
         this.position = pos;
-        collisionBox = new CollisionBox(pos.getX(), pos.getY(), Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
+        collisionBox = new CollisionBox(position, Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
     }
 
     public void spawn(Map map) {

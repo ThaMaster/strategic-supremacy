@@ -6,4 +6,5 @@ public enum EntityState {
     ATTACKING,
     TAKING_DAMAGE,
     MINING,
+    DEAD
 }

@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.entities.units;
 
+import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
@@ -13,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class PlayerUnitView extends EntityView {
-
     public PlayerUnitView(long id, Position pos) {
         super(id, pos);
         initAnimator();
@@ -28,11 +28,18 @@ public class PlayerUnitView extends EntityView {
             g2d.setColor(Color.GREEN);
             int desScreenX = destination.getX() - cameraWorldPosition.getX() + UtilView.screenX;
             int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
+
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
-            g2d.fillRect(desScreenX-4, desScreenY -4, 8, 8);
+            g2d.fillRect(desScreenX-4, desScreenY-4, 8, 8);
+
+            if(AppSettings.DEBUG) {
+                drawCollisionBox(g2d, cameraWorldPosition);
+                g2d.setColor(Color.RED);
+                g2d.drawRect(posScreenX - (attackRange / 2), posScreenY - (attackRange / 2), attackRange, attackRange);
+            }
         }
 
-        this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
+        this.animator.draw(g2d, new Position(posScreenX, posScreenY));
     }
 
     @Override
@@ -49,6 +56,8 @@ public class PlayerUnitView extends EntityView {
                 break;
             case RUNNING:
                 this.animator.changeAnimation("running");
+                break;
+            case DEAD:
                 break;
             default:
                 break;

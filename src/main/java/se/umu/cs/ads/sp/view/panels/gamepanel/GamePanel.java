@@ -281,6 +281,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             else if(collectable instanceof Gold){
                 collectable.getPosition().printPosition("Gold");
                 newCollectable = new GoldView(collectable.getId(), collectable.getPosition());
+                newCollectable.setCollisionBox(collectable.getCollisionBox());
             }
             if(newCollectable != null) {
                 this.collectables.put(collectable.getId(), newCollectable);
@@ -300,6 +301,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             this.gameEntitiesView.get(entityModel.getId()).setPosition(entityModel.getPosition());
             this.gameEntitiesView.get(entityModel.getId()).setDestination(entityModel.getDestination());
             this.gameEntitiesView.get(entityModel.getId()).setSelected(entityModel.isSelected());
+            this.gameEntitiesView.get(entityModel.getId()).setAttackRange(entityModel.getAttackRange());
+            this.gameEntitiesView.get(entityModel.getId()).setCollisionBox(entityModel.getCollisionBox());
             this.gameEntitiesView.get(entityModel.getId()).update();
         }
     }

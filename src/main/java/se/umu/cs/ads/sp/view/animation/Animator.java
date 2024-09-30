@@ -48,9 +48,9 @@ public class Animator {
         if(currentAnimation != null) {
             BufferedImage frame = currentAnimation.getCurrentFrame();
             if(flipped) {
-                g2d.drawImage(frame, frame.getWidth()+pos.getX(), pos.getY(), -frame.getWidth(), frame.getHeight(), null);
+                g2d.drawImage(frame, frame.getWidth()+pos.getX() - (frame.getWidth()/2), pos.getY() - (frame.getHeight()/2), -frame.getWidth(), frame.getHeight(), null);
             } else {
-                g2d.drawImage(frame, pos.getX(), pos.getY(), frame.getWidth(), frame.getHeight(), null);
+                g2d.drawImage(frame, pos.getX() - (frame.getWidth()/2), pos.getY() - (frame.getHeight()/2), frame.getWidth(), frame.getHeight(), null);
             }
         }
     }

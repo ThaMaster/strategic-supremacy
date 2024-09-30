@@ -1,9 +1,6 @@
 package se.umu.cs.ads.sp.model.map;
 
-import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
-import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 
 import java.util.ArrayList;
@@ -14,10 +11,9 @@ public class TileModel {
 
     ArrayList<GameObject> inhabitants = new ArrayList<>();
 
-    private CollisionBox collisionBox;
     private boolean hasCollision = false;
 
-    public TileModel(int type, int width, int height) {
+    public TileModel(int type) {
         initTile(type);
     }
 
@@ -57,7 +53,7 @@ public class TileModel {
     }
 
     public void setInhabitant(GameObject inhabitant) {
-        if(!inhabitants.contains(inhabitant)) {
+        if (!inhabitants.contains(inhabitant)) {
             inhabitants.add(inhabitant);
         }
     }

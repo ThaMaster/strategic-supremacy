@@ -7,6 +7,7 @@ import se.umu.cs.ads.sp.utils.Position;
 public abstract class Collectable extends GameObject {
     protected boolean hasBeenCollected;
     protected Reward reward;
+
     public Collectable(Position pos) {
         super(pos);
         hasBeenCollected = false;

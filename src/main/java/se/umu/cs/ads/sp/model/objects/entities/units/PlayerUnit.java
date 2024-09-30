@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.model.objects.entities.units;
 
-import se.umu.cs.ads.sp.model.Cooldown;
+import org.checkerframework.checker.units.qual.C;
+import se.umu.cs.ads.sp.model.components.CollisionBox;
+import se.umu.cs.ads.sp.model.components.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.GoldMine;
@@ -15,15 +17,24 @@ import java.util.ArrayList;
 
 public class PlayerUnit extends Entity {
 
-    private ArrayList<Collectable> collected;
+    private ArrayList<Collectable> collected = new ArrayList<>();
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;
     private GoldMine goldMine;
 
+    private final int attack;
+    private int attackBuff;
+
     public PlayerUnit(Position startPos, Map map) {
         super(startPos, map);
-        collected = new ArrayList<>();
         miningCooldown = new Cooldown(3);
+        this.baseHp = 100;
+        this.maxHp = baseHp;
+        this.currentHp = maxHp;
+        this.attack = 10;
+        this.attackBuff = 0;
+        this.attackRange = 250;
+        this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
     @Override
@@ -48,6 +59,9 @@ public class PlayerUnit extends Entity {
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
                 }
+                break;
+            case DEAD:
+                System.out.println("Unit is dead!");
                 break;
             default:
                 break;
@@ -75,11 +89,17 @@ public class PlayerUnit extends Entity {
         }
     }
 
-
     public ArrayList<Collectable> getCollected() {
         return this.collected;
     }
 
+    public void setAttackBuff(int newBuff) {
+        this.attackBuff = newBuff;
+    }
+
+    public void attack(Entity e) {
+        e.takeDamage(attack + attackBuff);
+    }
     private void startMining(){
         if(this.state == EntityState.MINING){
             return;

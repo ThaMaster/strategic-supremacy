@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.model;
+package se.umu.cs.ads.sp.model.components;
 
 public class Cooldown {
 
