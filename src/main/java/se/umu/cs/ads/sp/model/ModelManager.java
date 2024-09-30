@@ -194,22 +194,6 @@ public class ModelManager {
         return false;
     }
 
-    public long containsEnemies(Position position) {
-        // Function for checking if you clicked on an enemy?
-        int row = position.getY() / Constants.TILE_WIDTH;
-        int col = position.getX() / Constants.TILE_HEIGHT;
-
-        if (!(col < 0) && !(row < 0) && !(col >= map.getCols()) && !(row >= map.getRows())) {
-            for(GameObject object : map.getModelMap().get(row).get(col).getInhabitants()) {
-                if (object instanceof Entity entity && gameEntities.containsKey(entity.getId()) && !myEntities.containsKey(entity.getId())) {
-                    return entity.getId();
-                }
-            }
-        }
-
-        return -1;
-    }
-
     public void setSelectedUnits(Rectangle area) {
         ArrayList<Long> hitEntities = new ArrayList<>();
         for (Entity entity : myEntities.values()) {

@@ -44,6 +44,7 @@ public abstract class Entity extends GameObject {
         // Check if the speed is greater than the distance left
         if (Position.distance(this.position, destination) <= speed) {
             this.position = destination;
+            this.collisionBox.setLocation(destination);
             this.state = EntityState.IDLE;
             map.setInhabitant(this, position);
             return;
@@ -67,7 +68,7 @@ public abstract class Entity extends GameObject {
         }
 
         this.position = new Position(newX, newY);
-        this.collisionBox.getCollisionShape().setLocation(newX, newY);
+        this.collisionBox.setLocation(position);
     }
 
     public boolean isSelected() {

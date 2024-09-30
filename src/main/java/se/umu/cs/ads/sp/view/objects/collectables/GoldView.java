@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.collectables;
 
-import se.umu.cs.ads.sp.utils.Constants;
+import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
@@ -14,7 +14,6 @@ public class GoldView extends CollectableView {
         super(id, pos);
         initAnimator();
         this.animator.changeAnimation("opening");
-        //this.animator.pause();
     }
 
     @Override
@@ -35,8 +34,12 @@ public class GoldView extends CollectableView {
 
     @Override
     public void draw(Graphics2D g2d, Position cameraWorldPosition) {
+        if(AppSettings.DEBUG) {
+            g2d.setColor(Color.BLUE);
+            drawCollisionBox(g2d, cameraWorldPosition);
+        }
         int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
         int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
-        this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
+        this.animator.draw(g2d, new Position(posScreenX, posScreenY));
     }
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Map {
 
@@ -40,6 +41,7 @@ public class Map {
             while ((line = br.readLine()) != null) {
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
+                System.out.println(Arrays.toString(numbers));
                 for (String number : numbers) {
                     map.get(row).add(new TileModel(Integer.parseInt(number)));
                 }

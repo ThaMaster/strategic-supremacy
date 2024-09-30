@@ -40,6 +40,4 @@ public abstract class EntityView extends ObjectView {
     public void setAttackRange(int newRange) {
         this.attackRange = newRange;
     }
-
-
 }

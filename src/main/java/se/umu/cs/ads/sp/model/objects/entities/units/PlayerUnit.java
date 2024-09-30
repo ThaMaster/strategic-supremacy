@@ -56,8 +56,13 @@ public class PlayerUnit extends Entity {
 
     public boolean checkCollision(CollisionBox cBox) {
         ArrayList<Position> corners = cBox.getCorners();
+        int q = 0;
         for (Position corner : corners) {
             ArrayList<GameObject> coll = map.getInhabitants(corner);
+            if(q == 0) {
+                System.out.println(corner);
+                q++;
+            }
             for (int i = coll.size() - 1; i >= 0; i--) {
                 if (coll.get(i) instanceof Collectable collectable) {
                     if (cBox.checkCollision(coll.get(i).getCollisionBox())) {
