@@ -131,11 +131,12 @@ public class ModelManager {
     public boolean setEntityDestination(Position newPosition) {
         if (isWalkable(newPosition)) {
             // Slightly randomise the units so they do not get the EXACT same position.
+            Position offsetPosition = newPosition;
             for (Long unit : selectedUnits) {
-                myEntities.get(unit).setDestination(newPosition);
+                myEntities.get(unit).setDestination(offsetPosition);
                 do{
-                    newPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
-                }while(!isWalkable(newPosition));
+                    offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
+                }while(!isWalkable(offsetPosition));
             }
             return true;
         }
