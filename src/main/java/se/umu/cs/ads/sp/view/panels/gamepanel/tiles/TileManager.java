@@ -29,8 +29,8 @@ public class TileManager {
 
     private void initTiles() {
         // Load all tiles and make them to objects.
-        tileMap.put(TileType.GRASS, new TileView("plain", ImageLoader.loadImage("/sprites/tiles/grass.png")));
-        tileMap.put(TileType.STONE, new TileView("plain", ImageLoader.loadImage("/sprites/tiles/stone.png")));
+        tileMap.put(TileType.GRASS, new TileView("plain", ImageLoader.loadImage("/sprites/tiles/grass.png"), ImageLoader.loadImage("/sprites/tiles/grassDark.png")));
+        tileMap.put(TileType.STONE, new TileView("plain", ImageLoader.loadImage("/sprites/tiles/stone.png"), ImageLoader.loadImage("/sprites/tiles/stoneDark.png")));
     }
 
     public void setMap(ArrayList<ArrayList<TileModel>> modelMap) {
@@ -64,13 +64,16 @@ public class TileManager {
                 int worldX = x * UtilView.tileSize;
                 int worldY = y * UtilView.tileSize;
                 if (insideScreen(worldX, worldY)) {
+                    TileType type = viewMap.get(y).get(x);
+                    int screenX = worldX - cameraWorldPosition.getX() + UtilView.screenX;
+                    int screenY = worldY - cameraWorldPosition.getY() + UtilView.screenY;
+                    BufferedImage image;
                     if(fowView.isInFow(new Position(worldX, worldY))) {
-                        TileType type = viewMap.get(y).get(x);
-                        int screenX = worldX - cameraWorldPosition.getX() + UtilView.screenX;
-                        int screenY = worldY - cameraWorldPosition.getY() + UtilView.screenY;
-                        BufferedImage image = tileMap.get(type).getImage();
-                        g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
+                        image = tileMap.get(type).getImage("light");
+                    }else{
+                        image = tileMap.get(type).getImage("dark");
                     }
+                    g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
                 }
             }
         }

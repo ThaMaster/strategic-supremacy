@@ -10,17 +10,22 @@ public class TileView {
 
     private final String variant;
     private final BufferedImage image;
+    private final BufferedImage darkImage;
 
-    public TileView(String variant, BufferedImage tileImage) {
+    public TileView(String variant, BufferedImage tileImage, BufferedImage darkImage) {
         this.variant = variant;
         this.image = tileImage;
+        this.darkImage = darkImage;
     }
 
     public String getVariant() {
         return this.variant;
     }
 
-    public BufferedImage getImage() {
+    public BufferedImage getImage(String mode) {
+        if(mode == "dark")
+            return darkImage;
+
         return this.image;
     }
 
