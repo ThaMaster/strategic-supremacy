@@ -30,7 +30,7 @@ public class ChestView extends CollectableView {
 
     @Override
     protected void initAnimator() {
-        Animation openingAnimation = new Animation("opening", ImageLoader.loadMultipleImages("/sprites/collectables/chests", "wodden_chest", 4), 7);
+        Animation openingAnimation = new Animation("opening", ImageLoader.loadImages("/sprites/collectables/chests", "wodden_chest", 4), 7);
         openingAnimation.setOneShot(true);
         this.animator.addAnimation(openingAnimation);
     }

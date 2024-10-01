@@ -28,7 +28,7 @@ public class GoldView extends CollectableView {
 
     @Override
     protected void initAnimator() {
-        Animation openingAnimation = new Animation("opening", ImageLoader.loadMultipleImages("/sprites/collectables/coins", "coin", 5), 7);
+        Animation openingAnimation = new Animation("opening", ImageLoader.loadImages("/sprites/collectables/coins", "coin", 5), 7);
         this.animator.addAnimation(openingAnimation);
     }
 

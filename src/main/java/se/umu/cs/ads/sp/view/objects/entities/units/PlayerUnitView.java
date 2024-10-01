@@ -1,7 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.entities.units;
 
 import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animation;
@@ -30,9 +29,9 @@ public class PlayerUnitView extends EntityView {
             int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
 
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
-            g2d.fillRect(desScreenX-4, desScreenY-4, 8, 8);
+            g2d.fillRect(desScreenX - 4, desScreenY - 4, 8, 8);
 
-            if(AppSettings.DEBUG) {
+            if (AppSettings.DEBUG) {
                 drawCollisionBox(g2d, cameraWorldPosition);
                 g2d.setColor(Color.RED);
                 g2d.drawRect(posScreenX - (attackRange / 2), posScreenY - (attackRange / 2), attackRange, attackRange);
@@ -44,8 +43,22 @@ public class PlayerUnitView extends EntityView {
 
     @Override
     protected void initAnimator() {
-        this.animator.addAnimation(new Animation("idle", getIdleImages(), 7));
-        this.animator.addAnimation(new Animation("running", getRunningImages(), 7));
+        this.animator.addAnimation(
+                new Animation(
+                        "idle",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/idle", "idle", 3)
+                        , 7));
+        this.animator.addAnimation(
+                new Animation(
+                        "running",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/run", "run", 3)
+                        , 7));
+        this.animator.addAnimation(
+                new Animation(
+                        "mining",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/mining", "mining", 3)
+                        , 7));
+
     }
 
     @Override
@@ -57,6 +70,8 @@ public class PlayerUnitView extends EntityView {
             case RUNNING:
                 this.animator.changeAnimation("running");
                 break;
+            case MINING:
+                this.animator.changeAnimation("mining");
             case DEAD:
                 break;
             default:
@@ -80,5 +95,4 @@ public class PlayerUnitView extends EntityView {
         }
         return images;
     }
-
 }

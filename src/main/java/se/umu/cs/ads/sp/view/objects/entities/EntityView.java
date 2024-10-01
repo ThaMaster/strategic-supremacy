@@ -33,6 +33,10 @@ public abstract class EntityView extends ObjectView {
         this.state = newState;
     }
 
+    public EntityState getEntityState() {
+        return this.state;
+    }
+
     public void update() {
         this.animator.update();
     }
