@@ -17,6 +17,7 @@ public abstract class ObjectView {
 
 
     public ObjectView(long id, Position pos) {
+        this.collisionBox = new CollisionBox(pos, 0,0);
         this.id = id;
         position = pos;
         animator = new Animator();

@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Map {
 
@@ -69,11 +68,16 @@ public class Map {
     }
 
     public ArrayList<GameObject> getInhabitants(int row, int col) {
-        return map.get(row).get(col).getInhabitants();
+        if (inBounds(row, col)) {
+            return map.get(row).get(col).getInhabitants();
+        }
+
+        return new ArrayList<>();
     }
 
     /**
      * Function for getting all the inhabitants from a whole collision box and not just the corners.
+     *
      * @param cBox The collision box to check.
      * @return the inhabitants
      */
@@ -89,8 +93,8 @@ public class Map {
         int row = topLeft.getY() / Constants.TILE_HEIGHT;
         int rowEnd = bottomLeft.getY() / Constants.TILE_HEIGHT;
 
-        for(int y = row-1; y >= 0 && y < rowEnd && y < map.size(); y++) {
-            for(int x = col-1; x >= 0 && x < colEnd && x < map.get(y).size(); x++) {
+        for (int y = row - 1; y >= 0 && y < rowEnd && y < map.size(); y++) {
+            for (int x = col - 1; x >= 0 && x < colEnd && x < map.get(y).size(); x++) {
                 inhabitants.addAll(map.get(y).get(x).getInhabitants());
             }
         }
@@ -123,5 +127,9 @@ public class Map {
 
     public int getRows() {
         return rows;
+    }
+
+    public boolean inBounds(int row, int col) {
+        return row >= 0 && row < map.size() && col >= 0 && col < map.get(row).size();
     }
 }

@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model.objects.entities;
 
-import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -8,26 +7,17 @@ import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 
-import java.util.ArrayList;
-
 public abstract class Entity extends GameObject {
 
     protected int maxHp;
     protected int baseHp;
     protected int currentHp;
-
     protected int speed;
-
     protected CollisionBox attackBox;
-    protected int attackRange;
-
     protected EntityState state;
     protected Map map;
-
-    private Position destination;
+    protected Position destination;
     private boolean selected = false;
-
-    protected long targetId = -1;
 
     public Entity(Position startPos, Map map) {
         super(startPos);
@@ -98,45 +88,9 @@ public abstract class Entity extends GameObject {
         return this.destination;
     }
 
-    public void setAttackDestination(Position newDestination, long target) {
-        this.destination = newDestination;
-        this.targetId = target;
-        this.state = EntityState.ATTACKING;
-    }
-
     public void setDestination(Position newDestination) {
-        long entityHit = checkEntityHit(newDestination);
-        if(entityHit != -1) {
-            System.out.println("Hit entity with Id: " + entityHit);
-        }
-
         this.destination = newDestination;
         this.state = EntityState.RUNNING;
-    }
-
-    private long checkEntityHit(Position position) {
-        // Make this smarter in some way?
-        int col = position.getX() / Constants.TILE_WIDTH;
-        int row = position.getY() / Constants.TILE_HEIGHT;
-
-        int colOffset = (position.getX() % Constants.TILE_WIDTH > Constants.TILE_WIDTH / 2) ? 1 : -1;
-        int rowOffset = (position.getY() % Constants.TILE_HEIGHT > Constants.TILE_HEIGHT / 2) ? 1 : -1;
-
-        ArrayList<Pair<Integer, Integer>> pairsToCheck = new ArrayList<>();
-        pairsToCheck.add(Pair.of(row, col));
-        pairsToCheck.add(Pair.of(row + rowOffset, col));
-        pairsToCheck.add(Pair.of(row, col + colOffset));
-        pairsToCheck.add(Pair.of(row + rowOffset, col + colOffset));
-
-        for(Pair<Integer, Integer> pair : pairsToCheck) {
-            for (GameObject object : map.getInhabitants(pair.getLeft(), pair.getRight())) {
-                if (object instanceof Entity entity && entity.getCollisionBox().contains(position)) {
-                    return entity.getId();
-                }
-            }
-        }
-
-        return -1;
     }
 
     public void setMaxHp(int hp) {
@@ -153,9 +107,5 @@ public abstract class Entity extends GameObject {
         if (currentHp <= 0) {
             this.state = EntityState.DEAD;
         }
-    }
-
-    public int getAttackRange() {
-        return attackRange;
     }
 }

@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
 import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
@@ -34,7 +34,7 @@ public class GameController implements ActionListener {
         mainFrame = new MainFrame(tileManager);
         this.timer = new Timer(1000 / FPS, this);
         mainFrame.getGamePanel().setGameController(this);
-        mainFrame.getGamePanel().setEntities(modelManager.getGameEntities());
+        mainFrame.getGamePanel().setEntities(modelManager.getMyUnits(), modelManager.getGameEntities());
         mainFrame.getGamePanel().setCollectables(modelManager.getCollectables());
         startGame();
     }

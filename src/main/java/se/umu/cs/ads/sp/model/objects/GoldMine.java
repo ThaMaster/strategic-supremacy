@@ -11,15 +11,15 @@ public class GoldMine extends GameObject {
         this.goldReserve = goldReserve;
     }
 
-    public void harvestGold(int amount){
+    public void harvestGold(int amount) {
         goldReserve -= amount;
     }
 
-    public boolean hasResourceLeft(){
+    public boolean hasResourceLeft() {
         return goldReserve >= 0;
     }
 
-    public int getGoldReserve(){
+    public int getGoldReserve() {
         return goldReserve;
     }
 }

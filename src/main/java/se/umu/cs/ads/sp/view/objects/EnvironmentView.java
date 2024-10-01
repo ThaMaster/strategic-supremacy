@@ -31,6 +31,10 @@ public class EnvironmentView {
         }
         int screenX = pos.getX() - position.getX() + UtilView.screenX;
         int screenY = pos.getY() - position.getY() + UtilView.screenY;
-        g2d.drawImage(image, screenX, screenY, 64, 64, null);
+        g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
+    }
+
+    public Position getPosition() {
+        return pos;
     }
 }

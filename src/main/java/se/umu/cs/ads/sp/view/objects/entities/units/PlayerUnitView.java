@@ -31,11 +31,11 @@ public class PlayerUnitView extends EntityView {
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
             g2d.fillRect(desScreenX - 4, desScreenY - 4, 8, 8);
 
-            if (AppSettings.DEBUG) {
-                drawCollisionBox(g2d, cameraWorldPosition);
-                g2d.setColor(Color.RED);
-                g2d.drawRect(posScreenX - (attackRange / 2), posScreenY - (attackRange / 2), attackRange, attackRange);
-            }
+        }
+        if (AppSettings.DEBUG) {
+            drawCollisionBox(g2d, cameraWorldPosition);
+            g2d.setColor(Color.RED);
+            g2d.drawOval(posScreenX - attackRange, posScreenY - attackRange, attackRange*2, attackRange*2);
         }
 
         this.animator.draw(g2d, new Position(posScreenX, posScreenY));

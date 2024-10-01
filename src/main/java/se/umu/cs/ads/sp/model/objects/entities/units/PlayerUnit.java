@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model.objects.entities.units;
 
-import org.checkerframework.checker.units.qual.C;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.components.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
@@ -23,22 +22,25 @@ public class PlayerUnit extends Entity {
     private GoldMine goldMine;
     private PlayerUnit targetedUnit;
     private final int attack;
+    protected int attackRange;
     private int attackBuff;
+    private boolean inAttackRange = false;
 
     public PlayerUnit(Position startPos, Map map) {
         super(startPos, map);
         miningCooldown = new Cooldown(3);
+        shootCooldown = new Cooldown(2);
         this.baseHp = 100;
         this.maxHp = baseHp;
         this.currentHp = maxHp;
         this.attack = 10;
         this.attackBuff = 0;
-        this.attackRange = 250;
+        this.attackRange = 150;
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
     @Override
-    public void update(){
+    public void update() {
         switch (state) {
             case IDLE:
                 break;
@@ -47,11 +49,25 @@ public class PlayerUnit extends Entity {
                 checkCollision();
                 break;
             case ATTACKING:
+                this.destination = targetedUnit.position;
+                if (shootCooldown.hasElapsed()) {
+                    if ((Position.distance(position, destination) > attackRange)) {
+                        move();
+                    } else {
+                        attack();
+                        shootCooldown.reset();
+                    }
+                }
+
                 break;
             case TAKING_DAMAGE:
+                destination = new Position(position.getX() + 100, position.getY());
+                move();
                 break;
             case MINING:
-                if(miningCooldown.hasElapsed() && this.goldMine.hasResourceLeft()){
+                if (!this.goldMine.hasResourceLeft()) {
+                    this.state = EntityState.IDLE;
+                } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
                     goldMine.harvestGold(1);
                     coin.setReward(new Reward(1, Reward.RewardType.GOLD));
@@ -59,6 +75,7 @@ public class PlayerUnit extends Entity {
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
                 }
+
                 break;
             case DEAD:
                 System.out.println("Unit is dead!");
@@ -72,21 +89,27 @@ public class PlayerUnit extends Entity {
         ArrayList<Position> corners = this.getCollisionBox().getCorners();
         for (Position corner : corners) {
             ArrayList<GameObject> coll = map.getInhabitants(corner);
-            for(int i = coll.size()-1; i >= 0; i--) {
+            for (int i = coll.size() - 1; i >= 0; i--) {
                 if (coll.get(i) instanceof Collectable collectable) {
-                    if(this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())){
+                    if (this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())) {
                         this.collected.add(collectable);
                         collectable.pickUp(map); //This removes the collectable from the map
                         continue;
                     }
                 }
-                if(this.position.equals(getDestination()) && coll.get(i) instanceof GoldMine) {
-                    //Have reached destination and I am next to a goldmine, start mining :)
+                if (this.position.equals(getDestination()) && coll.get(i) instanceof GoldMine) {
+                    //Have reached destination, and I am next to a goldmine, start mining :)
                     goldMine = (GoldMine) coll.get(i);
                     startMining();
                 }
             }
         }
+    }
+
+    public void setAttackTarget(PlayerUnit target) {
+        this.targetedUnit = target;
+        this.destination = targetedUnit.position;
+        state = EntityState.ATTACKING;
     }
 
     public ArrayList<Collectable> getCollected() {
@@ -97,15 +120,19 @@ public class PlayerUnit extends Entity {
         this.attackBuff = newBuff;
     }
 
-    public void attack(Entity e) {
-        e.takeDamage(attack + attackBuff);
+    public void attack() {
+        targetedUnit.takeDamage(attack + attackBuff);
     }
-    private void startMining(){
-        if(this.state == EntityState.MINING){
+
+    private void startMining() {
+        if (this.state == EntityState.MINING) {
             return;
         }
         this.state = EntityState.MINING;
         miningCooldown.start();
     }
 
+    public int getAttackRange() {
+        return attackRange;
+    }
 }

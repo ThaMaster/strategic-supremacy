@@ -30,13 +30,15 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
     // TODO: Handle the camera world position in a better way, how i do not know...
     private Position cameraWorldPosition;
 
     private TileManager tileManager;
     private GameController gController;
+
+    private HashMap<Long, PlayerUnitView> myUnitsView = new HashMap<>();
     private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
     private HashMap<Long, CollectableView> collectables = new HashMap<>();
     private SoundManager soundManager;
@@ -53,15 +55,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-        this.cameraWorldPosition = new Position((UtilView.screenWidth / 2), (UtilView.screenHeight / 2));
+        this.cameraWorldPosition = new Position((int) ((UtilView.screenWidth / 2) * UtilView.scale), (int) ((UtilView.screenHeight / 2) * UtilView.scale));
 
         this.tileManager = tm;
 
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
+        this.addMouseWheelListener(this);
         this.setFocusable(true);  // Ensure the panel can receive key events
         this.addKeyListener(this); // Add KeyListener
-        this.goldPile = new EnvironmentView(52, new Position(200,200));
+        this.goldPile = new EnvironmentView(52, new Position(200, 200));
     }
 
     @Override
@@ -82,6 +85,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mousePressed(MouseEvent e) {
+
         // Convert the mouse screen coordinates to world coordinates.
         int worldX = e.getX() - UtilView.screenX + cameraWorldPosition.getX();
         int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
@@ -189,7 +193,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
                 break;
             case KeyEvent.VK_LEFT:
-                if(cameraWorldPosition.getX() < 0)
+                if (cameraWorldPosition.getX() < 0)
                     return;
                 cameraWorldPosition.setX(cameraWorldPosition.getX() - 10);
                 break;
@@ -220,18 +224,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         // Draw collectables
         for (CollectableView collectableView : collectables.values()) {
-            collectableView.draw(g2d, cameraWorldPosition);
+            if (tileManager.isInFow(collectableView.getPosition())) {
+                collectableView.draw(g2d, cameraWorldPosition);
+            }
         }
-        this.goldPile.draw(g2d, cameraWorldPosition);
+
+        if (tileManager.isInFow(this.goldPile.getPosition())) {
+            this.goldPile.draw(g2d, cameraWorldPosition);
+        }
+
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
-            entity.draw(g2d, cameraWorldPosition);
+            if (tileManager.isInFow(entity.getPosition())) {
+                entity.draw(g2d, cameraWorldPosition);
+            }
         }
 
 
-
-        for (TextAnimation animation : textAnimations){
-            if(animation.hasCompleted()){
+        for (TextAnimation animation : textAnimations) {
+            if (animation.hasCompleted()) {
                 this.textAnimations.remove(animation);
                 this.remove(animation);
                 break;
@@ -262,8 +273,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g2d.drawRect(x, y, width, height);
     }
 
-    public void setEntities(HashMap<Long, Entity> entities) {
+    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, Entity> entities) {
+        this.myUnitsView.clear();
         this.gameEntitiesView.clear();
+
+        for (PlayerUnit unit : myUnits.values()) {
+            PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getPosition());
+            newUnit.setSelected(unit.isSelected());
+            this.myUnitsView.put(newUnit.getId(), newUnit);
+        }
         for (Entity entity : entities.values()) {
             EntityView newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
             newEntity.setSelected(entity.isSelected());
@@ -275,15 +293,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.collectables.clear();
         CollectableView newCollectable = null;
         for (Collectable collectable : collectables.values()) {
-            if(collectable instanceof Chest) {
+            if (collectable instanceof Chest) {
                 newCollectable = new ChestView(collectable.getId(), collectable.getPosition());
-            }
-            else if(collectable instanceof Gold){
+            } else if (collectable instanceof Gold) {
                 collectable.getPosition().printPosition("Gold");
                 newCollectable = new GoldView(collectable.getId(), collectable.getPosition());
                 newCollectable.setCollisionBox(collectable.getCollisionBox());
             }
-            if(newCollectable != null) {
+            if (newCollectable != null) {
                 this.collectables.put(collectable.getId(), newCollectable);
             }
         }
@@ -297,14 +314,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void updateEntityViews(HashMap<Long, Entity> entities) {
         for (Entity entityModel : entities.values()) {
-            this.gameEntitiesView.get(entityModel.getId()).setEntityState(entityModel.getState());
-            this.gameEntitiesView.get(entityModel.getId()).setPosition(entityModel.getPosition());
-            this.gameEntitiesView.get(entityModel.getId()).setDestination(entityModel.getDestination());
-            this.gameEntitiesView.get(entityModel.getId()).setSelected(entityModel.isSelected());
-            this.gameEntitiesView.get(entityModel.getId()).setAttackRange(entityModel.getAttackRange());
-            this.gameEntitiesView.get(entityModel.getId()).setCollisionBox(entityModel.getCollisionBox());
-            this.gameEntitiesView.get(entityModel.getId()).update();
+            if (entityModel instanceof PlayerUnit modelUnit) {
+                this.gameEntitiesView.get(entityModel.getId()).setEntityState(modelUnit.getState());
+                this.gameEntitiesView.get(entityModel.getId()).setPosition(modelUnit.getPosition());
+                this.gameEntitiesView.get(entityModel.getId()).setDestination(modelUnit.getDestination());
+                this.gameEntitiesView.get(entityModel.getId()).setSelected(modelUnit.isSelected());
+                this.gameEntitiesView.get(entityModel.getId()).setAttackRange(modelUnit.getAttackRange());
+                this.gameEntitiesView.get(entityModel.getId()).setCollisionBox(modelUnit.getCollisionBox());
+                this.gameEntitiesView.get(entityModel.getId()).update();
+
+                if (myUnitsView.containsKey(modelUnit.getId())) {
+                    PlayerUnitView myUnit = (PlayerUnitView) gameEntitiesView.get(entityModel.getId());
+                    this.myUnitsView.put(entityModel.getId(), myUnit);
+                }
+            }
         }
+        tileManager.updateFowView(new ArrayList<>(myUnitsView.values()));
     }
 
     public void setGameController(GameController gc) {
@@ -312,26 +337,27 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void moveCamera(int xAmount, int yAmount) {
-        if(canMoveCameraHorizontaly(xAmount)){
+        if (canMoveCameraHorizontaly(xAmount)) {
             cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
         }
-        if(canMoveCameraVertically(yAmount)){
+        if (canMoveCameraVertically(yAmount)) {
             cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
         }
     }
-    private boolean canMoveCameraVertically(int yAmount){
-        if(cameraWorldPosition.getY() + yAmount < 0){
+
+    private boolean canMoveCameraVertically(int yAmount) {
+        if (cameraWorldPosition.getY() + yAmount < 0) {
             return false;
         }
-        if((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumCols())){
+        if ((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumCols())) {
             return false;
         }
 
         return true;
     }
 
-    private boolean canMoveCameraHorizontaly(int xAmount){
-        if(cameraWorldPosition.getX() + xAmount < 0){
+    private boolean canMoveCameraHorizontaly(int xAmount) {
+        if (cameraWorldPosition.getX() + xAmount < 0) {
             return false;
         }
         return cameraWorldPosition.getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumRows();
@@ -344,19 +370,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void performPickUp(long collectable, String reward) {
 
-        if(!this.collectables.containsKey(collectable)){
+        if (!this.collectables.containsKey(collectable)) {
             return;
         }
-        if(this.collectables.get(collectable).hasBeenCollected()){
+        if (this.collectables.get(collectable).hasBeenCollected()) {
             return;
         }
 
         CollectableView collectableView = this.collectables.get(collectable);
         collectableView.pickup();
 
-        if(collectableView instanceof ChestView){
+        if (collectableView instanceof ChestView) {
             soundManager.play(SoundFX.OPEN_CHEST);
-        }else if(collectableView instanceof GoldView){
+        } else if (collectableView instanceof GoldView) {
             soundManager.play(SoundFX.GOLD);
             this.collectables.remove(collectable);
         }
@@ -369,12 +395,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     }
 
-    public void addEvent(UpdateEvent event){
-        if(!this.collectables.containsKey(event.getId())){
+    public void addEvent(UpdateEvent event) {
+        if (!this.collectables.containsKey(event.getId())) {
             //Not a registered collectable. Could be random info or mining gold
             System.out.println(event.getEvent());
             TextAnimation textAnim = new TextAnimation(event.getEvent());
-            if(event.getType() == EventType.GOLD_PICK_UP){
+            if (event.getType() == EventType.GOLD_PICK_UP) {
                 soundManager.play(SoundFX.GOLD);
             }
             this.textAnimations.add(textAnim);
@@ -384,16 +410,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             return;
         }
         //It's a registered collectable
-        if(this.collectables.get(event.getId()).hasBeenCollected()){
+        if (this.collectables.get(event.getId()).hasBeenCollected()) {
             return;
         }
 
         CollectableView collectableView = this.collectables.get(event.getId());
         collectableView.pickup();
 
-        if(collectableView instanceof ChestView){
+        if (collectableView instanceof ChestView) {
             soundManager.play(SoundFX.OPEN_CHEST);
-        }else if(collectableView instanceof GoldView){
+        } else if (collectableView instanceof GoldView) {
             soundManager.play(SoundFX.GOLD);
             this.collectables.remove(event.getId());
         }
@@ -403,6 +429,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.add(newAnim);
         this.revalidate();
         this.repaint();
+    }
 
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.isControlDown()) {
+            if (e.getWheelRotation() > 0) {
+                UtilView.changeScale(-0.01);
+            } else {
+                UtilView.changeScale(0.01);
+            }
+        }
     }
 }
