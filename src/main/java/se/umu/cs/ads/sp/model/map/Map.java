@@ -41,7 +41,6 @@ public class Map {
             while ((line = br.readLine()) != null) {
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
-                System.out.println(Arrays.toString(numbers));
                 for (String number : numbers) {
                     map.get(row).add(new TileModel(Integer.parseInt(number)));
                 }
@@ -86,17 +85,11 @@ public class Map {
         int row = topLeft.getY() / Constants.TILE_HEIGHT;
         int rowEnd = bottomLeft.getY() / Constants.TILE_HEIGHT;
 
-        System.out.println("col -> " + col);
-        System.out.println("colEnd -> " + colEnd);
-        System.out.println("row -> " + row);
-        System.out.println("rowEnd -> " + rowEnd);
-
         for(int y = row-1; y >= 0 && y < rowEnd && y < map.size(); y++) {
             for(int x = col-1; x >= 0 && x < colEnd && x < map.get(y).size(); x++) {
                 inhabitants.addAll(map.get(y).get(x).getInhabitants());
             }
         }
-        System.out.println("inhabitants -> " + inhabitants.size());
         return inhabitants;
     }
 

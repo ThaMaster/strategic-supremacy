@@ -102,6 +102,8 @@ public abstract class Entity extends GameObject {
     }
 
     public void setDestination(Position newDestination) {
+        //if l1.size() > 0 hämta inhabitant där vi klicka, finns det en fiende där? Sätt targetEntity.
+        //
         this.destination = newDestination;
         this.state = EntityState.RUNNING;
     }

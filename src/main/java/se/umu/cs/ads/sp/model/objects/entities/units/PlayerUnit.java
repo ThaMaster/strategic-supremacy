@@ -21,7 +21,7 @@ public class PlayerUnit extends Entity {
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;
     private GoldMine goldMine;
-
+    private PlayerUnit targetedUnit;
     private final int attack;
     private int attackBuff;
 

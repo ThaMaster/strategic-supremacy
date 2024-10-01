@@ -60,7 +60,7 @@ public class ModelManager {
         PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
         PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
 
-        //gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
         //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
         //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
 
