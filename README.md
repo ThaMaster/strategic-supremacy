@@ -39,6 +39,15 @@ system, there is to exists three different clients:
 - **Leader:** The leader will be at the top of the hierarchy and act as the source of truth, regularly send out **L1**
   updates to other clients to fix potential concurrency errors that could have occurred.
 
+An illustration of how these clients are to communicate with each other is found in the following image.
+
+![clientTree](docs/images/readme/clientTree.png)
+
+_Illustration of how the leader messages will be propagated between the clients._
+
+This is ultimately done to not overload the leader since all clients will need to send important messages to the leader
+at a rapid rate. This is believed to alleviate this problem and make comuncation between the leader and all other clients
+better.
 
 ### Leader election
 
@@ -59,7 +68,7 @@ There will exist three types of priority that can be assigned to a message:
 Depending on the update event which the message represent, the priority of the message will dictate if the leader should
 overwrite its current information and restart its timer for the **L1** timer, see image below for illustration.
 
-![messagePriority](/docs/images/messagePriority.png)
+![messagePriority](/docs/images/readme/messagePriority.png)
 
 _Illustration of how the different messages sent from a client affect the leaders timer._
 
@@ -92,6 +101,20 @@ makes the units visible on the screen between the players. Now every action a pl
 the other player. Since the leader is considered the source of truth every action is also sent to the leader.
 
 ### Bounding Boxes
+
+Instead of constantly checking all units individually which communication zone they are currently in, the player will store
+a **Bounding box (BB)** that surrounds all the players units. This is believed to boost performance since if, for example, the
+game consisted of 100 players where each have 3 units one would have to perform 297 checks for all three of the players units
+regardless of how the units are positioned on the map. See the following image for an illustration regarding the **BB**.
+
+![comBB](/docs/images/readme/comBB.png)
+
+_Illustration of the **Bounding Box** surrounding the players units will look like._
+
+When utilizing the **BB** in the best case scenario, each player now only needs to perform 99 checks. 
+The player will also store its own **BB** and only perform checks on individual units if the **BB** intersects with any
+other **BB**. As seen in the above image, the **BB**  will also include **Z2** in order to make sure that it captures 
+when a unit is transferred from **Z3** to **Z2**.
 
 ## Milestones
 

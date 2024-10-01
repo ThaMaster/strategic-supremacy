@@ -2,6 +2,9 @@ package se.umu.cs.ads.sp.model.communication;
 
 import se.umu.cs.ads.sp.utils.Position;
 
+/**
+ * Class that will be used to parse proto classes to java and vise versa.
+ */
 public class GrpcUtil {
 
     public static proto.Position toProto(Position javaPos) {
