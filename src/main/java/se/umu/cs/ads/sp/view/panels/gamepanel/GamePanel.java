@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel;
 
+import se.umu.cs.ads.sp.Events.GameEvent;
+import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -8,9 +10,9 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.EnvironmentView;
@@ -240,6 +242,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             }
         }
 
+        collectEvents();
 
         for (TextAnimation animation : textAnimations) {
             if (animation.hasCompleted()) {
@@ -395,21 +398,48 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     }
 
-    public void addEvent(UpdateEvent event) {
-        if (!this.collectables.containsKey(event.getId())) {
-            //Not a registered collectable. Could be random info or mining gold
-            System.out.println(event.getEvent());
-            TextAnimation textAnim = new TextAnimation(event.getEvent());
-            if (event.getType() == EventType.GOLD_PICK_UP) {
-                soundManager.play(SoundFX.GOLD);
+    private void collectEvents(){
+        ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
+        for(GameEvent event : events){
+            switch(event.getType()){
+                case COLLECT:
+                    addTextEvent(event, 15, EventColor.SUCCESS);
+                    break;
+                case NEW_ROUND:
+                    addTextEvent(event, 15, EventColor.ALERT);
+                case LOGG:
+                    addTextEvent(event, 15, EventColor.DEFAULT);
+                    break;
+                default:
+                    //This is default case, it's a collectable we have stored
+                    addCollectableEvent(event);
+                    break;
             }
-            this.textAnimations.add(textAnim);
-            this.add(textAnim);
-            this.revalidate();
-            this.repaint();
+        }
+        GameEvents.getInstance().clearEvents();
+    }
+
+    private void addTextEvent(GameEvent event, int size, EventColor color){
+        TextAnimation textAnim = new TextAnimation(event.getEvent());
+        textAnim.setSize(size);
+        textAnim.setDisplayTime(2);
+        textAnim.setColor(color);
+        this.textAnimations.add(textAnim);
+        this.add(textAnim);
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void addCollectableEvent(GameEvent event) {
+        if (!this.collectables.containsKey(event.getId())) {
+            //Collected something that doesn't need an animation, forexample mining gold
+            if(event.getType() == EventType.GOLD_PICK_UP){
+                //Inc displayed gold?
+            }
+            addTextEvent(event, 25, EventColor.SUCCESS);
             return;
         }
-        //It's a registered collectable
+
         if (this.collectables.get(event.getId()).hasBeenCollected()) {
             return;
         }
@@ -423,12 +453,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             soundManager.play(SoundFX.GOLD);
             this.collectables.remove(event.getId());
         }
-
-        TextAnimation newAnim = new TextAnimation(event.getEvent());
-        this.textAnimations.add(newAnim);
-        this.add(newAnim);
-        this.revalidate();
-        this.repaint();
+        addTextEvent(event, 25, EventColor.SUCCESS);
     }
 
     @Override

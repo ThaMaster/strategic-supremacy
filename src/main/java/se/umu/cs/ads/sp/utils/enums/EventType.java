@@ -5,9 +5,10 @@ public enum EventType {
     NEW_ROUND,
     LOGG,
 
-    //Collects
+    COLLECT,
     GOLD_PICK_UP,
     CHEST_PICK_UP,
+    MINING,
 
     //Game actions
     TAKE_DMG,

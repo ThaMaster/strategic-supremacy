@@ -1,7 +1,9 @@
 package se.umu.cs.ads.sp.model.objects.entities.units;
 
+import se.umu.cs.ads.sp.Events.GameEvent;
+import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
-import se.umu.cs.ads.sp.model.components.Cooldown;
+import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.GoldMine;
@@ -11,6 +13,7 @@ import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.util.ArrayList;
 
@@ -58,7 +61,6 @@ public class PlayerUnit extends Entity {
                         shootCooldown.reset();
                     }
                 }
-
                 break;
             case TAKING_DAMAGE:
                 destination = new Position(position.getX() + 100, position.getY());
@@ -74,6 +76,7 @@ public class PlayerUnit extends Entity {
                     this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
+                    GameEvents.getInstance().addEvent(new GameEvent(coin.getId(), coin.getReward().toString(), EventType.GOLD_PICK_UP));
                 }
 
                 break;

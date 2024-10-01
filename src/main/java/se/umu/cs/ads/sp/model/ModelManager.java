@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
+import se.umu.cs.ads.sp.Events.GameEvent;
+import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -13,7 +15,6 @@ import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.UpdateEvent;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 
@@ -37,15 +38,14 @@ public class ModelManager {
     private HashMap<Long, Collectable> collectables = new HashMap<>();
 
     private ArrayList<Long> selectedUnits = new ArrayList<>();
-    private ArrayList<UpdateEvent> events;
     private ArrayList<GameObject> environment;
 
     private FowModel fow;
+    private GameEvents gameEvents;
 
     public ModelManager() {
         map = new Map();
         map.loadMap("maps/map1.txt");
-        events = new ArrayList<>();
         PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
         PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
         PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
@@ -74,6 +74,7 @@ public class ModelManager {
         spawnGold(new Position(450, 250));
         spawnGold(new Position(500, 250));
         spawnGoldMine(new Position(200, 200));
+        gameEvents = GameEvents.getInstance();
     }
 
     private void spawnChest(Position spawnPosition, Reward reward) {
@@ -103,25 +104,16 @@ public class ModelManager {
             if (entity instanceof PlayerUnit playerUnit) {
                 for (Collectable collected : playerUnit.getCollected()) {
                     //Should do here for example increment gold, points, add buffs depending on collected
-
                     if (collected instanceof Chest) {
-                        events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.CHEST_PICK_UP));
+                        gameEvents.addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
                     } else if (collected instanceof Gold) {
-                        events.add(new UpdateEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+                        gameEvents.addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
                     }
                 }
                 playerUnit.getCollected().clear();
             }
         }
         fow.updateUnitPositions(new ArrayList<>(myUnits.values()));
-    }
-
-    public ArrayList<UpdateEvent> getEvents() {
-        return events;
-    }
-
-    public void clearEvents() {
-        this.events.clear();
     }
 
     public HashMap<Long, Entity> getGameEntities() {

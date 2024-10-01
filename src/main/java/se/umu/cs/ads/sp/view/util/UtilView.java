@@ -20,6 +20,7 @@ public class UtilView {
     public static int screenX = screenWidth/2 - tileSize/2;
     public static int screenY = screenHeight/2 - tileSize/2;
 
+
     public static void changeScale(double amount) {
         double newScale = scale + amount;
         if(newScale > 10 || newScale < 1) {

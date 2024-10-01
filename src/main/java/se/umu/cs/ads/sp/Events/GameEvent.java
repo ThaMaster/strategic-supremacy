@@ -1,14 +1,13 @@
-package se.umu.cs.ads.sp.utils;
+package se.umu.cs.ads.sp.Events;
 
 import se.umu.cs.ads.sp.utils.enums.EventType;
 
-public class UpdateEvent {
-
+public class GameEvent {
     private long id;
     private String event;
     private EventType type;
 
-    public UpdateEvent(long id, String event, EventType type) {
+    public GameEvent(long id, String event, EventType type) {
         this.type = type;
         this.id = id;
         this.event = event;
@@ -33,5 +32,4 @@ public class UpdateEvent {
     public void setEvent(String event) {
         this.event = event;
     }
-
 }
