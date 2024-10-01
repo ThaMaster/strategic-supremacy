@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.utils.Position;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,10 @@ public class CollisionBox {
 
     public boolean checkCollision(Line2D line) {
         return this.collisionBox.intersectsLine(line);
+    }
+
+    public boolean contains(Position position) {
+        return this.collisionBox.contains(new Point(position.getX(),position.getY()));
     }
 
     public Rectangle getCollisionShape() {

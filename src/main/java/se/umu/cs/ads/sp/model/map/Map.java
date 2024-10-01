@@ -68,6 +68,10 @@ public class Map {
         return map.get(row).get(col).getInhabitants();
     }
 
+    public ArrayList<GameObject> getInhabitants(int row, int col) {
+        return map.get(row).get(col).getInhabitants();
+    }
+
     /**
      * Function for getting all the inhabitants from a whole collision box and not just the corners.
      * @param cBox The collision box to check.

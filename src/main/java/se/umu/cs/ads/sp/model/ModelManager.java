@@ -52,8 +52,8 @@ public class ModelManager {
 
         // Maybe totally separate this?
         gameEntities.put(firstUnit.getId(), firstUnit);
-        //gameEntities.put(secondUnit.getId(), secondUnit);
-        //gameEntities.put(thirdUnit.getId(), thirdUnit);
+        gameEntities.put(secondUnit.getId(), secondUnit);
+        gameEntities.put(thirdUnit.getId(), thirdUnit);
 
 
         PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
@@ -136,7 +136,7 @@ public class ModelManager {
                 myEntities.get(unit).setDestination(offsetPosition);
                 do{
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
-                }while(!isWalkable(offsetPosition));
+                } while(!isWalkable(offsetPosition));
             }
             return true;
         }
@@ -144,21 +144,23 @@ public class ModelManager {
     }
 
     public void setSelection(Position clickLocation) {
-        ArrayList<Entity> hitEntities = new ArrayList<>();
+//        ArrayList<Entity> hitEntities = new ArrayList<>();
         selectedUnits.clear();
         for (Entity entity : myEntities.values()) {
             if (Position.distance(entity.getPosition(), clickLocation) / Constants.ENTITY_WIDTH <= 1) {
                 entity.setSelected(true);
-                hitEntities.add(entity);
+//                hitEntities.add(entity);
+                selectedUnits.add(entity.getId());
+                return;
             }
         }
 
-        if (hitEntities.size() == 1) {
-            selectedUnits.add(hitEntities.get(0).getId());
-        } else if(hitEntities.size() > 1) {
-            //Multiple entities were clicked. Get the entity with the closest distance from the click
-            selectedUnits.add(getClosestHitUnit(hitEntities, clickLocation));
-        }
+//        if (hitEntities.size() == 1) {
+//            selectedUnits.add(hitEntities.get(0).getId());
+//        } else if(hitEntities.size() > 1) {
+//            //Multiple entities were clicked. Get the entity with the closest distance from the click
+//            selectedUnits.add(getClosestHitUnit(hitEntities, clickLocation));
+//        }
     }
 
     public void setSelection(long selectedUnit) {
