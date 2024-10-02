@@ -3,7 +3,6 @@ package se.umu.cs.ads.sp.model.objects.entities.units;
 import se.umu.cs.ads.sp.Events.GameEvent;
 import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
-import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.GoldMine;
@@ -11,6 +10,7 @@ import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.utils.enums.EventType;
@@ -28,11 +28,14 @@ public class PlayerUnit extends Entity {
     protected int attackRange;
     private int attackBuff;
     private boolean inAttackRange = false;
+    private boolean attacked = false;
+    private boolean hit = false;
 
     public PlayerUnit(Position startPos, Map map) {
         super(startPos, map);
         miningCooldown = new Cooldown(3);
         shootCooldown = new Cooldown(2);
+        hitCooldown = new Cooldown(1);
         this.baseHp = 100;
         this.maxHp = baseHp;
         this.currentHp = maxHp;
@@ -55,16 +58,29 @@ public class PlayerUnit extends Entity {
                 this.destination = targetedUnit.position;
                 if (shootCooldown.hasElapsed()) {
                     if ((Position.distance(position, destination) > attackRange)) {
+                        inAttackRange = false;
+                        attacked = false;
                         move();
-                    } else {
+                    } else if (targetedUnit.getState() != EntityState.DEAD) {
+                        inAttackRange = true;
+                        attacked = true;
                         attack();
                         shootCooldown.reset();
+                    } else {
+                        this.state = EntityState.IDLE;
                     }
+                } else {
+                    attacked = false;
                 }
                 break;
             case TAKING_DAMAGE:
-                destination = new Position(position.getX() + 100, position.getY());
-                move();
+                if(hitCooldown.hasElapsed()) {
+                    this.state = EntityState.IDLE;
+                    hit = false;
+                } else {
+                    hit = true;
+                }
+
                 break;
             case MINING:
                 if (!this.goldMine.hasResourceLeft()) {
@@ -78,10 +94,8 @@ public class PlayerUnit extends Entity {
                     miningCooldown.reset();
                     GameEvents.getInstance().addEvent(new GameEvent(coin.getId(), coin.getReward().toString(), EventType.GOLD_PICK_UP));
                 }
-
                 break;
             case DEAD:
-                System.out.println("Unit is dead!");
                 break;
             default:
                 break;
@@ -112,6 +126,7 @@ public class PlayerUnit extends Entity {
     public void setAttackTarget(PlayerUnit target) {
         this.targetedUnit = target;
         this.destination = targetedUnit.position;
+
         state = EntityState.ATTACKING;
     }
 
@@ -121,6 +136,10 @@ public class PlayerUnit extends Entity {
 
     public void setAttackBuff(int newBuff) {
         this.attackBuff = newBuff;
+    }
+
+    public boolean isInAttackRange() {
+        return this.inAttackRange;
     }
 
     public void attack() {
@@ -137,5 +156,12 @@ public class PlayerUnit extends Entity {
 
     public int getAttackRange() {
         return attackRange;
+    }
+
+    public boolean hasAttacked() {
+        return attacked;
+    }
+    public boolean hasBeenHit() {
+        return hit;
     }
 }

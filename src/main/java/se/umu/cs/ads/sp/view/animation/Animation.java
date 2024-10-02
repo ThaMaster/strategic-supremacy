@@ -41,11 +41,16 @@ public class Animation {
         this.oneShot = bool;
     }
 
+
     public String getName() {
         return this.name;
     }
 
     public BufferedImage getCurrentFrame() {
         return this.frames.get(currentFrame);
+    }
+
+    public void resetAnimation() {
+        this.currentFrame = 0;
     }
 }

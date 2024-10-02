@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.utils.Constants;
+import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 
@@ -13,6 +14,7 @@ public abstract class Entity extends GameObject {
     protected int baseHp;
     protected int currentHp;
     protected int speed;
+    protected Cooldown hitCooldown;
     protected CollisionBox attackBox;
     protected EntityState state;
     protected Map map;
@@ -65,11 +67,13 @@ public abstract class Entity extends GameObject {
     }
 
     public boolean isSelected() {
-        return selected;
+        return state != EntityState.DEAD && selected;
     }
 
     public void setSelected(boolean select) {
-        this.selected = select;
+        if(state != EntityState.DEAD) {
+            this.selected = select;
+        }
     }
 
     public EntityState getState() {
@@ -104,6 +108,8 @@ public abstract class Entity extends GameObject {
     public void takeDamage(int damage) {
         this.state = EntityState.TAKING_DAMAGE;
         this.currentHp -= damage;
+        System.out.println("AHJJJ");
+        hitCooldown.start();
         if (currentHp <= 0) {
             this.state = EntityState.DEAD;
         }

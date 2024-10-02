@@ -9,8 +9,6 @@ import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 public class PlayerUnitView extends EntityView {
     public PlayerUnitView(long id, Position pos) {
@@ -35,7 +33,7 @@ public class PlayerUnitView extends EntityView {
         if (AppSettings.DEBUG) {
             drawCollisionBox(g2d, cameraWorldPosition);
             g2d.setColor(Color.RED);
-            g2d.drawOval(posScreenX - attackRange, posScreenY - attackRange, attackRange*2, attackRange*2);
+            g2d.drawOval(posScreenX - attackRange, posScreenY - attackRange, attackRange * 2, attackRange * 2);
         }
 
         this.animator.draw(g2d, new Position(posScreenX, posScreenY));
@@ -46,19 +44,39 @@ public class PlayerUnitView extends EntityView {
         this.animator.addAnimation(
                 new Animation(
                         "idle",
-                        ImageLoader.loadImages("/sprites/entities/units/basic/idle", "idle", 3)
-                        , 7));
+                        ImageLoader.loadImages("/sprites/entities/units/basic/idle", "idle", 3),
+                        7));
         this.animator.addAnimation(
                 new Animation(
                         "running",
-                        ImageLoader.loadImages("/sprites/entities/units/basic/run", "run", 3)
-                        , 7));
+                        ImageLoader.loadImages("/sprites/entities/units/basic/run", "run", 3),
+                        7));
         this.animator.addAnimation(
                 new Animation(
                         "mining",
-                        ImageLoader.loadImages("/sprites/entities/units/basic/mining", "mining", 3)
-                        , 7));
-
+                        ImageLoader.loadImages("/sprites/entities/units/basic/mining", "mining", 3),
+                        7));
+        Animation hitAnimation =
+                new Animation(
+                        "hit",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/hit", "hit", 1),
+                        7);
+        hitAnimation.setOneShot(true);
+        this.animator.addAnimation(hitAnimation);
+        Animation deadAnimation =
+                new Animation(
+                        "dead",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/dead", "dead", 1),
+                        7);
+        deadAnimation.setOneShot(true);
+        this.animator.addAnimation(deadAnimation);
+        Animation attackAnimation =
+                new Animation(
+                        "attack",
+                        ImageLoader.loadImages("/sprites/entities/units/basic/attack", "attack", 3),
+                        7);
+        attackAnimation.setOneShot(true);
+        this.animator.addAnimation(attackAnimation);
     }
 
     @Override
@@ -72,27 +90,27 @@ public class PlayerUnitView extends EntityView {
                 break;
             case MINING:
                 this.animator.changeAnimation("mining");
+            case ATTACKING:
+                if (inRange) {
+                    this.animator.changeAnimation("attack");
+                    if (attacked) {
+                        this.animator.getCurrentAnimation().resetAnimation();
+                    }
+                } else {
+                    this.animator.changeAnimation("running");
+                }
+                break;
+            case TAKING_DAMAGE:
+                if (hasBeenHit) {
+                    this.animator.changeAnimation("hit");
+                }
+                break;
             case DEAD:
+                this.animator.changeAnimation("dead");
                 break;
             default:
                 break;
         }
         this.state = newState;
-    }
-
-    private ArrayList<BufferedImage> getIdleImages() {
-        ArrayList<BufferedImage> images = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
-            images.add(ImageLoader.loadImage("/sprites/entities/units/basic/idle/idle" + i + ".png"));
-        }
-        return images;
-    }
-
-    private ArrayList<BufferedImage> getRunningImages() {
-        ArrayList<BufferedImage> images = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
-            images.add(ImageLoader.loadImage("/sprites/entities/units/basic/run/run" + i + ".png"));
-        }
-        return images;
     }
 }
