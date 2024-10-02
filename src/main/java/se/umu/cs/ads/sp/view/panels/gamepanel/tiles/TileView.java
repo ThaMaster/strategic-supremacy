@@ -1,35 +1,24 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel.tiles;
 
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.enums.TileType;
-
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
-public class TileView {
+public abstract class TileView {
 
-    private final String variant;
-    private final BufferedImage image;
-    private final BufferedImage darkImage;
+    protected final HashMap<String, BufferedImage> images;
+    protected final HashMap<String, BufferedImage> darkImages;
 
-    public TileView(String variant, BufferedImage tileImage, BufferedImage darkImage) {
-        this.variant = variant;
-        this.image = tileImage;
-        this.darkImage = darkImage;
+    public TileView() {
+        this.images = new HashMap<>();
+        this.darkImages = new HashMap<>();
+        initImages();
     }
 
-    public String getVariant() {
-        return this.variant;
+    public BufferedImage getImage(String mode, String imageVariant) {
+        if (mode == "dark")
+            return darkImages.get(imageVariant);
+        return this.images.get(imageVariant);
     }
 
-    public BufferedImage getImage(String mode) {
-        if(mode == "dark")
-            return darkImage;
-
-        return this.image;
-    }
-
-//    public void draw(Graphics2D g2d, int x, int y) {
-//        g2d.drawImage(image, x, y, Constants.TILE_WIDTH, Constants.TILE_HEIGHT, null);
-//    }
+    abstract void initImages();
 }

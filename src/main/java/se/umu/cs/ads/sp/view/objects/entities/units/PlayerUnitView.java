@@ -90,6 +90,7 @@ public class PlayerUnitView extends EntityView {
                 break;
             case MINING:
                 this.animator.changeAnimation("mining");
+                break;
             case ATTACKING:
                 if (inRange) {
                     this.animator.changeAnimation("attack");

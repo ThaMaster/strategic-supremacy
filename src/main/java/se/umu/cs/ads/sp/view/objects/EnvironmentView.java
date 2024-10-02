@@ -12,6 +12,8 @@ public class EnvironmentView {
     private final Position pos;
     private long id;
     private BufferedImage image;
+    private boolean depleted;
+
     public EnvironmentView(long id, Position position) {
         this.id = id;
         this.pos = position;
@@ -31,7 +33,13 @@ public class EnvironmentView {
         }
         int screenX = pos.getX() - position.getX() + UtilView.screenX;
         int screenY = pos.getY() - position.getY() + UtilView.screenY;
-        g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
+        if(!depleted) {
+            g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
+        }
+    }
+
+    public void setDepleted(boolean bool) {
+        this.depleted = bool;
     }
 
     public Position getPosition() {

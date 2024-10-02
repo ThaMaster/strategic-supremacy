@@ -328,7 +328,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 this.gameEntitiesView.get(entityModel.getId()).setHasAttacked(modelUnit.hasAttacked());
                 this.gameEntitiesView.get(entityModel.getId()).setHasBeenHit(modelUnit.hasBeenHit());
                 this.gameEntitiesView.get(entityModel.getId()).update();
-
                 if (myUnitsView.containsKey(modelUnit.getId())) {
                     PlayerUnitView myUnit = (PlayerUnitView) gameEntitiesView.get(entityModel.getId());
                     this.myUnitsView.put(entityModel.getId(), myUnit);
@@ -374,44 +373,33 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         cameraWorldPosition.setY(yAmount);
     }
 
-    public void performPickUp(long collectable, String reward) {
-
-        if (!this.collectables.containsKey(collectable)) {
-            return;
-        }
-        if (this.collectables.get(collectable).hasBeenCollected()) {
-            return;
-        }
-
-        CollectableView collectableView = this.collectables.get(collectable);
-        collectableView.pickup();
-
-        if (collectableView instanceof ChestView) {
-            soundManager.play(SoundFX.OPEN_CHEST);
-        } else if (collectableView instanceof GoldView) {
-            soundManager.play(SoundFX.GOLD);
-            this.collectables.remove(collectable);
-        }
-
-        TextAnimation newAnim = new TextAnimation(reward);
-        this.textAnimations.add(newAnim);
-        this.add(newAnim);
-        this.revalidate();
-        this.repaint();
-
-    }
-
-    private void collectEvents(){
+    private void collectEvents() {
         ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
-        for(GameEvent event : events){
-            switch(event.getType()){
+        for (GameEvent event : events) {
+            switch (event.getType()) {
                 case COLLECT:
                     addTextEvent(event, 15, EventColor.SUCCESS);
                     break;
                 case NEW_ROUND:
                     addTextEvent(event, 15, EventColor.ALERT);
+                    break;
                 case LOGG:
                     addTextEvent(event, 15, EventColor.DEFAULT);
+                    break;
+                case MINE_DEPLETED:
+                    // Change this to hashmap and get the goldpile with specific id.
+                    this.goldPile.setDepleted(true);
+                    break;
+                case MINING:
+                    break;
+                case DEATH:
+                    soundManager.play("DEATH");
+                    break;
+                case ATTACK:
+                    soundManager.play("ATTACK");
+                    break;
+                case TAKE_DMG:
+                    soundManager.play("TAKE_DMG");
                     break;
                 default:
                     //This is default case, it's a collectable we have stored
@@ -422,7 +410,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         GameEvents.getInstance().clearEvents();
     }
 
-    private void addTextEvent(GameEvent event, int size, EventColor color){
+    private void addTextEvent(GameEvent event, int size, EventColor color) {
         TextAnimation textAnim = new TextAnimation(event.getEvent());
         textAnim.setSize(size);
         textAnim.setDisplayTime(2);
@@ -436,7 +424,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void addCollectableEvent(GameEvent event) {
         if (!this.collectables.containsKey(event.getId())) {
             //Collected something that doesn't need an animation, forexample mining gold
-            if(event.getType() == EventType.GOLD_PICK_UP){
+            if (event.getType() == EventType.GOLD_PICK_UP) {
                 //Inc displayed gold?
             }
             addTextEvent(event, 25, EventColor.SUCCESS);

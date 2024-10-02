@@ -8,9 +8,11 @@ public enum EventType {
     COLLECT,
     GOLD_PICK_UP,
     CHEST_PICK_UP,
+    MINE_DEPLETED,
     MINING,
 
     //Game actions
     TAKE_DMG,
-    SHOOT,
+    ATTACK,
+    DEATH
 }

@@ -74,17 +74,18 @@ public class PlayerUnit extends Entity {
                 }
                 break;
             case TAKING_DAMAGE:
-                if(hitCooldown.hasElapsed()) {
+                if (hitCooldown.hasElapsed()) {
                     this.state = EntityState.IDLE;
                     hit = false;
                 } else {
                     hit = true;
                 }
-
                 break;
             case MINING:
                 if (!this.goldMine.hasResourceLeft()) {
+                    GameEvents.getInstance().addEvent(new GameEvent(goldMine.getId(), "depleted", EventType.MINE_DEPLETED));
                     this.state = EntityState.IDLE;
+                    return;
                 } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
                     goldMine.harvestGold(1);
@@ -126,7 +127,6 @@ public class PlayerUnit extends Entity {
     public void setAttackTarget(PlayerUnit target) {
         this.targetedUnit = target;
         this.destination = targetedUnit.position;
-
         state = EntityState.ATTACKING;
     }
 
@@ -143,6 +143,7 @@ public class PlayerUnit extends Entity {
     }
 
     public void attack() {
+        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit attacking", EventType.ATTACK));
         targetedUnit.takeDamage(attack + attackBuff);
     }
 
@@ -150,6 +151,7 @@ public class PlayerUnit extends Entity {
         if (this.state == EntityState.MINING) {
             return;
         }
+        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit mining", EventType.MINING));
         this.state = EntityState.MINING;
         miningCooldown.start();
     }
@@ -161,6 +163,7 @@ public class PlayerUnit extends Entity {
     public boolean hasAttacked() {
         return attacked;
     }
+
     public boolean hasBeenHit() {
         return hit;
     }

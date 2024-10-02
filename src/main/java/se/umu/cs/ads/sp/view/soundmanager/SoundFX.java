@@ -1,8 +1,5 @@
 package se.umu.cs.ads.sp.view.soundmanager;
 
-import java.net.URL;
-import java.util.HashMap;
-
 public class SoundFX {
     public static String OPEN_CHEST = "OPEN_CHEST";
     public static String MOVE_1 = "MOVE_1";
@@ -12,4 +9,7 @@ public class SoundFX {
     public static String MOVE_5 = "MOVE_5";
     public static String MOVE_6 = "MOVE_6";
     public static String GOLD = "GOLD";
+    public static String ATTACK = "ATTACK";
+    public static String DEATH = "DEATH";
+    public static String TAKE_DMG = "TAKE_DMG";
 }

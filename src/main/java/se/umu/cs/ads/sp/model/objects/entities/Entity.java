@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.model.objects.entities;
 
+import se.umu.cs.ads.sp.Events.GameEvent;
+import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -7,6 +9,7 @@ import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 
 public abstract class Entity extends GameObject {
 
@@ -71,7 +74,7 @@ public abstract class Entity extends GameObject {
     }
 
     public void setSelected(boolean select) {
-        if(state != EntityState.DEAD) {
+        if (state != EntityState.DEAD) {
             this.selected = select;
         }
     }
@@ -108,10 +111,12 @@ public abstract class Entity extends GameObject {
     public void takeDamage(int damage) {
         this.state = EntityState.TAKING_DAMAGE;
         this.currentHp -= damage;
-        System.out.println("AHJJJ");
         hitCooldown.start();
         if (currentHp <= 0) {
             this.state = EntityState.DEAD;
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
+        } else {
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));
         }
     }
 }

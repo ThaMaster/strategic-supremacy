@@ -89,6 +89,14 @@ public class SoundManager {
             audioSrc = getClass().getClassLoader().getResource("audio/gold.wav");
             sounds.put(SoundFX.GOLD, audioSrc != null ? audioSrc.toExternalForm() : null);
 
+            audioSrc = getClass().getClassLoader().getResource("audio/attack.wav");
+            sounds.put(SoundFX.ATTACK, audioSrc != null ? audioSrc.toExternalForm() : null);
+
+            audioSrc = getClass().getClassLoader().getResource("audio/death.wav");
+            sounds.put(SoundFX.DEATH, audioSrc != null ? audioSrc.toExternalForm() : null);
+
+            audioSrc = getClass().getClassLoader().getResource("audio/takeDmg.wav");
+            sounds.put(SoundFX.TAKE_DMG, audioSrc != null ? audioSrc.toExternalForm() : null);
         }catch(NullPointerException e){
             System.out.println("Could not load audio file");
         }
