@@ -1,11 +1,12 @@
+/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/app/NSServer.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/NewLobbyOrBuilder.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/LobbiesOrBuilder.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/grpc-java/nsProto/GrpcNamingServiceGrpc.java
+/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/Main.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/AddressOrBuilder.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/util/GrpcUtil.java
-/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/NamingService.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/UserId.java
-/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/NSServer.java
+/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/app/NamingService.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/UserIdOrBuilder.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/Lobbies.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/NewLobby.java
@@ -16,4 +17,5 @@
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/Address.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/LobbyInfo.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/LobbyInfoOrBuilder.java
+/home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/src/main/java/se.umu.cs.ads.ns/util/Util.java
 /home/thamaster/Documents/University/advanced_distributed_systems/course-project/strategic-supremacy/namingService/target/generated-sources/protobuf/java/nsProto/Proto.java

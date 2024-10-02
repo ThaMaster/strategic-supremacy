@@ -1,3 +1,4 @@
+se/umu/cs/ads/ns/app/NamingService.class
 nsProto/UserOrBuilder.class
 nsProto/LobbiesOrBuilder.class
 nsProto/UserIdOrBuilder.class
@@ -7,6 +8,7 @@ se/umu/cs/ads/ns/util/GrpcUtil.class
 nsProto/User$1.class
 se/umu/cs/ads/ns/util/Util.class
 nsProto/NewLobby$Builder.class
+se/umu/cs/ads/ns/app/NSServer.class
 nsProto/GrpcNamingServiceGrpc$GrpcNamingServiceFutureStub.class
 nsProto/User.class
 nsProto/Proto.class
@@ -24,16 +26,14 @@ nsProto/Lobbies$Builder.class
 nsProto/LobbyInfo.class
 nsProto/UserId$Builder.class
 nsProto/LobbyInfoOrBuilder.class
-se/umu/cs/ads/ns/util/NamingService.class
+se/umu/cs/ads/ns/app/NSServer$GrpcNamingService.class
 nsProto/User$Builder.class
 nsProto/NewLobbyOrBuilder.class
 nsProto/NewLobby$1.class
-se/umu/cs/ads/ns/NSServer$GrpcNamingService.class
 nsProto/UserId$1.class
 nsProto/UserId.class
 nsProto/Proto$1.class
 nsProto/AddressOrBuilder.class
-se/umu/cs/ads/ns/NSServer.class
 nsProto/Lobbies$1.class
 nsProto/LobbyId.class
 nsProto/GrpcNamingServiceGrpc$GrpcNamingServiceImplBase.class
