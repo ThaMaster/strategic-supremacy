@@ -1,0 +1,51 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "nsProto";
+option java_outer_classname = "Proto";
+
+package grpc;
+
+message UserId {
+  string id = 1;
+}
+
+message LobbyId {
+  string id = 1;
+}
+
+message Address {
+  string ip = 1;
+  int32 port = 2;
+}
+
+message User {
+  UserId id = 1;
+  Address connection = 2;
+}
+
+message LobbyInfo {
+  LobbyId id = 1;
+  User lobbyLeader = 2;
+  string lobbyName = 3;
+  int32 nrPlayers = 4;
+  int32 maxPlayers = 5;
+}
+
+message NewLobby {
+  User lobbyCreator = 1;
+  string lobbyName = 2;
+  int32 maxPlayers = 3;
+}
+
+message Lobbies {
+  repeated LobbyInfo lobbyInfos = 1;
+}
+
+service GrpcNamingService {
+  rpc createLobby (NewLobby) returns (LobbyId);
+  rpc deleteLobby (LobbyId) returns (google.protobuf.Empty);
+  rpc getLobbyInfo (LobbyId) returns (LobbyInfo);
+  rpc getLobbies (google.protobuf.Empty) returns (Lobbies);
+}
