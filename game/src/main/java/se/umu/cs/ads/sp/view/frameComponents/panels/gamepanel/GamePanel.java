@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.view.panels.gamepanel;
 
-import se.umu.cs.ads.sp.Events.GameEvent;
-import se.umu.cs.ads.sp.Events.GameEvents;
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.events.GameEvent;
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
@@ -67,6 +67,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.setFocusable(true);  // Ensure the panel can receive key events
         this.addKeyListener(this); // Add KeyListener
         this.goldPile = new EnvironmentView(52, new Position(200, 200));
+        this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
     }
 
     @Override
