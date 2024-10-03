@@ -1,0 +1,57 @@
+package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles;
+
+import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.TileType;
+import se.umu.cs.ads.sp.view.util.UtilView;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+public class MiniMap {
+
+    private BufferedImage miniMap;
+    private final int miniMapWidth;
+    private final int miniMapHeight;
+    private final double scaleX;
+    private final double scaleY;
+    private final int mapTileWidth;
+    private final int mapTileHeight;
+
+    public MiniMap(int miniMapWidth, int miniMapHeight, int mapWidth, int mapHeight) {
+        this.miniMapWidth = miniMapWidth;
+        this.miniMapHeight = miniMapHeight;
+        scaleX = (double) miniMapWidth / mapWidth;
+        scaleY = (double) miniMapHeight / mapHeight;
+        mapTileWidth = (int) Math.ceil(UtilView.tileSize * scaleX);
+        mapTileHeight = (int) Math.ceil(UtilView.tileSize * scaleY);
+        miniMap = new BufferedImage(miniMapWidth, miniMapHeight, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public void addTile(int x, int y, TileType type, String variant) {
+        int minimapX = (int) Math.floor(x * scaleX);
+        int minimapY = (int) Math.floor(y * scaleY);
+        Graphics2D mapGraphics = miniMap.createGraphics();
+
+        if (type == TileType.GRASS) {
+            mapGraphics.setColor((variant.equals("light") ? Color.GREEN : Color.GREEN.darker().darker()));
+        } else {
+            mapGraphics.setColor((variant.equals("light") ? Color.GRAY : Color.GRAY.darker().darker()));
+        }
+
+        mapGraphics.fillRect(minimapX, minimapY, mapTileWidth, mapTileHeight);
+        mapGraphics.dispose();
+    }
+
+    public void addPoint(Position entityPosition, Color objectColor, int pointSize) {
+        int minimapX = (int) Math.floor(entityPosition.getX() * scaleX);
+        int minimapY = (int) Math.floor(entityPosition.getY() * scaleY);
+        Graphics2D mapGraphics = miniMap.createGraphics();
+        mapGraphics.setColor(objectColor);
+        mapGraphics.fillRect(minimapX, minimapY, (int) Math.ceil(pointSize * scaleX), (int) Math.ceil(pointSize * scaleY));
+        mapGraphics.dispose();
+    }
+
+    public void draw(Graphics2D g2d) {
+        g2d.drawImage(miniMap, UtilView.screenWidth - miniMap.getWidth(), 0, miniMapWidth, miniMapHeight, null);
+    }
+}

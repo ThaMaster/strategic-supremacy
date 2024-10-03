@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.Events;
+package se.umu.cs.ads.sp.events;
 
 import se.umu.cs.ads.sp.utils.enums.EventType;
 

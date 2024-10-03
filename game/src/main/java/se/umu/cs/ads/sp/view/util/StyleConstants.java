@@ -18,6 +18,10 @@ public class StyleConstants {
     public static final Color BACKGROUND_COLOR = new Color(150, 150, 150); // Light gray
     public static final Color ERROR_COLOR = new Color(255, 0, 0); // Red
 
+    public static final Color ALLY_COLOR = Color.BLUE;
+    public static final Color ENEMY_COLOR = Color.RED;
+    public static final Color GOLD_COLOR = Color.YELLOW;
+
     // Add additional styles as needed
     public static final Border DEFAULT_BORDER = BorderFactory.createLineBorder(Color.GRAY, 1);
 

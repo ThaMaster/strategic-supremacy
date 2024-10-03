@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles;
 
 import se.umu.cs.ads.sp.model.map.TileModel;
 import se.umu.cs.ads.sp.utils.Position;
@@ -45,8 +45,8 @@ public class TileManager {
             }
         }
 
-        numCols = modelMap.size();
-        numRows = longestRow;
+        numRows = modelMap.size();
+        numCols = longestRow;
     }
 
     public int getNumCols() {
@@ -57,7 +57,8 @@ public class TileManager {
         return numRows;
     }
 
-    public void draw(Graphics2D g2d, Position cameraWorldPosition) {
+    public MiniMap draw(Graphics2D g2d, Position cameraWorldPosition) {
+        MiniMap miniMap = new MiniMap(150, 150, numCols * UtilView.tileSize, numRows * UtilView.tileSize);
         for (int y = 0; y < viewMap.size(); y++) {
             for (int x = 0; x < viewMap.get(y).size(); x++) {
                 int worldX = x * UtilView.tileSize;
@@ -66,16 +67,21 @@ public class TileManager {
                     TileType type = viewMap.get(y).get(x);
                     int screenX = worldX - cameraWorldPosition.getX() + UtilView.screenX;
                     int screenY = worldY - cameraWorldPosition.getY() + UtilView.screenY;
+
                     BufferedImage image;
                     if (fowView.isInFow(new Position(worldX, worldY))) {
                         image = tileMap.get(type).getImage("light", getTileVariant(x, y));
+                        miniMap.addTile(worldX, worldY, type, "light");
                     } else {
                         image = tileMap.get(type).getImage("dark", getTileVariant(x, y));
+                        miniMap.addTile(worldX, worldY, type, "dark");
                     }
                     g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
                 }
             }
         }
+
+        return miniMap;
     }
 
     public String getTileVariant(int col, int row) {
@@ -89,7 +95,7 @@ public class TileManager {
                 continue;
             }
             for (int x = col - 1; x <= col + 1; x++) {
-                if(x < 0 || x >= viewMap.get(y).size() || viewMap.get(y).get(x) == TileType.STONE) {
+                if (x < 0 || x >= viewMap.get(y).size() || viewMap.get(y).get(x) == TileType.STONE) {
                     tileVariant.append("1");
                 } else {
                     tileVariant.append("0");

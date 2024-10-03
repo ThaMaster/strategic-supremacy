@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public abstract class TileView {
     }
 
     public BufferedImage getImage(String mode, String imageVariant) {
-        if (mode == "dark")
+        if (mode.equals("dark"))
             return darkImages.get(imageVariant);
         return this.images.get(imageVariant);
     }

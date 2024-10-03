@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.panels.browsepanel;
+package se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -6,8 +6,8 @@ import java.awt.*;
 
 public class BrowsePanel extends JPanel {
     private JTable table;
-    private String empty[][] = {{"", "", "", ""}};
-    private String column[] = {"ID", "Lobby Name", "Members", "Private"};
+    private final String[][] empty = {{"", "", "", ""}};
+    private final String[] column = {"ID", "Lobby Name", "Players", "Private"};
 
     private JButton joinButton;
     private JButton refreshButton;
@@ -34,12 +34,21 @@ public class BrowsePanel extends JPanel {
         table.getTableHeader().setReorderingAllowed(false);
 
         JScrollPane scroll = new JScrollPane(table);
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
         joinButton = new JButton("Join");
-        refreshButton = new JButton("Refresh");
         joinButton.setEnabled(false);
+        refreshButton = new JButton("Refresh");
+        createButton = new JButton("Create");
+        backButton = new JButton("Back");
+
         buttonPanel.add(joinButton);
+        buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(refreshButton);
+        buttonPanel.add(createButton);
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(backButton);
 
         this.add(groupTextPanel, BorderLayout.NORTH);
         this.add(scroll, BorderLayout.CENTER);
@@ -68,6 +77,15 @@ public class BrowsePanel extends JPanel {
     public JButton getRefreshButton() {
         return refreshButton;
     }
+
+    public JButton getCreateButton() {
+        return createButton;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
+    }
+
 
     public JTable getBrowseTable() {
         return table;

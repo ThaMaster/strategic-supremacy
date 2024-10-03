@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.panels.gamepanel;
+package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel;
 
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
@@ -15,20 +15,23 @@ import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
+import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.MiniMap;
 import se.umu.cs.ads.sp.view.objects.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
-import se.umu.cs.ads.sp.view.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
+import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -223,27 +226,42 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         Graphics2D g2d = (Graphics2D) g;
 
         // Draw tile set
-        tileManager.draw(g2d, cameraWorldPosition);
+        MiniMap miniMap =  tileManager.draw(g2d, cameraWorldPosition);
 
         // Draw collectables
         for (CollectableView collectableView : collectables.values()) {
             if (tileManager.isInFow(collectableView.getPosition())) {
+                miniMap.addPoint(goldPile.getPosition(), Color.BLACK, 50);
                 collectableView.draw(g2d, cameraWorldPosition);
             }
         }
 
         if (tileManager.isInFow(this.goldPile.getPosition())) {
+            miniMap.addPoint(goldPile.getPosition(), StyleConstants.GOLD_COLOR, 100);
             this.goldPile.draw(g2d, cameraWorldPosition);
         }
 
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
             if (tileManager.isInFow(entity.getPosition())) {
+                if(myUnitsView.containsKey(entity.getId())) {
+                    miniMap.addPoint(entity.getPosition(), StyleConstants.ALLY_COLOR, 50);
+                } else {
+                    miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
+                }
                 entity.draw(g2d, cameraWorldPosition);
             }
         }
 
         collectEvents();
+
+        // Draw selection box
+        if (startDragPoint != null && endDragPoint != null) {
+            drawDragBox(g2d);
+        }
+
+        // === DRAW MINIMAP ===
+        miniMap.draw(g2d);
 
         for (TextAnimation animation : textAnimations) {
             if (animation.hasCompleted()) {
@@ -252,11 +270,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 break;
             }
             animation.update();
-        }
-
-        // Draw selection box
-        if (startDragPoint != null && endDragPoint != null) {
-            drawDragBox(g2d);
         }
     }
 

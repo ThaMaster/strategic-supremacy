@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.model.objects.entities.units;
 
-import se.umu.cs.ads.sp.Events.GameEvent;
-import se.umu.cs.ads.sp.Events.GameEvents;
+import se.umu.cs.ads.sp.events.GameEvent;
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;

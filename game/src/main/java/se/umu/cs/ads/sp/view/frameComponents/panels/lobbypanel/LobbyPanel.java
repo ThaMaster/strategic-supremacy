@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.panels.lobbypanel;
+package se.umu.cs.ads.sp.view.frameComponents.panels.lobbypanel;
 
 import javax.swing.*;
 import java.awt.*;
