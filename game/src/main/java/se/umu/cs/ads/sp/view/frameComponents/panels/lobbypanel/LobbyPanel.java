@@ -7,10 +7,18 @@ public class LobbyPanel extends JPanel {
 
     private JButton startButton;
 
+    private PlayerPanel playerPanel;
+    private MapPanel mapPanel;
+
     public LobbyPanel() {
         this.setLayout(new BorderLayout());
 
+        playerPanel = new PlayerPanel();
+        mapPanel = new MapPanel();
         this.startButton = new JButton("Start");
+
+        this.add(playerPanel, BorderLayout.WEST);
+        this.add(mapPanel, BorderLayout.EAST);
         this.add(startButton, BorderLayout.SOUTH);
     }
 

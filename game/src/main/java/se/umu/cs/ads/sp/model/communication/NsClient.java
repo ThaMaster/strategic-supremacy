@@ -25,6 +25,7 @@ public class NsClient {
     private GrpcNamingServiceGrpc.GrpcNamingServiceFutureStub stub;
     private ComHandler comHandler;
     private ArrayList<Lobby> lobbies;
+
     public NsClient(ComHandler handler){
         channel = ManagedChannelBuilder.forAddress(AppSettings.NAMING_SERVICE_IP,
                     AppSettings.NAMING_SERVICE_PORT)

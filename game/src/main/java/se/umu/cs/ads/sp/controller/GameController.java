@@ -5,7 +5,6 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
-import se.umu.cs.ads.sp.model.communication.NsClient;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
@@ -30,6 +29,7 @@ public class GameController implements ActionListener {
     private Direction cameraPanningDirection = Direction.NONE;
     private User player;
     private ComHandler comHandler;
+
     public GameController() {
         modelManager = new ModelManager();
         tileManager = new TileManager();
@@ -129,7 +129,7 @@ public class GameController implements ActionListener {
         mainFrame.setJoinButtonListener(new JoinButtonListener());
         mainFrame.setRefreshJoinButtonListener(new RefreshButtonListener());
         mainFrame.setStartButtonListener(new StartButtonListener());
-        mainFrame.setCreateButtonListener(new CreateButtonListener());
+        mainFrame.setCreateLobbyListener(new CreateButtonListener());
         mainFrame.getBrowseTable().getSelectionModel().addListSelectionListener(e -> {
             // If I do not have this if, it will fire an event when pressing and releasing the mouse
             if (!e.getValueIsAdjusting()) {
@@ -143,14 +143,16 @@ public class GameController implements ActionListener {
                 sw.execute();
             }
         });
-
     }
 
-    public class CreateButtonListener implements  ActionListener{
+    public class CreateButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            User user = new User(Util.generateId(), GameController.this.player.username, "192.0.0.01", 8080);
-            comHandler.createLobby(user, "Death match extreme pain", 2);
+            String lobbyName = mainFrame.getCreateLobbyFrame().getLobbyNameField().getText();
+            int maxPlayers = mainFrame.getCreateLobbyFrame().getMaxPlayerValue();
+            comHandler.createLobby(GameController.this.player, lobbyName, maxPlayers);
+            mainFrame.getCreateLobbyFrame().showFrame(false);
+            comHandler.fetchLobbies();
         }
     }
 
@@ -165,6 +167,7 @@ public class GameController implements ActionListener {
             mainFrame.setPlayerName(inputName);
             GameController.this.player = new User(Util.generateId(), inputName, Util.getLocalIP(), Util.getFreePort());
             mainFrame.switchPanel("Browse");
+            comHandler.fetchLobbies();
         }
     }
 
@@ -176,9 +179,9 @@ public class GameController implements ActionListener {
         }
     }
 
-    public void updateLobbies(ArrayList<Lobby> lobbies){
+    public void updateLobbies(ArrayList<Lobby> lobbies) {
         String[][] lobbyData = new String[lobbies.size()][];
-        for(int i = 0; i < lobbies.size(); i++){
+        for (int i = 0; i < lobbies.size(); i++) {
             lobbyData[i] = new String[]{
                     String.valueOf(lobbies.get(i).id),
                     lobbies.get(i).name,
@@ -205,7 +208,6 @@ public class GameController implements ActionListener {
     }
 
     //----------------------------------------
-
     private void performGroupSelection() {
         int row = mainFrame.getBrowseTable().getSelectedRow();
         if (row >= 0) {

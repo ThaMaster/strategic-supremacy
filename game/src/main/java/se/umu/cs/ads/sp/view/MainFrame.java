@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.view;
 import se.umu.cs.ads.sp.view.frameComponents.dialogs.AboutDialog;
 import se.umu.cs.ads.sp.view.frameComponents.dialogs.HelpDialog;
 import se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel.BrowsePanel;
+import se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel.CreateLobbyFrame;
 import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.GamePanel;
 import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.frameComponents.panels.lobbypanel.LobbyPanel;
@@ -11,9 +12,12 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainFrame extends JFrame {
+
+    private CreateLobbyFrame createLobbyFrame;
 
     private JLabel playerLabel;
     private JMenuBar menuBar;
@@ -31,6 +35,8 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setTitle("Strategic Supremacy");
+        createLobbyFrame = new CreateLobbyFrame(this);
+
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
 
@@ -71,6 +77,7 @@ public class MainFrame extends JFrame {
         lobbyPanel = new LobbyPanel();
         cardPanel.add(lobbyPanel, "Lobby");
         browsePanel = new BrowsePanel();
+        browsePanel.getCreateButton().addActionListener(e -> createLobbyFrame.showFrame(true));
         cardPanel.add(browsePanel, "Browse");
         startPanel = new StartPanel();
         cardPanel.add(startPanel, "Start");
@@ -160,6 +167,10 @@ public class MainFrame extends JFrame {
         browsePanel.setJoinEnabled(bool);
     }
 
+    public CreateLobbyFrame getCreateLobbyFrame() {
+        return createLobbyFrame;
+    }
+
     //----------------------------------------
     public void setEnterButtonListener(ActionListener actionListener) {
         this.startPanel.getEnterButton().addActionListener(actionListener);
@@ -173,15 +184,13 @@ public class MainFrame extends JFrame {
         this.browsePanel.getRefreshButton().addActionListener(actionListener);
     }
 
-    public void setCreateButtonListener(ActionListener actionListener) {
-        this.browsePanel.getCreateButton().addActionListener(actionListener);
+    public void setCreateLobbyListener(ActionListener actionListener) {
+        this.createLobbyFrame.getCreateButton().addActionListener(actionListener);
     }
 
     public void setStartButtonListener(ActionListener actionListener) {
         this.lobbyPanel.getStartButton().addActionListener(actionListener);
     }
-
-
     //----------------------------------------
 
 }

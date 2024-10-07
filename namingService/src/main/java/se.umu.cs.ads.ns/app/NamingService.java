@@ -12,7 +12,7 @@ public class NamingService {
         server = new NSServer(58727);
         System.out.println("Starting NamingService!");
         System.out.println("Local Ip: " + ip);
-        System.out.println("Free Port: " + port);
+        System.out.println("Free Port: " + 58727);
     }
 
     public void startServer() {
