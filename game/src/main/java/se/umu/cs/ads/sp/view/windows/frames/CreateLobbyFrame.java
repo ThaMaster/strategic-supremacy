@@ -1,29 +1,58 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel;
+package se.umu.cs.ads.sp.view.windows.panels.browsepanel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class CreateLobbyFrame extends JFrame {
 
     private JTextField nameField;
     private JSlider slider;
-    private final JButton createButton;
-    private JFrame parentFrame;
+    private JButton createButton;
+    private JComboBox comboBox;
 
-    public CreateLobbyFrame(JFrame mainFrame) {
+    public CreateLobbyFrame() {
         this.setTitle("Create new lobby");
         this.setLayout(new BorderLayout());
 
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+        centerPanel.add(createNamePanel());
+        centerPanel.add(createMapSelectionPanel());
+        centerPanel.add(createSliderPanel());
+
+        this.add(centerPanel, BorderLayout.CENTER);
+        this.add(createButtonPanel(), BorderLayout.SOUTH);
+
+        this.setResizable(false);
+        this.pack();
+        this.setLocationRelativeTo(null);
+        this.setVisible(false);
+    }
+
+    private JPanel createNamePanel() {
         JPanel namePanel = new JPanel(new FlowLayout());
         JLabel nameLabel = new JLabel("Lobby Name");
         nameField = new JTextField();
         nameField.setColumns(10);
         namePanel.add(nameLabel);
         namePanel.add(nameField);
+        return namePanel;
+    }
 
-        // Create a JSlider
+    private JPanel createMapSelectionPanel() {
+        JPanel mapSelectionPanel = new JPanel(new FlowLayout());
+        String[] names = {"Beginner", "Easy", "Medium", "Hard", "Extreme"}; // Sample descriptive names
+        JLabel mapSelectionLabel = new JLabel("Selected Map:");
+        comboBox = new JComboBox<>(names);
+
+        mapSelectionPanel.add(mapSelectionLabel);
+        mapSelectionPanel.add(Box.createHorizontalGlue());
+        mapSelectionPanel.add(comboBox);
+
+        return mapSelectionPanel;
+    }
+
+    private JPanel createSliderPanel() {
         JPanel sliderSectionPanel = new JPanel();
         sliderSectionPanel.setLayout(new BoxLayout(sliderSectionPanel, BoxLayout.PAGE_AXIS));
 
@@ -42,12 +71,10 @@ public class CreateLobbyFrame extends JFrame {
         slider.addChangeListener(e -> sliderLabel.setText("Max Players: " + slider.getValue()));
         sliderSectionPanel.add(sliderLabel);
         sliderSectionPanel.add(sliderPanel);
+        return sliderSectionPanel;
+    }
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
-        centerPanel.add(namePanel);
-        centerPanel.add(sliderSectionPanel);
-
+    private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> {
@@ -57,15 +84,7 @@ public class CreateLobbyFrame extends JFrame {
         createButton = new JButton("Create");
         buttonPanel.add(backButton);
         buttonPanel.add(createButton);
-
-        this.add(centerPanel, BorderLayout.CENTER);
-        this.add(buttonPanel, BorderLayout.SOUTH);
-
-        this.setResizable(false);
-        this.pack();
-        this.parentFrame = mainFrame;
-        this.setLocationRelativeTo(mainFrame);
-        this.setVisible(false);
+        return buttonPanel;
     }
 
     public JTextField getLobbyNameField() {
@@ -78,6 +97,10 @@ public class CreateLobbyFrame extends JFrame {
 
     public int getMaxPlayerValue() {
         return slider.getValue();
+    }
+
+    public int getSelectedMap() {
+        return comboBox.getSelectedIndex();
     }
 
     public void showFrame(boolean bool) {

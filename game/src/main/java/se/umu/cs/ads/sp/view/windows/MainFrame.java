@@ -12,7 +12,6 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainFrame extends JFrame {
@@ -35,7 +34,7 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setTitle("Strategic Supremacy");
-        createLobbyFrame = new CreateLobbyFrame(this);
+        createLobbyFrame = new CreateLobbyFrame();
 
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
@@ -163,7 +162,9 @@ public class MainFrame extends JFrame {
         return browsePanel.getBrowseTable();
     }
 
-    public void setLobbyData(String data[][]) {lobbyPanel.getPlayerPanel().setData(data);}
+    public void setLobbyData(String data[][]) {
+        lobbyPanel.getPlayerPanel().setData(data);
+    }
 
     public void setJoinEnabled(boolean bool) {
         browsePanel.setJoinEnabled(bool);
