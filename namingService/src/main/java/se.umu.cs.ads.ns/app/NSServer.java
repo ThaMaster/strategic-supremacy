@@ -78,7 +78,7 @@ public class NSServer {
         }
 
         @Override
-        public void joinLobby(JoinRequest request, StreamObserver<LobbyPlayers> responseObserver) {
+        public void joinLobby(JoinRequest request, StreamObserver<DetailedLobbyInfo> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             lobby.addLeader(NsGrpcUtil.fromGrpc(request.getUser()));
             lobbies.put(lobby.id, lobby);

@@ -7,10 +7,10 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import nsProto.DetailedLobbyInfo;
 import nsProto.GrpcNamingServiceGrpc;
 import nsProto.Lobbies;
 import nsProto.LobbyId;
-import nsProto.LobbyPlayers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
@@ -18,6 +18,7 @@ import se.umu.cs.ads.ns.util.NsGrpcUtil;
 import se.umu.cs.ads.sp.utils.AppSettings;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class NsClient {
@@ -68,19 +69,21 @@ public class NsClient {
         }
     }
 
-    public void fetchLobbies() {
+    public CompletableFuture<ArrayList<Lobby>> fetchLobbies() {
+        CompletableFuture<ArrayList<Lobby>> onComplete = new CompletableFuture<>();
         ListenableFuture<Lobbies> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .getLobbies(Empty.newBuilder().build());
 
-        Futures.addCallback(future, new FutureCallback<Lobbies>() {
+        Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Lobbies lobbies) {
                 if (lobbies == null) {
                     System.out.println("Received null lobbies");
                     return;
+                } else {
+                    onComplete.complete(NsGrpcUtil.fromGrpc(lobbies));
                 }
-                comHandler.onFetchLobbiesComplete(NsGrpcUtil.fromGrpc(lobbies));
             }
 
             @Override
@@ -90,29 +93,21 @@ public class NsClient {
 
         }, MoreExecutors.directExecutor());
 
-        // Await future completion. Note that the callbacks are triggered on completion.
-        try {
-            while (!future.isDone()) {
-                System.out.println("Awaiting future completion...");
-                Thread.sleep(250);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return onComplete;
     }
 
     public void fetchPlayersFromLobby(Long lobbyId, User user) {
-        ListenableFuture<LobbyPlayers> future = stub
+        ListenableFuture<DetailedLobbyInfo> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .joinLobby(NsGrpcUtil.toGrpc(lobbyId, user));
 
-        Futures.addCallback(future, new FutureCallback<LobbyPlayers>() {
+        Futures.addCallback(future, new FutureCallback<DetailedLobbyInfo>() {
             @Override
-            public void onSuccess(@Nullable LobbyPlayers lobbyPlayers) {
-                if (lobbyPlayers == null) {
+            public void onSuccess(@Nullable DetailedLobbyInfo detailedLobbyInfo) {
+                if (detailedLobbyInfo == null) {
                     return;
                 }
-                comHandler.onFetchLobbyPlayersComplete(NsGrpcUtil.fromGrpc(lobbyPlayers), lobbyPlayers.getSelectedMap());
+                comHandler.onFetchLobbyPlayersComplete(NsGrpcUtil.fromGrpc(detailedLobbyInfo), detailedLobbyInfo.getSelectedMap());
             }
 
             @Override

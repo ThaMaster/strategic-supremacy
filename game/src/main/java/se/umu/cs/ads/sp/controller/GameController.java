@@ -136,7 +136,8 @@ public class GameController implements ActionListener {
                 SwingWorker<Object, Object> sw = new SwingWorker<>() {
                     @Override
                     protected String doInBackground() {
-                        performGroupSelection();
+                        int row = mainFrame.getBrowseTable().getSelectedRow();
+                        mainFrame.setJoinEnabled(row >= 0);
                         return "";
                     }
                 };
@@ -152,7 +153,7 @@ public class GameController implements ActionListener {
             int maxPlayers = mainFrame.getCreateLobbyFrame().getMaxPlayerValue();
             comHandler.createLobby(GameController.this.player, lobbyName, maxPlayers);
             mainFrame.getCreateLobbyFrame().showFrame(false);
-            comHandler.fetchLobbies();
+            fetchLobbies();
         }
     }
 
@@ -167,7 +168,7 @@ public class GameController implements ActionListener {
             mainFrame.setPlayerName(inputName);
             GameController.this.player = new User(Util.generateId(), inputName, Util.getLocalIP(), Util.getFreePort());
             mainFrame.switchPanel("Browse");
-            comHandler.fetchLobbies();
+            fetchLobbies();
         }
     }
 
@@ -175,20 +176,8 @@ public class GameController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Fetch and refresh the table full of lobbies.
-            comHandler.fetchLobbies();
+            fetchLobbies();
         }
-    }
-
-    public void updateLobbies(ArrayList<Lobby> lobbies) {
-        String[][] lobbyData = new String[lobbies.size()][];
-        for (int i = 0; i < lobbies.size(); i++) {
-            lobbyData[i] = new String[]{
-                    String.valueOf(lobbies.get(i).id),
-                    lobbies.get(i).name,
-                    (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
-            };
-        }
-        mainFrame.setBrowsePanelData(lobbyData);
     }
 
     public class JoinButtonListener implements ActionListener {
@@ -222,8 +211,23 @@ public class GameController implements ActionListener {
     }
 
     //----------------------------------------
-    private void performGroupSelection() {
-        int row = mainFrame.getBrowseTable().getSelectedRow();
-        mainFrame.setJoinEnabled(row >= 0);
+
+    //------ALL-COMMUNICATION-FUNCTIONS------//
+    private void fetchLobbies() {
+        comHandler.fetchLobbies().thenAccept(lobbies -> {
+            SwingUtilities.invokeLater(() -> {
+                String[][] lobbyData = new String[lobbies.size()][];
+                for (int i = 0; i < lobbies.size(); i++) {
+                    lobbyData[i] = new String[]{
+                            String.valueOf(lobbies.get(i).id),
+                            lobbies.get(i).name,
+                            (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
+                    };
+                }
+                mainFrame.setBrowsePanelData(lobbyData);
+            });
+        });
     }
+
+    //---------------------------------------//
 }

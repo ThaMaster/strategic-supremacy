@@ -11,7 +11,7 @@ public class AppSettings {
     public static boolean DEBUG = false;
 
     public static void SetGameConfig() {
-        File config = new File("./game/AppSettings.cfg");
+        File config = new File("./AppSettings.cfg");
 
         if (!config.exists()) {
             System.out.println("Could not find config file. " + config.getAbsolutePath());

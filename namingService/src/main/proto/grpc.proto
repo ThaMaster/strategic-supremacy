@@ -30,12 +30,12 @@ message LobbyInfo {
   int32 maxPlayers = 5;
 }
 
-message LobbyPlayers {
-  repeated User users = 1;
+message DetailedLobbyInfo {
+  string lobbyName = 5;
   User leader = 2;
+  repeated User users = 1;
   int32 maxPlayers = 3;
   int32 selectedMap = 4;
-  string lobbyName = 5;
 }
 
 message NewLobby {
@@ -58,5 +58,5 @@ service GrpcNamingService {
   rpc deleteLobby (LobbyId) returns (google.protobuf.Empty);
   rpc getLobbyInfo (LobbyId) returns (LobbyInfo);
   rpc getLobbies (google.protobuf.Empty) returns (Lobbies);
-  rpc joinLobby(JoinRequest) returns (LobbyPlayers);
+  rpc joinLobby(JoinRequest) returns (DetailedLobbyInfo);
 }
