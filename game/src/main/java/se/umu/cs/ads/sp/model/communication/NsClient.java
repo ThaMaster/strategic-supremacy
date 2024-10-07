@@ -7,9 +7,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import nsProto.*;
+import nsProto.GrpcNamingServiceGrpc;
+import nsProto.Lobbies;
+import nsProto.LobbyId;
+import nsProto.LobbyPlayers;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import proto.PlayerUnit;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.NsGrpcUtil;
@@ -24,16 +26,16 @@ public class NsClient {
     private ComHandler comHandler;
     private ArrayList<Lobby> lobbies;
 
-    public NsClient(ComHandler handler){
+    public NsClient(ComHandler handler) {
         channel = ManagedChannelBuilder.forAddress(AppSettings.NAMING_SERVICE_IP,
-                    AppSettings.NAMING_SERVICE_PORT)
+                        AppSettings.NAMING_SERVICE_PORT)
                 .usePlaintext()
                 .build();
         stub = GrpcNamingServiceGrpc.newFutureStub(channel);
         this.comHandler = handler;
     }
 
-    public void createLobby(User user, String name, int maxPlayers){
+    public void createLobby(User user, String name, int maxPlayers) {
         // Create request abd call service
         ListenableFuture<LobbyId> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -42,7 +44,7 @@ public class NsClient {
         Futures.addCallback(future, new FutureCallback<LobbyId>() {
             @Override
             public void onSuccess(@Nullable LobbyId lobbyId) {
-                if(lobbyId == null){
+                if (lobbyId == null) {
                     System.out.println("Weird");
                 }
                 System.out.println("We got success yea " + lobbyId);
@@ -66,7 +68,7 @@ public class NsClient {
         }
     }
 
-    public void fetchLobbies(){
+    public void fetchLobbies() {
         ListenableFuture<Lobbies> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .getLobbies(Empty.newBuilder().build());
@@ -74,7 +76,7 @@ public class NsClient {
         Futures.addCallback(future, new FutureCallback<Lobbies>() {
             @Override
             public void onSuccess(@Nullable Lobbies lobbies) {
-                if(lobbies == null){
+                if (lobbies == null) {
                     System.out.println("Received null lobbies");
                     return;
                 }
@@ -99,7 +101,7 @@ public class NsClient {
         }
     }
 
-    public void fetchPlayersFromLobby(Long lobbyId, User user){
+    public void fetchPlayersFromLobby(Long lobbyId, User user) {
         ListenableFuture<LobbyPlayers> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .joinLobby(NsGrpcUtil.toGrpc(lobbyId, user));
@@ -107,7 +109,7 @@ public class NsClient {
         Futures.addCallback(future, new FutureCallback<LobbyPlayers>() {
             @Override
             public void onSuccess(@Nullable LobbyPlayers lobbyPlayers) {
-                if(lobbyPlayers == null){
+                if (lobbyPlayers == null) {
                     return;
                 }
                 comHandler.onFetchLobbyPlayersComplete(NsGrpcUtil.fromGrpc(lobbyPlayers), lobbyPlayers.getSelectedMap());
