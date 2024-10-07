@@ -24,49 +24,42 @@ import java.util.concurrent.TimeUnit;
 public class NsClient {
     private ManagedChannel channel = null;
     private GrpcNamingServiceGrpc.GrpcNamingServiceFutureStub stub;
-    private ComHandler comHandler;
     private ArrayList<Lobby> lobbies;
 
-    public NsClient(ComHandler handler) {
+    public NsClient() {
         channel = ManagedChannelBuilder.forAddress(AppSettings.NAMING_SERVICE_IP,
                         AppSettings.NAMING_SERVICE_PORT)
                 .usePlaintext()
                 .build();
         stub = GrpcNamingServiceGrpc.newFutureStub(channel);
-        this.comHandler = handler;
     }
 
-    public void createLobby(User user, String name, int maxPlayers) {
+    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, int selectedMap) {
+        CompletableFuture<Long> onComplete = new CompletableFuture<>();
         // Create request abd call service
         ListenableFuture<LobbyId> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers));
+                .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers, selectedMap));
 
-        Futures.addCallback(future, new FutureCallback<LobbyId>() {
+        Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable LobbyId lobbyId) {
                 if (lobbyId == null) {
-                    System.out.println("Weird");
+                    System.out.println("[Client] No Lobby Id Found!");
+                } else {
+                    onComplete.complete(NsGrpcUtil.fromGrpc(lobbyId));
+                    System.out.println("[Client] Created lobby with Id: " + lobbyId);
                 }
-                System.out.println("We got success yea " + lobbyId);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("Failed to retrieve player info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+                System.out.println("[Client] Failed to create new lobby using address '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
             }
 
         }, MoreExecutors.directExecutor());
 
-        // Await future completion. Note that the callbacks are triggered on completion.
-        try {
-            while (!future.isDone()) {
-                System.out.println("Awaiting future completion...");
-                Thread.sleep(250);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return onComplete;
     }
 
     public CompletableFuture<ArrayList<Lobby>> fetchLobbies() {
@@ -79,8 +72,7 @@ public class NsClient {
             @Override
             public void onSuccess(@Nullable Lobbies lobbies) {
                 if (lobbies == null) {
-                    System.out.println("Received null lobbies");
-                    return;
+                    System.out.println("[Client] Did not find any lobbies!");
                 } else {
                     onComplete.complete(NsGrpcUtil.fromGrpc(lobbies));
                 }
@@ -88,7 +80,7 @@ public class NsClient {
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("Failed to retrieve player info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+                System.out.println("[Client] Failed to fetch lobbies from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
             }
 
         }, MoreExecutors.directExecutor());
@@ -96,35 +88,46 @@ public class NsClient {
         return onComplete;
     }
 
-    public void fetchPlayersFromLobby(Long lobbyId, User user) {
+    public CompletableFuture<Lobby> fetchDetailedLobbyInfo(Long lobbyId, User user) {
+        CompletableFuture<Lobby> onComplete = new CompletableFuture<>();
         ListenableFuture<DetailedLobbyInfo> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .joinLobby(NsGrpcUtil.toGrpc(lobbyId, user));
+                .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
 
-        Futures.addCallback(future, new FutureCallback<DetailedLobbyInfo>() {
+        Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable DetailedLobbyInfo detailedLobbyInfo) {
-                if (detailedLobbyInfo == null) {
-                    return;
+                if (detailedLobbyInfo != null) {
+                    onComplete.complete(NsGrpcUtil.fromGrpc(detailedLobbyInfo));
                 }
-                comHandler.onFetchLobbyPlayersComplete(NsGrpcUtil.fromGrpc(detailedLobbyInfo), detailedLobbyInfo.getSelectedMap());
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("Failed to retrieve player info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+                System.out.println("[Client] Failed to fetch detailed lobby info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
             }
 
         }, MoreExecutors.directExecutor());
 
-        // Await future completion. Note that the callbacks are triggered on completion.
-        try {
-            while (!future.isDone()) {
-                System.out.println("Awaiting future completion...");
-                Thread.sleep(250);
+        return onComplete;
+    }
+
+    public void leaveLobby(Long lobbyId, User user) {
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .leaveLobby(NsGrpcUtil.toGrpcLeave(lobbyId, user));
+
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty empty) {
+                System.out.println("[Client] Successfully left the lobby!");
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("[Client] Failed to leave lobby from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+            }
+
+        }, MoreExecutors.directExecutor());
     }
 }

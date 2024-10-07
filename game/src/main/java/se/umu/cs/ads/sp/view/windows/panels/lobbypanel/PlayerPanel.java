@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.lobbypanel;
+package se.umu.cs.ads.sp.view.windows.panels.lobbypanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

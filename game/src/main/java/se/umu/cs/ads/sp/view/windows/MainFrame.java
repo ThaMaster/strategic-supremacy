@@ -1,14 +1,14 @@
-package se.umu.cs.ads.sp.view;
+package se.umu.cs.ads.sp.view.windows;
 
-import se.umu.cs.ads.sp.view.frameComponents.dialogs.AboutDialog;
-import se.umu.cs.ads.sp.view.frameComponents.dialogs.HelpDialog;
-import se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel.BrowsePanel;
-import se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel.CreateLobbyFrame;
-import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.GamePanel;
-import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.TileManager;
-import se.umu.cs.ads.sp.view.frameComponents.panels.lobbypanel.LobbyPanel;
-import se.umu.cs.ads.sp.view.frameComponents.panels.start.StartPanel;
 import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.dialogs.AboutDialog;
+import se.umu.cs.ads.sp.view.windows.dialogs.HelpDialog;
+import se.umu.cs.ads.sp.view.windows.frames.CreateLobbyFrame;
+import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.panels.lobbypanel.LobbyPanel;
+import se.umu.cs.ads.sp.view.windows.panels.start.StartPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,6 +77,7 @@ public class MainFrame extends JFrame {
         cardPanel.add(lobbyPanel, "Lobby");
         browsePanel = new BrowsePanel();
         browsePanel.getCreateButton().addActionListener(e -> createLobbyFrame.showFrame(true));
+        browsePanel.getBackButton().addActionListener(e -> switchPanel("Start"));
         cardPanel.add(browsePanel, "Browse");
         startPanel = new StartPanel();
         cardPanel.add(startPanel, "Start");
@@ -146,10 +147,6 @@ public class MainFrame extends JFrame {
         browsePanel.setData(data);
     }
 
-    public void setLobbyPanelData(String data[][]) {
-        lobbyPanel.setData(data);
-    }
-
     public void setPlayerName(String name) {
         this.playerLabel.setText(name);
     }
@@ -166,6 +163,10 @@ public class MainFrame extends JFrame {
         lobbyPanel.getPlayerPanel().setData(data);
     }
 
+    public LobbyPanel getLobbyPanel() {
+        return lobbyPanel;
+    }
+
     public void setJoinEnabled(boolean bool) {
         browsePanel.setJoinEnabled(bool);
     }
@@ -177,6 +178,7 @@ public class MainFrame extends JFrame {
     //----------------------------------------
     public void setEnterButtonListener(ActionListener actionListener) {
         this.startPanel.getEnterButton().addActionListener(actionListener);
+        this.startPanel.getRootPane().setDefaultButton(startPanel.getEnterButton());
     }
 
     public void setJoinButtonListener(ActionListener actionListener) {
@@ -193,6 +195,11 @@ public class MainFrame extends JFrame {
 
     public void setStartButtonListener(ActionListener actionListener) {
         this.lobbyPanel.getStartButton().addActionListener(actionListener);
+
+    }
+
+    public void setLeaveButtonListener(ActionListener actionListener) {
+        this.lobbyPanel.getLeaveButton().addActionListener(actionListener);
     }
     //----------------------------------------
 

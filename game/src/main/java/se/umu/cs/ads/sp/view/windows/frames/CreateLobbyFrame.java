@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.browsepanel;
+package se.umu.cs.ads.sp.view.windows.frames;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,6 +105,5 @@ public class CreateLobbyFrame extends JFrame {
 
     public void showFrame(boolean bool) {
         this.setVisible(bool);
-        //this.parentFrame.setEnabled(!bool);
     }
 }

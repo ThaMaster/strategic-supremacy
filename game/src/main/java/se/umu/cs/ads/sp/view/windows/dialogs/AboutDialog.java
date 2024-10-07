@@ -1,6 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.dialogs;
-
-import com.google.api.Backend;
+package se.umu.cs.ads.sp.view.windows.dialogs;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

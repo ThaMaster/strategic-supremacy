@@ -9,21 +9,17 @@ public class Lobby {
     public Long id;
     public String name;
     public ArrayList<User> users = new ArrayList<>();
-    public int maxPlayers;
     public User leader;
+
+    public int maxPlayers;
     public int currentPlayers;
-    public Lobby(Long id,String name, int maxPlayers) {
+    public int selectedMap;
+
+    public Lobby(Long id, String name, int maxPlayers) {
         this.id = id;
         this.name = name;
         this.maxPlayers = maxPlayers;
-
     }
-
-    public void setUsers(ArrayList<User> users) {
-        this.currentPlayers = users.size();
-        this.users = users;
-    }
-
 
     public Lobby(String name, int maxPlayers) {
         this.id = Util.generateId();
@@ -31,10 +27,14 @@ public class Lobby {
         this.maxPlayers = maxPlayers;
     }
 
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+        this.currentPlayers = users.size();
+    }
+
     public void addLeader(User user){
         this.leader = user;
-        this.users.add(user);
-        this.currentPlayers++;
+        addUser(user);
     }
 
     public void addUser(User user){
@@ -46,6 +46,4 @@ public class Lobby {
         this.users.remove(user);
         this.currentPlayers--;
     }
-
-
 }

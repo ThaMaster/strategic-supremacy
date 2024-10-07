@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles;
 
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
@@ -6,6 +6,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class MiniMap {
 
@@ -53,5 +54,28 @@ public class MiniMap {
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(miniMap, UtilView.screenWidth - miniMap.getWidth(), 0, miniMapWidth, miniMapHeight, null);
+    }
+
+    public static BufferedImage createMinimapFromArray(ArrayList<ArrayList<TileType>> map, int mapWidth, int mapHeight, int width, int height) {
+        double scaleX = (double) width / mapWidth;
+        double scaleY = (double) height / mapHeight;
+        int mapTileWidth = (int) Math.ceil(UtilView.tileSize * scaleX);
+        int mapTileHeight = (int) Math.ceil(UtilView.tileSize * scaleY);
+        BufferedImage mapImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D mapGraphics = mapImage.createGraphics();
+        for (int y = 0; y < map.size(); y++) {
+            for (int x = 0; x < map.get(y).size(); x++) {
+                TileType type = map.get(y).get(x);
+                int minimapX = (int) Math.floor(x * scaleX);
+                int minimapY = (int) Math.floor(y * scaleY);
+                if (type == TileType.GRASS) {
+                    mapGraphics.setColor(Color.GREEN);
+                } else {
+                    mapGraphics.setColor(Color.GRAY);
+                }
+                mapGraphics.fillRect(minimapX, minimapY, mapTileWidth, mapTileHeight);
+            }
+        }
+        return mapImage;
     }
 }

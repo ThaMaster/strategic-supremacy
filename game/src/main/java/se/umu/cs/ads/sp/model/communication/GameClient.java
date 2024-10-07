@@ -43,37 +43,4 @@ public class GameClient {
             e.printStackTrace();
         }
     }
-
-    public void requestUnitInfo(long unitId) {
-        // Create request abd call service
-        ListenableFuture<PlayerUnit> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .getPlayerUnitInfo(GrpcUtil.toProto(unitId));
-
-        Futures.addCallback(future, new FutureCallback<PlayerUnit>() {
-            @Override
-            public void onSuccess(@Nullable PlayerUnit result) {
-                System.out.println("Successfully retrieved player info from '" + ip + ":" + port + "'");
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                System.out.println("Failed to retrieve player info from '" + ip + ":" + port + "'");
-            }
-
-        }, MoreExecutors.directExecutor());
-
-        // Alternative callback
-        future.addListener(() -> System.out.println("Response received!"), MoreExecutors.directExecutor());
-
-        // Await future completion. Note that the callbacks are triggered on completion.
-        try {
-            while (!future.isDone()) {
-                System.out.println("Awaiting future completion...");
-                Thread.sleep(250);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

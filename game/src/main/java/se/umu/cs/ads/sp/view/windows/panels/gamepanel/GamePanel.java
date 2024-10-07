@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
@@ -15,14 +15,14 @@ import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
-import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.MiniMap;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.MiniMap;
 import se.umu.cs.ads.sp.view.objects.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
-import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
@@ -31,7 +31,6 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 

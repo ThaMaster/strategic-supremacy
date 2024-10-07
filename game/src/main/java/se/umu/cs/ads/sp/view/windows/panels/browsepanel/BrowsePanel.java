@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.browsepanel;
+package se.umu.cs.ads.sp.view.windows.panels.browsepanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

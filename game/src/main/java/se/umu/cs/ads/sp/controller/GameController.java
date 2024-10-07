@@ -1,14 +1,13 @@
 package se.umu.cs.ads.sp.controller;
 
-import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
-import se.umu.cs.ads.sp.view.MainFrame;
-import se.umu.cs.ads.sp.view.frameComponents.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.MainFrame;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,15 +29,17 @@ public class GameController implements ActionListener {
     private User player;
     private ComHandler comHandler;
 
+    // TODO: CHANGE THIS TO OTHER PLACE AND REMOVE FROM VIEW!!!
+    private Long joinedLobby = -1L;
+
     public GameController() {
         modelManager = new ModelManager();
         tileManager = new TileManager();
         tileManager.setMap(modelManager.getMap().getModelMap());
 
-        // TODO: Fix the initialization of the tile manager (should not be passed in the constructor of the main frame)
         mainFrame = new MainFrame();
+        comHandler = new ComHandler();
         setActionListeners();
-        comHandler = new ComHandler(this);
 
 
     }
@@ -124,11 +125,11 @@ public class GameController implements ActionListener {
     // Action listener things
     //----------------------------------------
     private void setActionListeners() {
-        // TODO: Make it possible to press ENTER when starting the application.
         mainFrame.setEnterButtonListener(new EnterButtonListener());
         mainFrame.setJoinButtonListener(new JoinButtonListener());
         mainFrame.setRefreshJoinButtonListener(new RefreshButtonListener());
         mainFrame.setStartButtonListener(new StartButtonListener());
+        mainFrame.setLeaveButtonListener(new LeaveButtonListener());
         mainFrame.setCreateLobbyListener(new CreateButtonListener());
         mainFrame.getBrowseTable().getSelectionModel().addListSelectionListener(e -> {
             // If I do not have this if, it will fire an event when pressing and releasing the mouse
@@ -151,9 +152,10 @@ public class GameController implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String lobbyName = mainFrame.getCreateLobbyFrame().getLobbyNameField().getText();
             int maxPlayers = mainFrame.getCreateLobbyFrame().getMaxPlayerValue();
-            comHandler.createLobby(GameController.this.player, lobbyName, maxPlayers);
+            int selectedMap = mainFrame.getCreateLobbyFrame().getSelectedMap();
             mainFrame.getCreateLobbyFrame().showFrame(false);
-            fetchLobbies();
+            createLobby(lobbyName, maxPlayers, selectedMap);
+            mainFrame.switchPanel("Lobby");
         }
     }
 
@@ -186,21 +188,22 @@ public class GameController implements ActionListener {
             // Get the id of the lobby and join the lobby.
             int selectedRow = mainFrame.getBrowseTable().getSelectedRow();
             String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(selectedRow, 0);
-            comHandler.fetchPlayersFromLobby(Long.valueOf(lobbyId), GameController.this.player);
+            GameController.this.joinedLobby = Long.parseLong(lobbyId);
+            fetchDetailedLobby(joinedLobby);
             mainFrame.switchPanel("Lobby");
-            //mainFrame.setLobbyName
         }
     }
 
-    public void updateLobbyPage(Lobby lobby, int selectedMap) {
-        String[][] lobbyData = new String[lobby.users.size()][];
-        for (int i = 0; i < lobby.users.size(); i++) {
-            lobbyData[i] = new String[]{
-                    String.valueOf(lobby.users.get(i).id),
-                    lobby.users.get(i).username,
-            };
+    public class LeaveButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (joinedLobby != -1L) {
+                leaveLobby(joinedLobby);
+            }
+            mainFrame.switchPanel("Browse");
+            fetchLobbies();
         }
-        mainFrame.setLobbyData(lobbyData);
     }
 
     public class StartButtonListener implements ActionListener {
@@ -214,19 +217,45 @@ public class GameController implements ActionListener {
 
     //------ALL-COMMUNICATION-FUNCTIONS------//
     private void fetchLobbies() {
-        comHandler.fetchLobbies().thenAccept(lobbies -> {
-            SwingUtilities.invokeLater(() -> {
-                String[][] lobbyData = new String[lobbies.size()][];
-                for (int i = 0; i < lobbies.size(); i++) {
-                    lobbyData[i] = new String[]{
-                            String.valueOf(lobbies.get(i).id),
-                            lobbies.get(i).name,
-                            (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
-                    };
-                }
-                mainFrame.setBrowsePanelData(lobbyData);
-            });
-        });
+        comHandler.fetchLobbies().thenAccept(lobbies -> SwingUtilities.invokeLater(() -> {
+            String[][] lobbyData = new String[lobbies.size()][];
+            for (int i = 0; i < lobbies.size(); i++) {
+                lobbyData[i] = new String[]{
+                        String.valueOf(lobbies.get(i).id),
+                        lobbies.get(i).name,
+                        (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
+                };
+            }
+            mainFrame.setBrowsePanelData(lobbyData);
+        }));
+    }
+
+    private void createLobby(String lobbyName, int maxPlayers, int selectedMap) {
+        comHandler.createLobby(GameController.this.player, lobbyName, maxPlayers, selectedMap)
+                .thenAccept(lobbyId -> {
+                    GameController.this.joinedLobby = lobbyId;
+                    fetchDetailedLobby(lobbyId);
+                });
+    }
+
+    private void leaveLobby(long lobbyId) {
+        comHandler.leaveLobby(lobbyId, GameController.this.player);
+        this.joinedLobby = -1L;
+    }
+
+    private void fetchDetailedLobby(long lobbyId) {
+        comHandler.fetchDetailedLobbyInfo(lobbyId, GameController.this.player)
+                .thenAccept(lobby -> SwingUtilities.invokeLater(() -> {
+                    String[][] lobbyData = new String[lobby.users.size()][];
+                    for (int i = 0; i < lobby.users.size(); i++) {
+                        lobbyData[i] = new String[]{
+                                String.valueOf(lobby.users.get(i).id),
+                                lobby.users.get(i).username,
+                        };
+                    }
+                    mainFrame.setLobbyData(lobbyData);
+                    mainFrame.getLobbyPanel().setLobbyName(lobby.name);
+                }));
     }
 
     //---------------------------------------//

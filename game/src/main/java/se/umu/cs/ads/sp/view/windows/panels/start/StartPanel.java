@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.panels.start;
+package se.umu.cs.ads.sp.view.windows.panels.start;
 
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 

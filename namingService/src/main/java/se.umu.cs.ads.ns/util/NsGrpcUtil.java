@@ -18,11 +18,11 @@ public class NsGrpcUtil {
         return nsProto.User.newBuilder().setId(user.id).setUsername(user.username).setIp(user.ip).setPort(user.port).build();
     }
 
-    public static nsProto.LobbyId toGrpc(long lobbyId) {
+    public static nsProto.LobbyId toGrpc(Long lobbyId) {
         return nsProto.LobbyId.newBuilder().setId(lobbyId).build();
     }
 
-    public static long fromGrpc(nsProto.LobbyId request) {
+    public static Long fromGrpc(nsProto.LobbyId request) {
         return request.getId();
     }
 
@@ -51,11 +51,12 @@ public class NsGrpcUtil {
 }
 
      */
-    public static nsProto.NewLobby toGrpc(User creator, String name, int maxPlayers) {
+    public static nsProto.NewLobby toGrpc(User creator, String name, int maxPlayers, int selectedMap) {
         return nsProto.NewLobby.newBuilder().
                 setLobbyCreator(toGrpc(creator)).
                 setLobbyName(name).
                 setMaxPlayers(maxPlayers).
+                setSelectedMap(selectedMap).
                 build();
     }
 
@@ -88,8 +89,15 @@ public class NsGrpcUtil {
         return builder.build();
     }
 
-    public static nsProto.JoinRequest toGrpc(long id, User user) {
+    public static nsProto.JoinRequest toGrpcJoin(Long id, User user) {
         nsProto.JoinRequest.Builder builder = nsProto.JoinRequest.newBuilder();
+        builder.setId(toGrpc(id));
+        builder.setUser(toGrpc(user));
+        return builder.build();
+    }
+
+    public static nsProto.LeaveRequest toGrpcLeave(Long id, User user) {
+        nsProto.LeaveRequest.Builder builder = nsProto.LeaveRequest.newBuilder();
         builder.setId(toGrpc(id));
         builder.setUser(toGrpc(user));
         return builder.build();
@@ -103,7 +111,9 @@ public class NsGrpcUtil {
             users.add(fromGrpc(user));
         }
         lobby.setUsers(users);
+        lobby.selectedMap = request.getSelectedMap();
         return lobby;
     }
-
 }
+
+

@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.frameComponents.dialogs;
+package se.umu.cs.ads.sp.view.windows.dialogs;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
