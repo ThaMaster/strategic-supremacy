@@ -173,9 +173,15 @@ public class MainFrame extends JFrame {
         this.browsePanel.getRefreshButton().addActionListener(actionListener);
     }
 
+    public void setCreateButtonListener(ActionListener actionListener) {
+        this.browsePanel.getCreateButton().addActionListener(actionListener);
+    }
+
     public void setStartButtonListener(ActionListener actionListener) {
         this.lobbyPanel.getStartButton().addActionListener(actionListener);
     }
+
+
     //----------------------------------------
 
 }

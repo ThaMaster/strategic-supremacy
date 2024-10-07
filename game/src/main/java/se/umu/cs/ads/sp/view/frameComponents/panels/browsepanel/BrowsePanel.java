@@ -6,8 +6,8 @@ import java.awt.*;
 
 public class BrowsePanel extends JPanel {
     private JTable table;
-    private final String[][] empty = {{"", "", "", ""}};
-    private final String[] column = {"ID", "Lobby Name", "Players", "Private"};
+    private final String[][] empty = {{"", "", ""}};
+    private final String[] column = {"ID", "Lobby Name", "Players"};
 
     private JButton joinButton;
     private JButton refreshButton;

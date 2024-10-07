@@ -19,6 +19,7 @@ public class GameClient {
 
     private String ip;
     private int port;
+    private String username;
 
     public GameClient() {
         super();

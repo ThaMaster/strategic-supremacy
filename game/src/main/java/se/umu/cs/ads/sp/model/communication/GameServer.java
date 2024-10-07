@@ -3,7 +3,9 @@ package se.umu.cs.ads.sp.model.communication;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import proto.*;
+import proto.GameServiceGrpc;
+import proto.ObjectId;
+import proto.PlayerUnit;
 
 import java.io.IOException;
 
@@ -31,7 +33,6 @@ public class GameServer {
         public void getPlayerUnitInfo(ObjectId request, StreamObserver<PlayerUnit> responseObserver) {
             super.getPlayerUnitInfo(request, responseObserver);
         }
-
     }
 
 }

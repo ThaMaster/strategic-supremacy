@@ -21,6 +21,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>se.umu.cs.ads.ns</groupId>
+            <artifactId>NamingService</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../namingService/target/NamingService-1.0-shaded.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.14.0</version>

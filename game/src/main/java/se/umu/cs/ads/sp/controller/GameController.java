@@ -1,6 +1,11 @@
 package se.umu.cs.ads.sp.controller;
 
+import se.umu.cs.ads.ns.app.Lobby;
+import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
+import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.communication.NsClient;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.MainFrame;
@@ -23,9 +28,8 @@ public class GameController implements ActionListener {
     private TileManager tileManager;
 
     private Direction cameraPanningDirection = Direction.NONE;
-
-    private String playerName = "";
-
+    private User player;
+    private ComHandler comHandler;
     public GameController() {
         modelManager = new ModelManager();
         tileManager = new TileManager();
@@ -34,6 +38,9 @@ public class GameController implements ActionListener {
         // TODO: Fix the initialization of the tile manager (should not be passed in the constructor of the main frame)
         mainFrame = new MainFrame();
         setActionListeners();
+        comHandler = new ComHandler(this);
+
+
     }
 
     public void startGame() {
@@ -122,6 +129,7 @@ public class GameController implements ActionListener {
         mainFrame.setJoinButtonListener(new JoinButtonListener());
         mainFrame.setRefreshJoinButtonListener(new RefreshButtonListener());
         mainFrame.setStartButtonListener(new StartButtonListener());
+        mainFrame.setCreateButtonListener(new CreateButtonListener());
         mainFrame.getBrowseTable().getSelectionModel().addListSelectionListener(e -> {
             // If I do not have this if, it will fire an event when pressing and releasing the mouse
             if (!e.getValueIsAdjusting()) {
@@ -138,16 +146,24 @@ public class GameController implements ActionListener {
 
     }
 
+    public class CreateButtonListener implements  ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            User user = new User(Util.generateId(), GameController.this.player.username, "192.0.0.01", 8080);
+            comHandler.createLobby(user, "Death match extreme pain", 2);
+        }
+    }
 
     public class EnterButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Fetch all lobbies from the naming service and set all entries to the browse panel.
-            playerName = mainFrame.getInputName();
-            if (playerName.isEmpty()) {
-                playerName = "Default User";
+            String inputName = mainFrame.getInputName();
+            if (inputName.isEmpty()) {
+                inputName = "Default User";
             }
-            mainFrame.setPlayerName(playerName);
+            mainFrame.setPlayerName(inputName);
+            GameController.this.player = new User(Util.generateId(), inputName, Util.getLocalIP(), Util.getFreePort());
             mainFrame.switchPanel("Browse");
         }
     }
@@ -156,21 +172,20 @@ public class GameController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Fetch and refresh the table full of lobbies.
-            String[][] dummyData = {
-                    {"432432432", "The best lobby ever", "3/100", "True"},
-                    {"gfdspoj90+8342", "The fullest lobby ever", "100/100", "False"},
-                    {"gfdspoj90+1234", "Almost full lobby", "95/100", "False"},
-                    {"gfdspoj90+5678", "Private Lobby", "80/100", "True"},
-                    {"gfdspoj90+4321", "Casual Game Room", "50/100", "False"},
-                    {"gfdspoj90+8765", "Fun Times Ahead", "75/100", "False"},
-                    {"gfdspoj90+0001", "Ultimate Showdown", "60/100", "True"},
-                    {"gfdspoj90+9999", "Chill Zone", "30/100", "False"},
-                    {"gfdspoj90+5432", "Competitive Lobby", "90/100", "True"},
-                    {"gfdspoj90+1111", "Friendly Match", "20/100", "False"},
-                    {"gfdspoj90+2222", "Tournament Room", "100/100", "True"}
-            };
-            mainFrame.setBrowsePanelData(dummyData);
+            comHandler.fetchLobbies();
         }
+    }
+
+    public void updateLobbies(ArrayList<Lobby> lobbies){
+        String[][] lobbyData = new String[lobbies.size()][];
+        for(int i = 0; i < lobbies.size(); i++){
+            lobbyData[i] = new String[]{
+                    String.valueOf(lobbies.get(i).id),
+                    lobbies.get(i).name,
+                    (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
+            };
+        }
+        mainFrame.setBrowsePanelData(lobbyData);
     }
 
     public class JoinButtonListener implements ActionListener {

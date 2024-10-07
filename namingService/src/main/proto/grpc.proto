@@ -12,17 +12,14 @@ message UserId {
 }
 
 message LobbyId {
-  string id = 1;
-}
-
-message Address {
-  string ip = 1;
-  int32 port = 2;
+  int64 id = 1;
 }
 
 message User {
-  UserId id = 1;
-  Address connection = 2;
+  int64 id = 1;
+  string ip = 2;
+  int32 port = 3;
+  string username = 4;
 }
 
 message LobbyInfo {

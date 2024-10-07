@@ -9,7 +9,7 @@ public class NamingService {
     public NamingService() {
         String ip = Util.getLocalIP();
         int port = Util.getFreePort();
-        server = new NSServer(port);
+        server = new NSServer(58727);
         System.out.println("Starting NamingService!");
         System.out.println("Local Ip: " + ip);
         System.out.println("Free Port: " + port);

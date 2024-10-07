@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 
 public class Util {
 
+    private static long currentId = 1;
+
     public static int getFreePort() {
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             return serverSocket.getLocalPort();
@@ -25,6 +27,10 @@ public class Util {
             e.printStackTrace();
         }
         return ip;
+    }
+
+    public static long generateId() {
+        return currentId++;
     }
 
 }
