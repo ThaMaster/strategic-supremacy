@@ -1,5 +1,9 @@
 package se.umu.cs.ads.sp.utils;
 
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Random;
 
 public class Utils {
@@ -17,5 +21,26 @@ public class Utils {
         Random random = new Random();
         return random.nextInt(min, max);
     }
+
+    public static int getFreePort() {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            return serverSocket.getLocalPort();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static String getLocalIP() {
+        String ip = null;
+        try(final DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ip;
+    }
+
 }
 
