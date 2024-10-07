@@ -195,12 +195,26 @@ public class GameController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Get the id of the lobby and join the lobby.
+            int selectedRow = mainFrame.getBrowseTable().getSelectedRow();
+            String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(selectedRow, 0);
+            comHandler.fetchPlayersFromLobby(Long.valueOf(lobbyId), GameController.this.player);
             mainFrame.switchPanel("Lobby");
+            //mainFrame.setLobbyName
         }
     }
 
-    public class StartButtonListener implements ActionListener {
+    public void updateLobbyPage(Lobby lobby, int selectedMap) {
+        String[][] lobbyData = new String[lobby.users.size()][];
+        for (int i = 0; i < lobby.users.size(); i++) {
+            lobbyData[i] = new String[]{
+                    String.valueOf(lobby.users.get(i).id),
+                    lobby.users.get(i).username,
+            };
+        }
+        mainFrame.setLobbyData(lobbyData);
+    }
 
+    public class StartButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             startGame();
@@ -210,14 +224,6 @@ public class GameController implements ActionListener {
     //----------------------------------------
     private void performGroupSelection() {
         int row = mainFrame.getBrowseTable().getSelectedRow();
-        if (row >= 0) {
-            String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(row, 0);
-            String lobbyName = (String) mainFrame.getBrowseTable().getValueAt(row, 1);
-            String players = (String) mainFrame.getBrowseTable().getValueAt(row, 2);
-            boolean isPrivate = Boolean.valueOf((String) mainFrame.getBrowseTable().getValueAt(row, 3));
-            mainFrame.setJoinEnabled(true);
-        } else {
-            mainFrame.setJoinEnabled(false);
-        }
+        mainFrame.setJoinEnabled(row >= 0);
     }
 }

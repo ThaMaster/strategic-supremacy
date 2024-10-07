@@ -50,12 +50,13 @@ public class NSServer {
     public class GrpcNamingService extends GrpcNamingServiceGrpc.GrpcNamingServiceImplBase {
         @Override
         public void createLobby(NewLobby request, StreamObserver<LobbyId> responseObserver) {
-            Long id = Util.generateId();
-            Lobby lobby = new Lobby(id, request.getLobbyName(), request.getMaxPlayers());
+            Lobby lobby = new Lobby(request.getLobbyName(), request.getMaxPlayers());
             lobby.addLeader(NsGrpcUtil.fromGrpc(request.getLobbyCreator()));
-            lobbies.put(id, lobby);
-            System.out.println("Responding with id = " + id);
-            responseObserver.onNext(NsGrpcUtil.toGrpc(id));
+
+            lobbies.put(lobby.id, lobby);
+
+            System.out.println("Responding with id = " + lobby.id);
+            responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.id));
             responseObserver.onCompleted();
         }
 
@@ -75,5 +76,15 @@ public class NSServer {
             responseObserver.onNext(NsGrpcUtil.toGrpc(new ArrayList<>(lobbies.values())));
             responseObserver.onCompleted();
         }
+
+        @Override
+        public void joinLobby(JoinRequest request, StreamObserver<LobbyPlayers> responseObserver) {
+            Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
+            lobby.addLeader(NsGrpcUtil.fromGrpc(request.getUser()));
+            lobbies.put(lobby.id, lobby);
+            responseObserver.onNext(NsGrpcUtil.toGrpc(lobby, 0));
+            responseObserver.onCompleted();
+        }
+
     }
 }

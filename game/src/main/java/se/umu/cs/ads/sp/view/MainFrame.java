@@ -163,6 +163,8 @@ public class MainFrame extends JFrame {
         return browsePanel.getBrowseTable();
     }
 
+    public void setLobbyData(String data[][]) {lobbyPanel.getPlayerPanel().setData(data);}
+
     public void setJoinEnabled(boolean bool) {
         browsePanel.setJoinEnabled(bool);
     }

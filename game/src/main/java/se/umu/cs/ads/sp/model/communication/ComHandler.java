@@ -15,8 +15,11 @@ public class ComHandler {
     }
 
     public void createLobby(User user, String name, int maxPlayers){
-
         this.namingService.createLobby(user, name, maxPlayers);
+    }
+
+    public void fetchPlayersFromLobby(Long lobbyId, User user){
+        this.namingService.fetchPlayersFromLobby(lobbyId, user);
     }
 
     public void fetchLobbies(){
@@ -25,5 +28,9 @@ public class ComHandler {
 
     public void onFetchLobbiesComplete(ArrayList<Lobby> lobbies){
         gameController.updateLobbies(lobbies);
+    }
+
+    public void onFetchLobbyPlayersComplete(Lobby lobby, int selectedMap){
+        gameController.updateLobbyPage(lobby, selectedMap);
     }
 }

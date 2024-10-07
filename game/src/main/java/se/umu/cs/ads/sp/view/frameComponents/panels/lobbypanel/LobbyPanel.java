@@ -29,4 +29,8 @@ public class LobbyPanel extends JPanel {
     public void setData(String[][] data) {
 
     }
+
+    public PlayerPanel getPlayerPanel() {
+        return playerPanel;
+    }
 }

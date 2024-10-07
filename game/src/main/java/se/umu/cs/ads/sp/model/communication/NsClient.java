@@ -7,9 +7,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import nsProto.GrpcNamingServiceGrpc;
-import nsProto.Lobbies;
-import nsProto.LobbyId;
+import nsProto.*;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.PlayerUnit;
 import se.umu.cs.ads.ns.app.Lobby;
@@ -69,7 +67,6 @@ public class NsClient {
     }
 
     public void fetchLobbies(){
-        ArrayList<Lobby> returnLobbies = new ArrayList<>();
         ListenableFuture<Lobbies> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .getLobbies(Empty.newBuilder().build());
@@ -82,6 +79,38 @@ public class NsClient {
                     return;
                 }
                 comHandler.onFetchLobbiesComplete(NsGrpcUtil.fromGrpc(lobbies));
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("Failed to retrieve player info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+            }
+
+        }, MoreExecutors.directExecutor());
+
+        // Await future completion. Note that the callbacks are triggered on completion.
+        try {
+            while (!future.isDone()) {
+                System.out.println("Awaiting future completion...");
+                Thread.sleep(250);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void fetchPlayersFromLobby(Long lobbyId, User user){
+        ListenableFuture<LobbyPlayers> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .joinLobby(NsGrpcUtil.toGrpc(lobbyId, user));
+
+        Futures.addCallback(future, new FutureCallback<LobbyPlayers>() {
+            @Override
+            public void onSuccess(@Nullable LobbyPlayers lobbyPlayers) {
+                if(lobbyPlayers == null){
+                    return;
+                }
+                comHandler.onFetchLobbyPlayersComplete(NsGrpcUtil.fromGrpc(lobbyPlayers), lobbyPlayers.getSelectedMap());
             }
 
             @Override

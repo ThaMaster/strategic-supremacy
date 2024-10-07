@@ -25,7 +25,7 @@
             <artifactId>NamingService</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../namingService/target/NamingService-1.0-shaded.jar</systemPath>
+            <systemPath>${basedir}/../namingService/target/NamingService-1.0-shaded.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

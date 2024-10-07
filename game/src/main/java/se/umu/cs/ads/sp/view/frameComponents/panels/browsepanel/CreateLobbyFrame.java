@@ -82,6 +82,6 @@ public class CreateLobbyFrame extends JFrame {
 
     public void showFrame(boolean bool) {
         this.setVisible(bool);
-        this.parentFrame.setEnabled(!bool);
+        //this.parentFrame.setEnabled(!bool);
     }
 }

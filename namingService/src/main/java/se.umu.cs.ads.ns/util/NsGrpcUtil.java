@@ -1,5 +1,6 @@
 package se.umu.cs.ads.ns.util;
 
+import nsProto.LobbyPlayers;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 
@@ -71,6 +72,37 @@ public class NsGrpcUtil {
     public static Lobby fromGrpc(nsProto.LobbyInfo request){
         Lobby lobby = new Lobby(fromGrpc(request.getId()),request.getLobbyName(), request.getMaxPlayers());
         lobby.currentPlayers = request.getNrPlayers();
+        return lobby;
+    }
+
+    public static nsProto.LobbyPlayers toGrpc(Lobby lobby, int selectedMap) {
+        nsProto.LobbyPlayers.Builder builder = nsProto.LobbyPlayers.newBuilder();
+        for (User user : lobby.users) {
+            builder.addUsers(toGrpc(user));
+        }
+
+        builder.setLeader(toGrpc(lobby.leader));
+        builder.setSelectedMap(selectedMap);
+        builder.setMaxPlayers(lobby.maxPlayers);
+        builder.setLobbyName(lobby.name);
+        return builder.build();
+    }
+
+    public static nsProto.JoinRequest toGrpc(long id, User user){
+        nsProto.JoinRequest.Builder builder = nsProto.JoinRequest.newBuilder();
+        builder.setId(toGrpc(id));
+        builder.setUser(toGrpc(user));
+        return builder.build();
+    }
+
+    public static Lobby fromGrpc(nsProto.LobbyPlayers request){
+        Lobby lobby = new Lobby(request.getLobbyName(), request.getMaxPlayers());
+        ArrayList<User> users = new ArrayList<>();
+        lobby.leader = fromGrpc(request.getLeader());
+        for(nsProto.User user : request.getUsersList()){
+            users.add(fromGrpc(user));
+        }
+        lobby.setUsers(users);
         return lobby;
     }
 
