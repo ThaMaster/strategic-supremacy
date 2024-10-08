@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class NsGrpcUtil {
 
     public static User fromGrpc(nsProto.User request) {
-        return new User(request.getUsername(), request.getIp(), request.getPort());
+        return new User(request.getId(), request.getUsername(), request.getIp(), request.getPort());
     }
 
     public static nsProto.User toGrpc(User user) {

@@ -81,28 +81,12 @@ public class NsServer {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User joiningUser = NsGrpcUtil.fromGrpc(request.getUser());
             System.out.println("[Server] User " + joiningUser.id + "joining lobby...");
-            if (joiningUser.id != lobby.leader.id && !lobby.users.contains(joiningUser)) {
+            if (!lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
-
-                // TODO: Understand this
-                Context newContext = Context.current().fork();
-                Context origContext = newContext.attach();
-                try {
-                    // Make all async calls here
-                    for (User user : lobby.users) {
-                        if (user.id != joiningUser.id) {
-                            NsClient client = new NsClient(user.ip, user.port);
-                            client.updateLobby(lobby, user);
-                        }
-                    }
-                } finally {
-                    // Return to old context
-                    newContext.detach(origContext);
-                }
-
+                sendUpdatedLobby(lobby);
             } else {
-                System.out.println("\t User already exists or is the leader!");
+                System.out.println("\t User already exists!");
             }
 
             System.out.println("\t Done.");
@@ -117,23 +101,38 @@ public class NsServer {
             if (leavingUser.id == lobby.leader.id) {
                 // Change the leader of the lobby!
                 System.out.println("[Server] Lobby leader, with id: " + leavingUser.id + ", left. Selecting new leader...");
-
                 lobby.removeUser(leavingUser);
             } else if (lobby.users.contains(leavingUser)) {
                 System.out.println("[Server] User " + leavingUser.id + " leaving lobby...");
                 lobby.removeUser(leavingUser);
             }
 
+
             if (lobby.currentPlayers == 0) {
                 System.out.println("[Server] Empty lobby, removing...");
                 lobbies.remove(lobby.id);
+            } else {
+                sendUpdatedLobby(lobby);
             }
 
             System.out.println("\t Done.");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
+    }
 
-
+    private void sendUpdatedLobby(Lobby lobby) {
+        Context newContext = Context.current().fork();
+        Context origContext = newContext.attach();
+        try {
+            // Make all async calls here
+            for (User user : lobby.users) {
+                NsClient client = new NsClient(user.ip, user.port);
+                client.updateLobby(lobby, user);
+            }
+        } finally {
+            // Return to old context
+            newContext.detach(origContext);
+        }
     }
 }

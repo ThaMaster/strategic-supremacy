@@ -15,4 +15,11 @@ public class User {
         this.ip = ip;
         this.port = port;
     }
+
+    public User(long id, String username, String ip, int port) {
+        this.id = id;
+        this.username = username;
+        this.ip = ip;
+        this.port = port;
+    }
 }

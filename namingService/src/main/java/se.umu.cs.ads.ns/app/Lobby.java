@@ -46,7 +46,12 @@ public class Lobby {
     }
 
     public void removeUser(User user) {
-        this.users.remove(user);
-        this.currentPlayers--;
+        for(User lobbyUser : this.users) {
+            if (lobbyUser.id == user.id) {
+                this.users.remove(lobbyUser);
+                this.currentPlayers--;
+                break;
+            }
+        }
     }
 }
