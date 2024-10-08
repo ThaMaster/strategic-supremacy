@@ -102,11 +102,13 @@ public class NsServer {
                 // Change the leader of the lobby!
                 System.out.println("[Server] Lobby leader, with id: " + leavingUser.id + ", left. Selecting new leader...");
                 lobby.removeUser(leavingUser);
-            } else if (lobby.users.contains(leavingUser)) {
+                if (lobby.currentPlayers != 0) {
+                    lobby.leader = lobby.users.get(0);
+                }
+            } else if (lobby.hasUser(leavingUser)) {
                 System.out.println("[Server] User " + leavingUser.id + " leaving lobby...");
                 lobby.removeUser(leavingUser);
             }
-
 
             if (lobby.currentPlayers == 0) {
                 System.out.println("[Server] Empty lobby, removing...");

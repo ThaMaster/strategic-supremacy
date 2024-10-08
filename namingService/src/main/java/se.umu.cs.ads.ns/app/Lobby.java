@@ -54,4 +54,13 @@ public class Lobby {
             }
         }
     }
+
+    public boolean hasUser(User user) {
+        for(User lobbyUser : this.users) {
+            if (lobbyUser.id == user.id) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
