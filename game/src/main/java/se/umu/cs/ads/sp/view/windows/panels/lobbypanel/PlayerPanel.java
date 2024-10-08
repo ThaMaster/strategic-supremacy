@@ -8,15 +8,16 @@ public class PlayerPanel extends JPanel {
     private JTable table;
     private final String[][] empty = {{"", ""}};
     private final String[] column = {"ID", "Name"};
+    private JLabel playerLabel;
 
     public PlayerPanel() {
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout());
 
         JPanel groupTextPanel = new JPanel(new FlowLayout());
-        JLabel groupText = new JLabel("Players");
-        groupText.setFont(new Font("serif", Font.BOLD, 20));
-        groupTextPanel.add(groupText);
+        playerLabel = new JLabel("Players");
+        playerLabel.setFont(new Font("serif", Font.BOLD, 20));
+        groupTextPanel.add(playerLabel);
 
         table = new JTable(new DefaultTableModel(empty, column)) {
             @Override
@@ -49,7 +50,7 @@ public class PlayerPanel extends JPanel {
         model.fireTableDataChanged();
     }
 
-    public JTable getPlayerTable() {
-        return table;
+    public void setPlayerAmount(int current, int max) {
+        playerLabel.setText("Players " + current + "/" + max);
     }
 }

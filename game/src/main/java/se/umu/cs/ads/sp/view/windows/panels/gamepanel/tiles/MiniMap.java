@@ -56,7 +56,7 @@ public class MiniMap {
         g2d.drawImage(miniMap, UtilView.screenWidth - miniMap.getWidth(), 0, miniMapWidth, miniMapHeight, null);
     }
 
-    public static BufferedImage createMinimapFromArray(ArrayList<ArrayList<TileType>> map, int mapWidth, int mapHeight, int width, int height) {
+    public static BufferedImage createMinimapPreview(ArrayList<ArrayList<TileType>> map, int mapWidth, int mapHeight, int width, int height) {
         double scaleX = (double) width / mapWidth;
         double scaleY = (double) height / mapHeight;
         int mapTileWidth = (int) Math.ceil(UtilView.tileSize * scaleX);
@@ -65,10 +65,9 @@ public class MiniMap {
         Graphics2D mapGraphics = mapImage.createGraphics();
         for (int y = 0; y < map.size(); y++) {
             for (int x = 0; x < map.get(y).size(); x++) {
-                TileType type = map.get(y).get(x);
                 int minimapX = (int) Math.floor(x * scaleX);
                 int minimapY = (int) Math.floor(y * scaleY);
-                if (type == TileType.GRASS) {
+                if (map.get(y).get(x) == TileType.GRASS) {
                     mapGraphics.setColor(Color.GREEN);
                 } else {
                     mapGraphics.setColor(Color.GRAY);

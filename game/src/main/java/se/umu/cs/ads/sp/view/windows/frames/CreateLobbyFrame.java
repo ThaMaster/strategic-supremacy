@@ -99,8 +99,8 @@ public class CreateLobbyFrame extends JFrame {
         return slider.getValue();
     }
 
-    public int getSelectedMap() {
-        return comboBox.getSelectedIndex();
+    public String getSelectedMap() {
+        return (String)comboBox.getSelectedItem();
     }
 
     public void showFrame(boolean bool) {

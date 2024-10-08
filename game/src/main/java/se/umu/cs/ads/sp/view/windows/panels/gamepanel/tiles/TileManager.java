@@ -9,6 +9,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class TileManager {
@@ -116,6 +117,18 @@ public class TileManager {
 
     public boolean isInFow(Position pos) {
         return this.fowView.isInFow(pos);
+    }
+
+    public ArrayList<ArrayList<TileType>> getViewMap() {
+        return this.viewMap;
+    }
+
+    public int getMapWidth() {
+        return numCols;
+    }
+
+    public int getMapHeight() {
+        return numRows;
     }
 
 }

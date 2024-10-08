@@ -51,7 +51,7 @@ public class NsGrpcUtil {
 }
 
      */
-    public static nsProto.NewLobby toGrpc(User creator, String name, int maxPlayers, int selectedMap) {
+    public static nsProto.NewLobby toGrpc(User creator, String name, int maxPlayers, String selectedMap) {
         return nsProto.NewLobby.newBuilder().
                 setLobbyCreator(toGrpc(creator)).
                 setLobbyName(name).
@@ -76,7 +76,7 @@ public class NsGrpcUtil {
         return lobby;
     }
 
-    public static nsProto.DetailedLobbyInfo toGrpc(Lobby lobby, int selectedMap) {
+    public static nsProto.DetailedLobbyInfo toGrpc(Lobby lobby, String selectedMap) {
         nsProto.DetailedLobbyInfo.Builder builder = nsProto.DetailedLobbyInfo.newBuilder();
         for (User user : lobby.users) {
             builder.addUsers(toGrpc(user));

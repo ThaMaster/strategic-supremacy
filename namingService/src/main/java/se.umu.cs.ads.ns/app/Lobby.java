@@ -13,7 +13,7 @@ public class Lobby {
 
     public int maxPlayers;
     public int currentPlayers;
-    public int selectedMap;
+    public String selectedMap;
 
     public Lobby(Long id, String name, int maxPlayers) {
         this.id = id;

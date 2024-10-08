@@ -79,9 +79,12 @@ public class NSServer {
         public void joinLobby(JoinRequest request, StreamObserver<DetailedLobbyInfo> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User joiningUser = NsGrpcUtil.fromGrpc(request.getUser());
+            System.out.println("[Server] User " + joiningUser.id + "joining lobby...");
             if (joiningUser.id != lobby.leader.id && !lobby.users.contains(joiningUser)) {
-                System.out.println("[Server] User " + joiningUser.id + "joining lobby...");
+                System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
+            } else {
+                System.out.println("\t User already exists or is the leader!");
             }
 
             System.out.println("\t Done.");

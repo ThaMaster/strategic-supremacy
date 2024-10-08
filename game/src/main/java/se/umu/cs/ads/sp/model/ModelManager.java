@@ -45,35 +45,7 @@ public class ModelManager {
 
     public ModelManager() {
         map = new Map();
-        map.loadMap("maps/map1.txt");
-        PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
-        PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
-        PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
-        myUnits.put(firstUnit.getId(), firstUnit);
-        myUnits.put(secondUnit.getId(), secondUnit);
-        myUnits.put(thirdUnit.getId(), thirdUnit);
 
-        fow = new FowModel(new ArrayList<>(myUnits.values()));
-
-        // Maybe totally separate this?
-        gameEntities.put(firstUnit.getId(), firstUnit);
-        gameEntities.put(secondUnit.getId(), secondUnit);
-        gameEntities.put(thirdUnit.getId(), thirdUnit);
-
-        PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
-        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
-        PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
-
-        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
-        //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
-        //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
-
-        spawnChest(new Position(600, 450), new Reward(10, Reward.RewardType.POINT));
-        spawnChest(new Position(500, 500), new Reward(2, Reward.RewardType.MOVEMENT));
-        spawnGold(new Position(400, 250));
-        spawnGold(new Position(450, 250));
-        spawnGold(new Position(500, 250));
-        spawnGoldMine(new Position(200, 200));
         gameEvents = GameEvents.getInstance();
     }
 
@@ -256,5 +228,37 @@ public class ModelManager {
             }
         }
         return -1;
+    }
+
+    public void loadMap(String mapName) {
+        map.loadMap("maps/" + mapName + ".txt");
+        PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
+        PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
+        PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);
+        myUnits.put(firstUnit.getId(), firstUnit);
+        myUnits.put(secondUnit.getId(), secondUnit);
+        myUnits.put(thirdUnit.getId(), thirdUnit);
+
+        fow = new FowModel(new ArrayList<>(myUnits.values()));
+
+        // Maybe totally separate this?
+        gameEntities.put(firstUnit.getId(), firstUnit);
+        gameEntities.put(secondUnit.getId(), secondUnit);
+        gameEntities.put(thirdUnit.getId(), thirdUnit);
+
+        PlayerUnit firstEnemyUnit = new PlayerUnit(new Position(700, 100), map);
+        PlayerUnit secondEnemyUnit = new PlayerUnit(new Position(850, 400), map);
+        PlayerUnit thirdEnemyUnit = new PlayerUnit(new Position(800, 100), map);
+
+        gameEntities.put(firstEnemyUnit.getId(), firstEnemyUnit);
+        //gameEntities.put(secondEnemyUnit.getId(), secondEnemyUnit);
+        //gameEntities.put(thirdEnemyUnit.getId(), thirdEnemyUnit);
+
+        spawnChest(new Position(600, 450), new Reward(10, Reward.RewardType.POINT));
+        spawnChest(new Position(500, 500), new Reward(2, Reward.RewardType.MOVEMENT));
+        spawnGold(new Position(400, 250));
+        spawnGold(new Position(450, 250));
+        spawnGold(new Position(500, 250));
+        spawnGoldMine(new Position(200, 200));
     }
 }

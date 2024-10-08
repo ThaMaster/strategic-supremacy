@@ -3,8 +3,10 @@ package se.umu.cs.ads.sp.view.windows.panels.lobbypanel;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.Style;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class LobbyPanel extends JPanel {
 
@@ -21,8 +23,6 @@ public class LobbyPanel extends JPanel {
         lobbyLabel.setFont(StyleConstants.TITLE_FONT);
         playerPanel = new PlayerPanel();
         mapPanel = new MapPanel();
-
-
 
         this.add(lobbyLabel, BorderLayout.NORTH);
         this.add(playerPanel, BorderLayout.WEST);
@@ -53,5 +53,11 @@ public class LobbyPanel extends JPanel {
 
     public PlayerPanel getPlayerPanel() {
         return playerPanel;
+    }
+
+    public void setMapPreview(BufferedImage map) {
+        this.mapPanel.setMapPreview(map);
+        this.revalidate();
+        this.repaint();
     }
 }

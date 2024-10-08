@@ -13,7 +13,7 @@ public class ComHandler {
         nsClient = new NsClient();
     }
 
-    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, int selectedMap) {
+    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, String selectedMap) {
         return nsClient.createLobby(user, name, maxPlayers, selectedMap);
     }
 

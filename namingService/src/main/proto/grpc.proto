@@ -35,14 +35,14 @@ message DetailedLobbyInfo {
   User leader = 2;
   repeated User users = 1;
   int32 maxPlayers = 3;
-  int32 selectedMap = 4;
+  string selectedMap = 4;
 }
 
 message NewLobby {
   User lobbyCreator = 1;
   string lobbyName = 2;
   int32 maxPlayers = 3;
-  int32 selectedMap = 4;
+  string selectedMap = 4;
 }
 
 message Lobbies {

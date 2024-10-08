@@ -34,7 +34,7 @@ public class NsClient {
         stub = GrpcNamingServiceGrpc.newFutureStub(channel);
     }
 
-    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, int selectedMap) {
+    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, String selectedMap) {
         CompletableFuture<Long> onComplete = new CompletableFuture<>();
         // Create request abd call service
         ListenableFuture<LobbyId> future = stub
