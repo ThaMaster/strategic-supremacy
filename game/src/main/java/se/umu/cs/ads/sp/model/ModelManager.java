@@ -232,6 +232,7 @@ public class ModelManager {
 
     public void loadMap(String mapName) {
         map.loadMap("maps/" + mapName + ".txt");
+
         PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
         PlayerUnit secondUnit = new PlayerUnit(new Position(300, 400), map);
         PlayerUnit thirdUnit = new PlayerUnit(new Position(500, 100), map);

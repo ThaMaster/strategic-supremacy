@@ -32,6 +32,7 @@ public class GameController implements ActionListener {
 
     // TODO: CHANGE THIS TO OTHER PLACE AND REMOVE FROM VIEW!!!
     private Long joinedLobby = -1L;
+    private boolean isLeader = false;
 
     public GameController() {
         modelManager = new ModelManager();
