@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class NsGrpcUtil {
 
     public static User fromGrpc(nsProto.User request) {
-        return new User(request.getId(), request.getUsername(), request.getIp(), request.getPort());
+        return new User(request.getUsername(), request.getIp(), request.getPort());
     }
 
     public static nsProto.User toGrpc(User user) {
@@ -104,9 +104,8 @@ public class NsGrpcUtil {
     }
 
     public static Lobby fromGrpc(nsProto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby(request.getLobbyName(), request.getMaxPlayers());
+        Lobby lobby = new Lobby(fromGrpc(request.getLeader()), request.getLobbyName(), request.getMaxPlayers());
         ArrayList<User> users = new ArrayList<>();
-        lobby.leader = fromGrpc(request.getLeader());
         for (nsProto.User user : request.getUsersList()) {
             users.add(fromGrpc(user));
         }

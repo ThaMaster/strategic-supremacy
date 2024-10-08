@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.model.communication;
+package se.umu.cs.ads.sp.model.communication.nsCom;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -22,9 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class NsClient {
-    private ManagedChannel channel = null;
+    private ManagedChannel channel;
     private GrpcNamingServiceGrpc.GrpcNamingServiceFutureStub stub;
-    private ArrayList<Lobby> lobbies;
 
     public NsClient() {
         channel = ManagedChannelBuilder.forAddress(AppSettings.NAMING_SERVICE_IP,
@@ -90,6 +89,7 @@ public class NsClient {
 
     public CompletableFuture<Lobby> fetchDetailedLobbyInfo(Long lobbyId, User user) {
         CompletableFuture<Lobby> onComplete = new CompletableFuture<>();
+
         ListenableFuture<DetailedLobbyInfo> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));

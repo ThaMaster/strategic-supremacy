@@ -4,12 +4,12 @@ import se.umu.cs.ads.ns.util.Util;
 
 
 public class NamingService {
-    private NSServer server;
+    private NsServer server;
 
     public NamingService() {
         String ip = Util.getLocalIP();
         int port = Util.getFreePort();
-        server = new NSServer(58727);
+        server = new NsServer(58727);
         System.out.println("Starting NamingService!");
         System.out.println("Local Ip: " + ip);
         System.out.println("Free Port: " + 58727);

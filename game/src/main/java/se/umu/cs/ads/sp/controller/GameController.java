@@ -39,10 +39,7 @@ public class GameController implements ActionListener {
         tileManager.setMap(modelManager.getMap().getModelMap());
 
         mainFrame = new MainFrame();
-        comHandler = new ComHandler();
         setActionListeners();
-
-
     }
 
     public void startGame() {
@@ -169,8 +166,8 @@ public class GameController implements ActionListener {
                 inputName = "Default User";
             }
             mainFrame.setPlayerName(inputName);
-            // TODO: CREATE ID FROM USERNAME AND IP + PORT!
-            GameController.this.player = new User(Util.generateId(), inputName, Util.getLocalIP(), Util.getFreePort());
+            GameController.this.player = new User(inputName, Util.getLocalIP(), Util.getFreePort());
+            comHandler = new ComHandler(GameController.this.player.port);
             mainFrame.switchPanel("Browse");
             fetchLobbies();
         }

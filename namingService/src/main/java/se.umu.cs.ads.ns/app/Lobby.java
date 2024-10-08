@@ -21,9 +21,12 @@ public class Lobby {
         this.maxPlayers = maxPlayers;
     }
 
-    public Lobby(String name, int maxPlayers) {
-        this.id = Util.generateId();
+    public Lobby(User leader, String name, int maxPlayers) {
+        this.leader = leader;
+        this.id = Util.sha1Hash(leader.username + ":" + leader.id + ":" + Util.generateId(), 1024);
         this.name = name;
+        this.addUser(leader);
+        this.currentPlayers = 1;
         this.maxPlayers = maxPlayers;
     }
 

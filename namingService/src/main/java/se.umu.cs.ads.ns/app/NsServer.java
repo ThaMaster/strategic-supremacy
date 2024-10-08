@@ -10,11 +10,11 @@ import se.umu.cs.ads.ns.util.NsGrpcUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class NSServer {
+public class NsServer {
     private Server server;
     private HashMap<Long, Lobby> lobbies = new HashMap<>();
 
-    public NSServer(int port) {
+    public NsServer(int port) {
         this.server = ServerBuilder
                 .forPort(port)
                 .addService(new GrpcNamingService())
@@ -50,8 +50,8 @@ public class NSServer {
     public class GrpcNamingService extends GrpcNamingServiceGrpc.GrpcNamingServiceImplBase {
         @Override
         public void createLobby(NewLobby request, StreamObserver<LobbyId> responseObserver) {
-            Lobby lobby = new Lobby(request.getLobbyName(), request.getMaxPlayers());
-            lobby.addLeader(NsGrpcUtil.fromGrpc(request.getLobbyCreator()));
+            User leader = NsGrpcUtil.fromGrpc(request.getLobbyCreator());
+            Lobby lobby = new Lobby(leader, request.getLobbyName(), request.getMaxPlayers());
             lobby.selectedMap = request.getSelectedMap();
             lobbies.put(lobby.id, lobby);
 
@@ -83,6 +83,12 @@ public class NSServer {
             if (joiningUser.id != lobby.leader.id && !lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
+                for (User user : lobby.users) {
+                    if (user.id != joiningUser.id) {
+                        NsClient client = new NsClient(user.ip, user.port);
+                        client.updateLobby(lobby, user);
+                    }
+                }
             } else {
                 System.out.println("\t User already exists or is the leader!");
             }
@@ -99,6 +105,7 @@ public class NSServer {
             if (leavingUser.id == lobby.leader.id) {
                 // Change the leader of the lobby!
                 System.out.println("[Server] Lobby leader, with id: " + leavingUser.id + ", left. Selecting new leader...");
+
                 lobby.removeUser(leavingUser);
             } else if (lobby.users.contains(leavingUser)) {
                 System.out.println("[Server] User " + leavingUser.id + " leaving lobby...");
