@@ -1,6 +1,7 @@
 package se.umu.cs.ads.ns.app;
 
 import com.google.protobuf.Empty;
+import io.grpc.Context;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -83,12 +84,23 @@ public class NsServer {
             if (joiningUser.id != lobby.leader.id && !lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
-                for (User user : lobby.users) {
-                    if (user.id != joiningUser.id) {
-                        NsClient client = new NsClient(user.ip, user.port);
-                        client.updateLobby(lobby, user);
+
+                // TODO: Understand this
+                Context newContext = Context.current().fork();
+                Context origContext = newContext.attach();
+                try {
+                    // Make all async calls here
+                    for (User user : lobby.users) {
+                        if (user.id != joiningUser.id) {
+                            NsClient client = new NsClient(user.ip, user.port);
+                            client.updateLobby(lobby, user);
+                        }
                     }
+                } finally {
+                    // Return to old context
+                    newContext.detach(origContext);
                 }
+
             } else {
                 System.out.println("\t User already exists or is the leader!");
             }
@@ -121,5 +133,7 @@ public class NsServer {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
+
+
     }
 }

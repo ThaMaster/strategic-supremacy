@@ -6,13 +6,15 @@ import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import nsProto.DetailedLobbyInfo;
 import nsProto.GrpcNamingServiceGrpc;
-import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.util.NsGrpcUtil;
+import se.umu.cs.ads.sp.model.communication.ComHandler;
 
 public class NsServer {
     private Server server;
+    private ComHandler comHandler;
 
-    public NsServer(int port) {
+    public NsServer(int port, ComHandler comHandler) {
+        this.comHandler = comHandler;
         this.server = ServerBuilder
                 .forPort(port)
                 .addService(new GrpcNamingService())
@@ -30,6 +32,7 @@ public class NsServer {
 
     private void stop() {
         if (server != null) {
+            System.out.println("[Client] Shutting down the client server to NS!");
             server.shutdown();
         }
     }
@@ -37,9 +40,9 @@ public class NsServer {
     public class GrpcNamingService extends GrpcNamingServiceGrpc.GrpcNamingServiceImplBase {
         @Override
         public void updateLobby(DetailedLobbyInfo request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Client] Received to update the lobby!");
-            Lobby updateLobby = NsGrpcUtil.fromGrpc(request);
-            System.out.println("\t Number of clients: " + updateLobby.users.size());
+            comHandler.updateLobby(NsGrpcUtil.fromGrpc(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
         }
     }
 }

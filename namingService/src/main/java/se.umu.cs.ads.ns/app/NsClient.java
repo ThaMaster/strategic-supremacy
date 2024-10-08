@@ -40,7 +40,8 @@ public class NsClient {
 
             @Override
             public void onFailure(Throwable t) {
-
+                System.out.println("[Server] Failed to update client " + currentUser.ip + ":" + currentUser.port);
+                System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
     }

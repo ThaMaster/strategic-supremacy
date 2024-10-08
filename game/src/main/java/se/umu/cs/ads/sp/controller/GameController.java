@@ -167,7 +167,8 @@ public class GameController implements ActionListener {
             }
             mainFrame.setPlayerName(inputName);
             GameController.this.player = new User(inputName, Util.getLocalIP(), Util.getFreePort());
-            comHandler = new ComHandler(GameController.this.player.port);
+            System.out.println("[Client] Creating my user " + GameController.this.player.ip + ":" + GameController.this.player.port);
+            comHandler = new ComHandler(GameController.this.player.port, GameController.this);
             mainFrame.switchPanel("Browse");
             fetchLobbies();
         }
@@ -234,7 +235,14 @@ public class GameController implements ActionListener {
                     GameController.this.joinedLobby = lobbyId;
                 });
         String[][] lobbyData = {{String.valueOf(GameController.this.player.id), GameController.this.player.username}};
-        handleJoinLobby(lobbyName, lobbyData, 1, maxPlayers, selectedMap);
+        updateLobby(lobbyName, lobbyData, 1, maxPlayers, selectedMap);
+        mainFrame.getLobbyPanel().setMapPreview(
+                MiniMap.createMinimapPreview(
+                        tileManager.getViewMap(),
+                        tileManager.getMapWidth(),
+                        tileManager.getMapHeight(),
+                        100,
+                        100));
     }
 
     private void leaveLobby(long lobbyId) {
@@ -253,24 +261,24 @@ public class GameController implements ActionListener {
                         };
                     }
 
-                    handleJoinLobby(lobby.name, lobbyData, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
+                    updateLobby(lobby.name, lobbyData, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
+                    mainFrame.getLobbyPanel().setMapPreview(
+                            MiniMap.createMinimapPreview(
+                                    tileManager.getViewMap(),
+                                    tileManager.getMapWidth(),
+                                    tileManager.getMapHeight(),
+                                    100,
+                                    100));
                 }));
     }
 
     //---------------------------------------//
 
-    private void handleJoinLobby(String lobbyName, String[][] playerData, int currentPlayers, int maxPlayers, String selectedMap) {
+    public void updateLobby(String lobbyName, String[][] playerData, int currentPlayers, int maxPlayers, String selectedMap) {
         mainFrame.setLobbyData(playerData);
         mainFrame.getLobbyPanel().setLobbyName(lobbyName);
         modelManager.loadMap(selectedMap);
         tileManager.setMap(modelManager.getMap().getModelMap());
         mainFrame.getLobbyPanel().getPlayerPanel().setPlayerAmount(currentPlayers, maxPlayers);
-        mainFrame.getLobbyPanel().setMapPreview(
-                MiniMap.createMinimapPreview(
-                        tileManager.getViewMap(),
-                        tileManager.getMapWidth(),
-                        tileManager.getMapHeight(),
-                        100,
-                        100));
     }
 }
