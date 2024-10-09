@@ -57,9 +57,9 @@ public class CreateLobbyFrame extends JFrame {
         sliderSectionPanel.setLayout(new BoxLayout(sliderSectionPanel, BoxLayout.PAGE_AXIS));
 
         JPanel sliderPanel = new JPanel(new FlowLayout());
-        slider = new JSlider(JSlider.HORIZONTAL, 5, 100, 50); // min, max, initial value
+        slider = new JSlider(JSlider.HORIZONTAL, 2, 100, 50); // min, max, initial value
         slider.setMajorTickSpacing(20);
-        slider.setMinorTickSpacing(5);
+        slider.setMinorTickSpacing(2);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
         sliderPanel.add(slider);

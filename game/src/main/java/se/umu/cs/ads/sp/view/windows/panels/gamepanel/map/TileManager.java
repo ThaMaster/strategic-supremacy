@@ -42,9 +42,9 @@ public class TileManager {
             viewMap.add(new ArrayList<>());
             for (int x = 0; x < modelMap.get(y).size(); x++) {
                 viewMap.get(y).add(modelMap.get(y).get(x).getType());
-                if (x > longestRow) {
-                    longestRow = x;
-                }
+            }
+            if (modelMap.get(y).size() > longestRow) {
+                longestRow = modelMap.get(y).size();
             }
         }
 
@@ -83,7 +83,6 @@ public class TileManager {
                 }
             }
         }
-
         return miniMap;
     }
 

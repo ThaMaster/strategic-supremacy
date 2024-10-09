@@ -63,6 +63,7 @@ public class MiniMap {
         int mapTileHeight = (int) Math.ceil(UtilView.tileSize * scaleY);
         BufferedImage mapImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D mapGraphics = mapImage.createGraphics();
+
         for (int y = 0; y < map.size(); y++) {
             for (int x = 0; x < map.get(y).size(); x++) {
                 int minimapX = (int) Math.floor(x * scaleX);
@@ -75,6 +76,7 @@ public class MiniMap {
                 mapGraphics.fillRect(minimapX, minimapY, mapTileWidth, mapTileHeight);
             }
         }
+
         return mapImage;
     }
 }
