@@ -31,11 +31,12 @@ message LobbyInfo {
 }
 
 message DetailedLobbyInfo {
-  string lobbyName = 5;
-  User leader = 2;
-  repeated User users = 1;
-  int32 maxPlayers = 3;
-  string selectedMap = 4;
+  LobbyId id = 1;
+  string lobbyName = 2;
+  User leader = 3;
+  repeated User users = 4;
+  int32 maxPlayers = 5;
+  string selectedMap = 6;
 }
 
 message NewLobby {

@@ -10,6 +10,7 @@ public class StartPanel extends JPanel {
     private JButton enterButton;
 
     public StartPanel() {
+        this.setName("StartPanel");
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         JPanel titlePanel = new JPanel(new FlowLayout());

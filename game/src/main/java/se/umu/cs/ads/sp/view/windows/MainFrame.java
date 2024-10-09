@@ -7,7 +7,7 @@ import se.umu.cs.ads.sp.view.windows.frames.CreateLobbyFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
 import se.umu.cs.ads.sp.view.windows.panels.lobbypanel.LobbyPanel;
 import se.umu.cs.ads.sp.view.windows.panels.start.StartPanel;
 
@@ -33,7 +33,6 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setResizable(false);
         this.setTitle("Strategic Supremacy");
         createLobbyFrame = new CreateLobbyFrame();
         settingsFrame = new SettingsFrame();
@@ -51,11 +50,11 @@ public class MainFrame extends JFrame {
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.setResizable(false);
     }
 
     private void setupRegularPanels() {
-        cardLayout = new CardLayout() {
-        };
+        cardLayout = new CardLayout();
 
         // Overrides the panel to get the size of the currently selected panel.
         cardPanel = new JPanel(cardLayout) {
@@ -63,7 +62,7 @@ public class MainFrame extends JFrame {
             public Dimension getPreferredSize() {
                 // Get the preferred size of the currently visible card
                 Component visibleCard = getVisibleCard(this);
-                return visibleCard != null ? visibleCard.getPreferredSize() : super.getPreferredSize();
+                return (visibleCard != null) ? visibleCard.getPreferredSize() : super.getPreferredSize();
             }
 
             private Component getVisibleCard(JPanel panel) {
@@ -84,7 +83,7 @@ public class MainFrame extends JFrame {
         cardPanel.add(browsePanel, "Browse");
         startPanel = new StartPanel();
         cardPanel.add(startPanel, "Start");
-        this.setContentPane(cardPanel);
+        this.add(cardPanel);
     }
 
     public GamePanel getGamePanel() {
@@ -100,7 +99,6 @@ public class MainFrame extends JFrame {
         layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         cardPanel.add(layeredPane, "Game");
-
         switchPanel("Game");
     }
 
@@ -138,13 +136,14 @@ public class MainFrame extends JFrame {
     }
 
     public void switchPanel(String panelName) {
+        this.setResizable(true);
         menuBar.setVisible(!panelName.equals("Start") && !panelName.equals("Game"));
-
         cardLayout.show(cardPanel, panelName);
         cardPanel.revalidate();
         cardPanel.repaint();
         this.pack();
         this.setLocationRelativeTo(null);
+        this.setResizable(false);
     }
 
     public void setBrowsePanelData(String data[][]) {
@@ -206,5 +205,7 @@ public class MainFrame extends JFrame {
         this.lobbyPanel.getLeaveButton().addActionListener(actionListener);
     }
     //----------------------------------------
-
+    public void displayWarningMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
 }

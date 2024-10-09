@@ -38,6 +38,7 @@ public class Map {
             int row = 0;
             int maxCol = 0;
             int currentCols;
+            this.map = new ArrayList<>();
             while ((line = br.readLine()) != null) {
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");

@@ -1,9 +1,7 @@
 package se.umu.cs.ads.ns.app;
 
 import com.google.protobuf.Empty;
-import io.grpc.Context;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import nsProto.*;
 import se.umu.cs.ads.ns.util.NsGrpcUtil;
@@ -80,7 +78,15 @@ public class NsServer {
         public void joinLobby(JoinRequest request, StreamObserver<DetailedLobbyInfo> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User joiningUser = NsGrpcUtil.fromGrpc(request.getUser());
-            System.out.println("[Server] User " + joiningUser.id + "joining lobby...");
+            System.out.println("[Server] User " + joiningUser.id + " joining lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
+            if (lobby.currentPlayers >= lobby.maxPlayers) {
+                System.out.println("\t Lobby is full! Denying user...");
+                StatusRuntimeException exception = Status.RESOURCE_EXHAUSTED
+                        .withDescription("Lobby is full, cannot accept more players.")
+                        .asRuntimeException();
+                responseObserver.onError(exception);
+                return;
+            }
             if (!lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
@@ -98,20 +104,21 @@ public class NsServer {
         public void leaveLobby(LeaveRequest request, StreamObserver<Empty> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User leavingUser = NsGrpcUtil.fromGrpc(request.getUser());
+            System.out.println("[Server] User " + leavingUser.id + "leaving lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
             if (leavingUser.id == lobby.leader.id) {
                 // Change the leader of the lobby!
-                System.out.println("[Server] Lobby leader, with id: " + leavingUser.id + ", left. Selecting new leader...");
+                System.out.println("\t User was the leader, selecting new leader...");
                 lobby.removeUser(leavingUser);
                 if (lobby.currentPlayers != 0) {
                     lobby.leader = lobby.users.get(0);
                 }
             } else if (lobby.hasUser(leavingUser)) {
-                System.out.println("[Server] User " + leavingUser.id + " leaving lobby...");
+                System.out.println("\t User was regular player...");
                 lobby.removeUser(leavingUser);
             }
 
             if (lobby.currentPlayers == 0) {
-                System.out.println("[Server] Empty lobby, removing...");
+                System.out.println("\t Lobby became empty, removing...");
                 lobbies.remove(lobby.id);
             } else {
                 sendUpdatedLobby(lobby);

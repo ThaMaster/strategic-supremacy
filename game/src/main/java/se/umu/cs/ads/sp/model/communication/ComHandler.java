@@ -40,8 +40,8 @@ public class ComHandler {
         controller.updateLobby(updatedLobby.name, lobbyData, updatedLobby.currentPlayers, updatedLobby.maxPlayers, updatedLobby.selectedMap);
     }
 
-    public CompletableFuture<Lobby> fetchDetailedLobbyInfo(Long lobbyId, User user) {
-        return nsClient.fetchDetailedLobbyInfo(lobbyId, user);
+    public CompletableFuture<Lobby> joinLobby(Long lobbyId, User user) {
+        return nsClient.joinLobby(lobbyId, user);
     }
 
     public CompletableFuture<ArrayList<Lobby>> fetchLobbies() {

@@ -81,7 +81,7 @@ public class NsGrpcUtil {
         for (User user : lobby.users) {
             builder.addUsers(toGrpc(user));
         }
-
+        builder.setId(toGrpc(lobby.id));
         builder.setLeader(toGrpc(lobby.leader));
         builder.setSelectedMap(selectedMap);
         builder.setMaxPlayers(lobby.maxPlayers);
@@ -104,7 +104,7 @@ public class NsGrpcUtil {
     }
 
     public static Lobby fromGrpc(nsProto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby(fromGrpc(request.getLeader()), request.getLobbyName(), request.getMaxPlayers());
+        Lobby lobby = new Lobby(fromGrpc(request.getId()), request.getLobbyName(), request.getMaxPlayers());
         ArrayList<User> users = new ArrayList<>();
         for (nsProto.User user : request.getUsersList()) {
             users.add(fromGrpc(user));

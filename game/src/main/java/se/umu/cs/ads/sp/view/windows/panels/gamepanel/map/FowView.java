@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;

@@ -87,7 +87,7 @@ public class NsClient {
         return onComplete;
     }
 
-    public CompletableFuture<Lobby> fetchDetailedLobbyInfo(Long lobbyId, User user) {
+    public CompletableFuture<Lobby> joinLobby(Long lobbyId, User user) {
         CompletableFuture<Lobby> onComplete = new CompletableFuture<>();
 
         ListenableFuture<DetailedLobbyInfo> future = stub
@@ -104,7 +104,7 @@ public class NsClient {
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("[Client] Failed to fetch detailed lobby info from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+                onComplete.completeExceptionally(t);
             }
 
         }, MoreExecutors.directExecutor());
@@ -113,6 +113,7 @@ public class NsClient {
     }
 
     public void leaveLobby(Long lobbyId, User user) {
+        System.out.println("[Client] leaving lobby w id: " + lobbyId);
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .leaveLobby(NsGrpcUtil.toGrpcLeave(lobbyId, user));

@@ -1,15 +1,17 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
 import se.umu.cs.ads.sp.model.map.TileModel;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles.GrassTile;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles.StoneTile;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles.TileView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class TileManager {

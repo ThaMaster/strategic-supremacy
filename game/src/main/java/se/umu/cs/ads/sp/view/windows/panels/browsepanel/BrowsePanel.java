@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.panels.browsepanel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
@@ -15,6 +16,7 @@ public class BrowsePanel extends JPanel {
     private JButton createButton;
 
     public BrowsePanel() {
+        this.setName("BrowsePanel");
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout());
 
@@ -55,18 +57,17 @@ public class BrowsePanel extends JPanel {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(400, 500);
+    }
+
     public void setData(String[][] data) {
-        clearTable();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.getDataVector().removeAllElements();
         for (int i = 0; i < data.length; i++) {
             model.addRow(data[i]);
         }
-        model.fireTableDataChanged();
-    }
-
-    private void clearTable() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.getDataVector().removeAllElements();
         model.fireTableDataChanged();
     }
 
@@ -85,7 +86,6 @@ public class BrowsePanel extends JPanel {
     public JButton getBackButton() {
         return backButton;
     }
-
 
     public JTable getBrowseTable() {
         return table;

@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;

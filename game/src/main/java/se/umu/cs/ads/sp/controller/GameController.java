@@ -7,8 +7,8 @@ import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.MiniMap;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +32,6 @@ public class GameController implements ActionListener {
 
     // TODO: CHANGE THIS TO OTHER PLACE AND REMOVE FROM VIEW!!!
     private Long joinedLobby = -1L;
-    private boolean isLeader = false;
 
     public GameController() {
         modelManager = new ModelManager();
@@ -154,6 +153,7 @@ public class GameController implements ActionListener {
             int maxPlayers = mainFrame.getCreateLobbyFrame().getMaxPlayerValue();
             String selectedMap = mainFrame.getCreateLobbyFrame().getSelectedMap();
             mainFrame.getCreateLobbyFrame().showFrame(false);
+
             createLobby(lobbyName, maxPlayers, selectedMap);
             mainFrame.switchPanel("Lobby");
         }
@@ -190,9 +190,7 @@ public class GameController implements ActionListener {
             // Get the id of the lobby and join the lobby.
             int selectedRow = mainFrame.getBrowseTable().getSelectedRow();
             String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(selectedRow, 0);
-            GameController.this.joinedLobby = Long.parseLong(lobbyId);
-            fetchDetailedLobby(joinedLobby);
-            mainFrame.switchPanel("Lobby");
+            joinLobby(Long.parseLong(lobbyId));
         }
     }
 
@@ -233,27 +231,20 @@ public class GameController implements ActionListener {
 
     private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         comHandler.createLobby(GameController.this.player, lobbyName, maxPlayers, selectedMap)
-                .thenAccept(lobbyId -> {
-                    GameController.this.joinedLobby = lobbyId;
-                });
-        String[][] lobbyData = {{String.valueOf(GameController.this.player.id), GameController.this.player.username}};
-        updateLobby(lobbyName, lobbyData, 1, maxPlayers, selectedMap);
-        mainFrame.getLobbyPanel().setMapPreview(
-                MiniMap.createMinimapPreview(
-                        tileManager.getViewMap(),
-                        tileManager.getMapWidth(),
-                        tileManager.getMapHeight(),
-                        100,
-                        100));
+                .thenAccept(lobbyId -> GameController.this.joinedLobby = lobbyId);
+        SwingUtilities.invokeLater(() -> {
+            String[][] lobbyData = {{String.valueOf(GameController.this.player.id), GameController.this.player.username}};
+            updateLobby(lobbyName, lobbyData, 1, maxPlayers, selectedMap);
+        });
     }
 
     private void leaveLobby(long lobbyId) {
         comHandler.leaveLobby(lobbyId, GameController.this.player);
-        this.joinedLobby = -1L;
+        GameController.this.joinedLobby = -1L;
     }
 
-    private void fetchDetailedLobby(long lobbyId) {
-        comHandler.fetchDetailedLobbyInfo(lobbyId, GameController.this.player)
+    private void joinLobby(long lobbyId) {
+        comHandler.joinLobby(lobbyId, GameController.this.player)
                 .thenAccept(lobby -> SwingUtilities.invokeLater(() -> {
                     String[][] lobbyData = new String[lobby.users.size()][];
                     for (int i = 0; i < lobby.users.size(); i++) {
@@ -262,16 +253,16 @@ public class GameController implements ActionListener {
                                 lobby.users.get(i).username,
                         };
                     }
-
                     updateLobby(lobby.name, lobbyData, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
-                    mainFrame.getLobbyPanel().setMapPreview(
-                            MiniMap.createMinimapPreview(
-                                    tileManager.getViewMap(),
-                                    tileManager.getMapWidth(),
-                                    tileManager.getMapHeight(),
-                                    100,
-                                    100));
-                }));
+                    GameController.this.joinedLobby = lobby.id;
+                    mainFrame.switchPanel("Lobby");
+
+                }))
+                .exceptionally(throwable -> {
+                    mainFrame.displayWarningMessage(throwable.getLocalizedMessage());
+                    GameController.this.joinedLobby = -1L;
+                    return null;
+                });
     }
 
     //---------------------------------------//
@@ -282,5 +273,12 @@ public class GameController implements ActionListener {
         modelManager.loadMap(selectedMap);
         tileManager.setMap(modelManager.getMap().getModelMap());
         mainFrame.getLobbyPanel().getPlayerPanel().setPlayerAmount(currentPlayers, maxPlayers);
+        mainFrame.getLobbyPanel().setMapPreview(
+                MiniMap.createMinimapPreview(
+                        tileManager.getViewMap(),
+                        tileManager.getMapWidth(),
+                        tileManager.getMapHeight(),
+                        100,
+                        100), selectedMap);
     }
 }

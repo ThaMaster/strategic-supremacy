@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.panels.lobbypanel;
 
+import se.umu.cs.ads.sp.view.util.StyleConstants;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -16,7 +18,7 @@ public class PlayerPanel extends JPanel {
 
         JPanel groupTextPanel = new JPanel(new FlowLayout());
         playerLabel = new JLabel("Players");
-        playerLabel.setFont(new Font("serif", Font.BOLD, 20));
+        playerLabel.setFont(StyleConstants.LABEL_FONT);
         groupTextPanel.add(playerLabel);
 
         table = new JTable(new DefaultTableModel(empty, column)) {
@@ -36,17 +38,11 @@ public class PlayerPanel extends JPanel {
     }
 
     public void setData(String[][] data) {
-        clearTable();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.getDataVector().removeAllElements();
         for (int i = 0; i < data.length; i++) {
             model.addRow(data[i]);
         }
-        model.fireTableDataChanged();
-    }
-
-    private void clearTable() {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.getDataVector().removeAllElements();
         model.fireTableDataChanged();
     }
 

@@ -2,6 +2,9 @@ package se.umu.cs.ads.sp.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Scanner;
 
 public class AppSettings {
@@ -11,33 +14,28 @@ public class AppSettings {
     public static boolean DEBUG = false;
 
     public static void SetGameConfig() {
-        File config = new File("./AppSettings.cfg");
+        InputStream settingsUrl = AppSettings.class.getClassLoader().getResourceAsStream("AppSettings.cfg");
 
-        if (!config.exists()) {
-            System.out.println("Could not find config file. " + config.getAbsolutePath());
+        if (settingsUrl == null) {
+            System.out.println("Could not find config file. ");
             return;
         }
 
-        try {
-            Scanner sc = new Scanner(config);
-            int row = 0;
-            while (sc.hasNext()) {
-            row++;
-            String[] words = sc.nextLine().split(" ");
-            if (words[0].startsWith("/")) {
-              // Comment
-              continue;
-            }
-            if (words.length != 2) {
-              System.out.println("Invalid syntax -> " + config.getName() + " row: " + row);
-              return;
-            }
-            setConfigField(words[0], words[1]);
-            }
-            sc.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Cannot find or open config file found");
+        Scanner sc = new Scanner(settingsUrl);
+        int row = 0;
+        while (sc.hasNext()) {
+        row++;
+        String[] words = sc.nextLine().split(" ");
+        if (words[0].startsWith("/")) {
+          // Comment
+          continue;
         }
+        if (words.length != 2) {
+          return;
+        }
+        setConfigField(words[0], words[1]);
+        }
+        sc.close();
     }
 
     private static void setConfigField(String key, String value) {

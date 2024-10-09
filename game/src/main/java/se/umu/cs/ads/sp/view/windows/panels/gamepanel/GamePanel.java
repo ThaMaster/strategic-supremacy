@@ -26,8 +26,8 @@ import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.MiniMap;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -262,7 +262,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             drawDragBox(g2d);
         }
 
-        // === DRAW MINIMAP ===
+        // Draw minimap
         miniMap.draw(g2d);
 
         for (TextAnimation animation : textAnimations) {
