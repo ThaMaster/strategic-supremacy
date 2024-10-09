@@ -15,18 +15,19 @@ import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.MiniMap;
 import se.umu.cs.ads.sp.view.objects.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
+import se.umu.cs.ads.sp.view.objects.entities.units.EnemyUnitView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.MiniMap;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -298,8 +299,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             newUnit.setSelected(unit.isSelected());
             this.myUnitsView.put(newUnit.getId(), newUnit);
         }
+
         for (Entity entity : entities.values()) {
-            EntityView newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
+            EntityView newEntity;
+            if (myUnitsView.containsKey(entity.getId())) {
+                newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
+            } else {
+                newEntity = new EnemyUnitView(entity.getId(), entity.getPosition());
+            }
             newEntity.setSelected(entity.isSelected());
             this.gameEntitiesView.put(newEntity.getId(), newEntity);
         }
