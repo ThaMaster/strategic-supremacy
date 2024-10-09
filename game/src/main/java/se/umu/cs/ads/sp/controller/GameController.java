@@ -46,6 +46,7 @@ public class GameController implements ActionListener {
     public void startGame() {
         this.timer = new Timer(1000 / FPS, this);
         mainFrame.showGamePanel(tileManager);
+        mainFrame.getGamePanel().startGame();
         mainFrame.getGamePanel().setGameController(this);
         mainFrame.getGamePanel().setEntities(modelManager.getMyUnits(), modelManager.getGameEntities());
         mainFrame.getGamePanel().setCollectables(modelManager.getCollectables());

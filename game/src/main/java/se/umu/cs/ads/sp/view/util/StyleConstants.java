@@ -8,7 +8,7 @@ public class StyleConstants {
 
     // Default font definitions
     public static final Font TITLE_FONT = new Font("serif", Font.BOLD, 24);
-    public static final Font LABEL_FONT = new Font("serif", Font.PLAIN, 14);
+    public static final Font LABEL_FONT = new Font("serif", Font.BOLD, 18);
     public static final Font BUTTON_FONT = new Font("serif", Font.BOLD, 16);
     public static final Font TEXT_FIELD_FONT = new Font("serif", Font.PLAIN, 14);
 

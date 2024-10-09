@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.dialogs.AboutDialog;
 import se.umu.cs.ads.sp.view.windows.dialogs.HelpDialog;
 import se.umu.cs.ads.sp.view.windows.frames.CreateLobbyFrame;
+import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.tiles.TileManager;
@@ -17,7 +18,7 @@ import java.awt.event.ActionListener;
 public class MainFrame extends JFrame {
 
     private CreateLobbyFrame createLobbyFrame;
-
+    private SettingsFrame settingsFrame;
     private JLabel playerLabel;
     private JMenuBar menuBar;
 
@@ -35,6 +36,8 @@ public class MainFrame extends JFrame {
         this.setResizable(false);
         this.setTitle("Strategic Supremacy");
         createLobbyFrame = new CreateLobbyFrame();
+        settingsFrame = new SettingsFrame();
+
 
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
@@ -106,6 +109,7 @@ public class MainFrame extends JFrame {
 
         JMenu fileMenu = new JMenu("Game");
         JMenuItem settingsItem = new JMenuItem("Settings");
+        settingsItem.addActionListener(e -> settingsFrame.showFrame(true));
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         fileMenu.add(settingsItem);

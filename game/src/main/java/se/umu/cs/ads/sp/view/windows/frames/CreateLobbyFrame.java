@@ -81,6 +81,7 @@ public class CreateLobbyFrame extends JFrame {
             showFrame(false);
             nameField.setText("");
         });
+
         createButton = new JButton("Create");
         buttonPanel.add(backButton);
         buttonPanel.add(createButton);

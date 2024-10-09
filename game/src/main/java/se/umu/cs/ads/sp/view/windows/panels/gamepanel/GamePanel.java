@@ -46,7 +46,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private HashMap<Long, PlayerUnitView> myUnitsView = new HashMap<>();
     private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
     private HashMap<Long, CollectableView> collectables = new HashMap<>();
-    private SoundManager soundManager;
     private final int edgeThreshold = 50;
 
     private Point startDragPoint;
@@ -56,11 +55,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private EnvironmentView goldPile;
 
     public GamePanel(TileManager tm) {
-        this.soundManager = new SoundManager();
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-        this.cameraWorldPosition = new Position((int) ((UtilView.screenWidth / 2) * UtilView.scale), (int) ((UtilView.screenHeight / 2) * UtilView.scale));
+        this.cameraWorldPosition = new Position((int) (((double) UtilView.screenWidth / 2) * UtilView.scale), (int) (((double) UtilView.screenHeight / 2) * UtilView.scale));
 
         this.tileManager = tm;
 
@@ -71,6 +69,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.addKeyListener(this); // Add KeyListener
         this.goldPile = new EnvironmentView(52, new Position(200, 200));
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
+    }
+
+    public void startGame() {
+        SoundManager.getInstance().playMusic();
     }
 
     @Override
@@ -107,7 +109,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
                 //20 % chance we play move sound
                 if (Utils.getRandomSuccess(80)) {
-                    soundManager.playMove();
+                    SoundManager.getInstance().playMove();
                 }
             }
         }
@@ -226,7 +228,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         Graphics2D g2d = (Graphics2D) g;
 
         // Draw tile set
-        MiniMap miniMap =  tileManager.draw(g2d, cameraWorldPosition);
+        MiniMap miniMap = tileManager.draw(g2d, cameraWorldPosition);
 
         // Draw collectables
         for (CollectableView collectableView : collectables.values()) {
@@ -244,7 +246,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
             if (tileManager.isInFow(entity.getPosition())) {
-                if(myUnitsView.containsKey(entity.getId())) {
+                if (myUnitsView.containsKey(entity.getId())) {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ALLY_COLOR, 50);
                 } else {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
@@ -413,13 +415,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 case MINING:
                     break;
                 case DEATH:
-                    soundManager.play("DEATH");
+                    SoundManager.getInstance().play("DEATH");
                     break;
                 case ATTACK:
-                    soundManager.play("ATTACK");
+                    SoundManager.getInstance().play("ATTACK");
                     break;
                 case TAKE_DMG:
-                    soundManager.play("TAKE_DMG");
+                    SoundManager.getInstance().play("TAKE_DMG");
                     break;
                 default:
                     //This is default case, it's a collectable we have stored
@@ -459,9 +461,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         collectableView.pickup();
 
         if (collectableView instanceof ChestView) {
-            soundManager.play(SoundFX.OPEN_CHEST);
+            SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
         } else if (collectableView instanceof GoldView) {
-            soundManager.play(SoundFX.GOLD);
+            SoundManager.getInstance().play(SoundFX.GOLD);
             this.collectables.remove(event.getId());
         }
         addTextEvent(event, 25, EventColor.SUCCESS);
