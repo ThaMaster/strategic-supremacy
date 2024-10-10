@@ -1,23 +1,17 @@
 package se.umu.cs.ads.sp.model;
 
-import io.grpc.internal.JsonUtil;
 import se.umu.cs.ads.ns.app.Lobby;
-import se.umu.cs.ads.sp.controller.GameController;
-
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 
 public class LobbyHandler {
 
     private Lobby lobby;
-    private ModelManager modelManager;
+    private final ModelManager modelManager;
     private String[][] fetchedLobbies;
 
     public LobbyHandler(ModelManager modelManager){
         this.modelManager = modelManager;
     }
-
 
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap){
         long id = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);

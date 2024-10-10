@@ -1,8 +1,7 @@
-package se.umu.cs.ads.sp.model.objects;
-
+package se.umu.cs.ads.sp.model.objects.Environment;
 import se.umu.cs.ads.sp.utils.Position;
 
-public class GoldMine extends GameObject {
+public class GoldMine extends Environment {
 
     private int goldReserve;
 
@@ -19,7 +18,4 @@ public class GoldMine extends GameObject {
         return goldReserve >= 0;
     }
 
-    public int getGoldReserve() {
-        return goldReserve;
-    }
 }

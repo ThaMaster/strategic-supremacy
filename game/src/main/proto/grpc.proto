@@ -25,6 +25,37 @@ message ObjectId {
   int64 id = 1;
 }
 
+message EntitySkeleton {
+    int64 id = 1;
+    int64 userId = 2;
+    Position position = 3;
+}
+
+message Reward {
+    int32 quantity = 1;
+    string reward = 2;
+}
+
+message Collectable {
+    int64 id = 1;
+    Position position = 2;
+    string type = 3;
+    Reward reward = 4;
+}
+
+message Environment {
+    int64 id = 1;
+    Position position = 2;
+    string type = 3;
+}
+
+message StartGameRequest {
+    repeated EntitySkeleton entities = 1;
+    repeated Collectable collectables = 2;
+    repeated Environment environments = 3;
+}
+
 service GameService {
   rpc getPlayerUnitInfo (ObjectId) returns (PlayerUnit);
+  rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
 }

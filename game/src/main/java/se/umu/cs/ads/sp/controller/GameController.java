@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
@@ -41,8 +42,9 @@ public class GameController implements ActionListener {
         mainFrame.showGamePanel(tileManager);
         mainFrame.getGamePanel().startGame();
         mainFrame.getGamePanel().setGameController(this);
-        mainFrame.getGamePanel().setEntities(modelManager.getMyUnits(), modelManager.getGameEntities());
-        mainFrame.getGamePanel().setCollectables(modelManager.getCollectables());
+        mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
+                modelManager.getObjectHandler().getEnemyUnits());
+        mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
         this.timer.start();
     }
 
@@ -52,9 +54,15 @@ public class GameController implements ActionListener {
         render();
     }
 
+    private ArrayList<Entity> getAllUnits(){
+        ArrayList<Entity> allUnits = new ArrayList<>(modelManager.getObjectHandler().getEnemyUnits().values());
+        allUnits.addAll(modelManager.getObjectHandler().getMyUnits().values());
+        return  allUnits;
+    }
+
     private void update() {
         modelManager.update();
-        mainFrame.getGamePanel().updateEntityViews(modelManager.getGameEntities());
+        mainFrame.getGamePanel().updateEntityViews(getAllUnits());
         mainFrame.getGamePanel().updateCollectables();
 
         // Check where to move the camera.
@@ -90,21 +98,21 @@ public class GameController implements ActionListener {
     }
 
     public void setSelection(Position clickLocation) {
-        modelManager.setSelection(clickLocation);
+        modelManager.getObjectHandler().setSelection(clickLocation);
     }
 
     public void setSelection(long entityId) {
         modelManager.setSelection(entityId);
-        Position newCameraPos = modelManager.getGameEntities().get(entityId).getPosition();
+        Position newCameraPos = modelManager.getObjectHandler().getMyUnits().get(entityId).getPosition();
         mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos.getX(), newCameraPos.getY());
     }
 
     public ArrayList<Long> getSelectedUnits() {
-        return modelManager.getSelectedUnits();
+        return modelManager.getObjectHandler().getSelectedUnitIds();
     }
 
     public void stopSelectedEntities() {
-        modelManager.stopSelectedEntities();
+        modelManager.getObjectHandler().stopSelectedEntities();
     }
 
     public void setCameraPanningDirection(Direction dir) {
@@ -112,7 +120,7 @@ public class GameController implements ActionListener {
     }
 
     public void setSelectedUnit(Rectangle area) {
-        this.modelManager.setSelectedUnits(area);
+        this.modelManager.getObjectHandler().setSelectedUnits(area);
     }
 
     // Action listener things
@@ -205,6 +213,7 @@ public class GameController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             startGame();
+            modelManager.startGame();
         }
     }
     //----------------------------------------

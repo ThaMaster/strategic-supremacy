@@ -5,7 +5,7 @@ import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.GoldMine;
+import se.umu.cs.ads.sp.model.objects.Environment.GoldMine;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
@@ -16,6 +16,7 @@ import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerUnit extends Entity {
 
@@ -33,9 +34,9 @@ public class PlayerUnit extends Entity {
 
     public PlayerUnit(Position startPos, Map map) {
         super(startPos, map);
-        miningCooldown = new Cooldown(3);
-        shootCooldown = new Cooldown(2);
-        hitCooldown = new Cooldown(1);
+        miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
+        shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
+        hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
         this.baseHp = 100;
         this.maxHp = baseHp;
         this.currentHp = maxHp;

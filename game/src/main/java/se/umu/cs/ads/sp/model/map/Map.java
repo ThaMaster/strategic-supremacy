@@ -134,4 +134,8 @@ public class Map {
     public boolean inBounds(int row, int col) {
         return row >= 0 && row < map.size() && col >= 0 && col < map.get(row).size();
     }
+
+    public ArrayList<Position> getStartPositions(int numPlayers){
+        return new ArrayList<>();
+    }
 }

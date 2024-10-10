@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.utils.enums.EventColor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.TimeUnit;
 
 public class TextAnimation extends JLabel {
 
@@ -25,11 +26,11 @@ public class TextAnimation extends JLabel {
         this.setFont(new Font("Arial", Font.BOLD, fontSize));
         this.setForeground(new Color(red, green, blue, alpha));
         this.state = TextState.START;
-        displayCooldown = new Cooldown(2);
+        displayCooldown = new Cooldown(2, TimeUnit.SECONDS);
     }
 
     public void setDisplayTime(int seconds){
-        displayCooldown = new Cooldown(seconds);
+        displayCooldown = new Cooldown(seconds, TimeUnit.SECONDS);
     }
 
     public void setSize(int size){

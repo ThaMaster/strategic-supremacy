@@ -115,6 +115,7 @@ public abstract class Entity extends GameObject {
         if (currentHp <= 0) {
             this.state = EntityState.DEAD;
             GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
+            this.destroy(map);
         } else {
             GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));
         }

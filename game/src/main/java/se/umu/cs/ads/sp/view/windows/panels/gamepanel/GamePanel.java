@@ -43,7 +43,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     private TileManager tileManager;
     private GameController gController;
 
-    private HashMap<Long, PlayerUnitView> myUnitsView = new HashMap<>();
     private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
     private HashMap<Long, CollectableView> collectables = new HashMap<>();
     private final int edgeThreshold = 50;
@@ -246,7 +245,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
             if (tileManager.isInFow(entity.getPosition())) {
-                if (myUnitsView.containsKey(entity.getId())) {
+                if (entity instanceof PlayerUnitView) {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ALLY_COLOR, 50);
                 } else {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
@@ -292,23 +291,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g2d.drawRect(x, y, width, height);
     }
 
-    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, Entity> entities) {
-        this.myUnitsView.clear();
+    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, PlayerUnit> entities) {
         this.gameEntitiesView.clear();
 
         for (PlayerUnit unit : myUnits.values()) {
             PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getPosition());
             newUnit.setSelected(unit.isSelected());
-            this.myUnitsView.put(newUnit.getId(), newUnit);
+            this.gameEntitiesView.put(newUnit.getId(), newUnit);
         }
 
         for (Entity entity : entities.values()) {
-            EntityView newEntity;
-            if (myUnitsView.containsKey(entity.getId())) {
-                newEntity = new PlayerUnitView(entity.getId(), entity.getPosition());
-            } else {
-                newEntity = new EnemyUnitView(entity.getId(), entity.getPosition());
-            }
+            EntityView newEntity = new EnemyUnitView(entity.getId(), entity.getPosition());
             newEntity.setSelected(entity.isSelected());
             this.gameEntitiesView.put(newEntity.getId(), newEntity);
         }
@@ -337,26 +330,27 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void updateEntityViews(HashMap<Long, Entity> entities) {
-        for (Entity entityModel : entities.values()) {
+    public void updateEntityViews(ArrayList<Entity> entities) {
+        ArrayList<PlayerUnitView> myUnits = new ArrayList<>();
+        for (Entity entityModel : entities) {
+            EntityView entity = this.gameEntitiesView.get(entityModel.getId());
             if (entityModel instanceof PlayerUnit modelUnit) {
-                this.gameEntitiesView.get(entityModel.getId()).setEntityState(modelUnit.getState());
-                this.gameEntitiesView.get(entityModel.getId()).setPosition(modelUnit.getPosition());
-                this.gameEntitiesView.get(entityModel.getId()).setDestination(modelUnit.getDestination());
-                this.gameEntitiesView.get(entityModel.getId()).setSelected(modelUnit.isSelected());
-                this.gameEntitiesView.get(entityModel.getId()).setAttackRange(modelUnit.getAttackRange());
-                this.gameEntitiesView.get(entityModel.getId()).setCollisionBox(modelUnit.getCollisionBox());
-                this.gameEntitiesView.get(entityModel.getId()).setInRange(modelUnit.isInAttackRange());
-                this.gameEntitiesView.get(entityModel.getId()).setHasAttacked(modelUnit.hasAttacked());
-                this.gameEntitiesView.get(entityModel.getId()).setHasBeenHit(modelUnit.hasBeenHit());
-                this.gameEntitiesView.get(entityModel.getId()).update();
-                if (myUnitsView.containsKey(modelUnit.getId())) {
-                    PlayerUnitView myUnit = (PlayerUnitView) gameEntitiesView.get(entityModel.getId());
-                    this.myUnitsView.put(entityModel.getId(), myUnit);
+                entity.setEntityState(modelUnit.getState());
+                entity.setPosition(modelUnit.getPosition());
+                entity.setDestination(modelUnit.getDestination());
+                entity.setSelected(modelUnit.isSelected());
+                entity.setAttackRange(modelUnit.getAttackRange());
+                entity.setCollisionBox(modelUnit.getCollisionBox());
+                entity.setInRange(modelUnit.isInAttackRange());
+                entity.setHasAttacked(modelUnit.hasAttacked());
+                entity.setHasBeenHit(modelUnit.hasBeenHit());
+                entity.update();
+                if (entity instanceof PlayerUnitView playerUnitView) {
+                    myUnits.add(playerUnitView);
                 }
             }
         }
-        tileManager.updateFowView(new ArrayList<>(myUnitsView.values()));
+        tileManager.updateFowView(myUnits);
     }
 
     public void setGameController(GameController gc) {

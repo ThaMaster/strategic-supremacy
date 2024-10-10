@@ -19,6 +19,10 @@ public class Reward {
         public static String MOVEMENT ="Movement";
         public static String POINT = "Points";
     }
+
+    public int getQuantity(){
+        return quantity;
+    }
 }
 
 

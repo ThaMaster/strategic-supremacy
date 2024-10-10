@@ -1,14 +1,8 @@
 package se.umu.cs.ads.sp.model.communication;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.GameServiceGrpc;
-import proto.PlayerUnit;
 
 import java.util.concurrent.TimeUnit;
 
