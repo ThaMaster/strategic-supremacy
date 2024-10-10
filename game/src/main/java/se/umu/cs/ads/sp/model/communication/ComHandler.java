@@ -21,7 +21,7 @@ public class ComHandler {
         this.controller = controller;
     }
 
-    public CompletableFuture<Long> createLobby(User user, String name, int maxPlayers, String selectedMap) {
+    public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
         return nsClient.createLobby(user, name, maxPlayers, selectedMap);
     }
 
@@ -40,11 +40,11 @@ public class ComHandler {
         controller.updateLobby(updatedLobby.name, lobbyData, updatedLobby.currentPlayers, updatedLobby.maxPlayers, updatedLobby.selectedMap);
     }
 
-    public CompletableFuture<Lobby> joinLobby(Long lobbyId, User user) {
+    public Lobby joinLobby(Long lobbyId, User user) {
         return nsClient.joinLobby(lobbyId, user);
     }
 
-    public CompletableFuture<ArrayList<Lobby>> fetchLobbies() {
+    public ArrayList<Lobby> fetchLobbies() {
         return nsClient.fetchLobbies();
     }
 }

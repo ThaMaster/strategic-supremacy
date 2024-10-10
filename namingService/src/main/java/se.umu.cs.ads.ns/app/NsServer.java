@@ -138,6 +138,8 @@ public class NsServer {
             for (User user : lobby.users) {
                 NsClient client = new NsClient(user.ip, user.port);
                 client.updateLobby(lobby, user);
+
+                client.shutDown();
             }
         } finally {
             // Return to old context

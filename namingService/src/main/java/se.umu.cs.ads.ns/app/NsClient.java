@@ -45,4 +45,12 @@ public class NsClient {
             }
         }, MoreExecutors.directExecutor());
     }
+    public void shutDown(){
+        channel.shutdown();
+        try{
+            while(!channel.awaitTermination(2000, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

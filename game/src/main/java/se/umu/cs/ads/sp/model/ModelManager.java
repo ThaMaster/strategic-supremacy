@@ -1,8 +1,11 @@
 package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
+import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
+import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -43,10 +46,26 @@ public class ModelManager {
     private FowModel fow;
     private GameEvents gameEvents;
 
-    public ModelManager() {
-        map = new Map();
+    private final ComHandler comHandler;
+    private final GameController gameController;
+    private final User player;
+    private final LobbyHandler lobbyHandler;
 
-        gameEvents = GameEvents.getInstance();
+    public ModelManager(GameController controller, User player) {
+        this.map = new Map();
+        this.gameController = controller;
+        this.gameEvents = GameEvents.getInstance();
+        this.comHandler = new ComHandler(player.port, controller);
+        this.player = player;
+        this.lobbyHandler = new LobbyHandler(this);
+    }
+
+    public User getPlayer(){
+        return this.player;
+    }
+
+    public ComHandler getComHandler(){
+        return comHandler;
     }
 
     private void spawnChest(Position spawnPosition, Reward reward) {
@@ -261,5 +280,9 @@ public class ModelManager {
         spawnGold(new Position(450, 250));
         spawnGold(new Position(500, 250));
         spawnGoldMine(new Position(200, 200));
+    }
+
+    public LobbyHandler getLobbyHandler(){
+        return this.lobbyHandler;
     }
 }

@@ -14,6 +14,7 @@ import se.umu.cs.ads.sp.view.windows.panels.start.StartPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 public class MainFrame extends JFrame {
 
@@ -162,8 +163,13 @@ public class MainFrame extends JFrame {
         return browsePanel.getBrowseTable();
     }
 
-    public void setLobbyData(String data[][]) {
+    public void setLobbyData(String data[][], String name, BufferedImage mapPreview,
+                             String selectedMap, boolean isLeader, int currentPlayers, int maxPlayers) {
         lobbyPanel.getPlayerPanel().setData(data);
+        lobbyPanel.setLobbyName(name);
+        lobbyPanel.setMapPreview(mapPreview, selectedMap);
+        lobbyPanel.showStartButton(isLeader);
+        lobbyPanel.getPlayerPanel().setPlayerAmount(currentPlayers, maxPlayers);
     }
 
     public LobbyPanel getLobbyPanel() {

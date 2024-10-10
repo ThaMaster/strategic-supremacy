@@ -13,7 +13,6 @@ public class LobbyPanel extends JPanel {
     private JLabel lobbyLabel;
     private PlayerPanel playerPanel;
     private MapPanel mapPanel;
-
     public LobbyPanel() {
         this.setName("LobbyPanel");
         this.setLayout(new BorderLayout());
@@ -38,6 +37,10 @@ public class LobbyPanel extends JPanel {
         buttonPanel.add(startButton);
         buttonPanel.add(leaveButton);
         return buttonPanel;
+    }
+
+    public void showStartButton(boolean show){
+        startButton.setVisible(show);
     }
 
     public void setLobbyName(String name) {
