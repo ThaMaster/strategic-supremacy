@@ -1,10 +1,8 @@
 # Compile the naming service
-cd ./namingService
-bash ./compile.sh
+bash ../namingService/compile.sh
 
 # Compile the game
-cd ../game
-bash ./compile.sh
+bash ../game/compile.sh
 
 # Start the game
-java -jar target/StrategicSupremacy.jar
+java -jar ../game/target/StrategicSupremacy.jar

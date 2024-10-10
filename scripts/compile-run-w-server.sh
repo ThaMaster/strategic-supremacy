@@ -1,13 +1,12 @@
 # Compile the naming service
-cd ./namingService
-bash ./compile.sh
+
+bash ../namingService/compile.sh
 
 # Compile the game
-cd ../game
-bash ./compile.sh
+bash ../gamecompile.sh
 
 # Start the server in another terminal
 gnome-terminal -- java -jar ../namingService/target/NamingService.jar
 
 # Start the game
-java -jar target/StrategicSupremacy.jar
+java -jar ../game/target/StrategicSupremacy.jar
