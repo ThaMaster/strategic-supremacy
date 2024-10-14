@@ -1,11 +1,14 @@
 package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.UnitInfoDTO;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -35,10 +38,10 @@ public class ModelManager {
     public ModelManager(GameController controller, User player) {
         map = new Map();
         gameEvents = GameEvents.getInstance();
-        comHandler = new ComHandler(player.port, controller);
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler();
+        comHandler = new ComHandler(player.port, controller, objectHandler);
     }
 
     public User getPlayer() {
@@ -77,6 +80,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(), getPlayersToUpdate());
             return true;
         }
         return false;
@@ -163,6 +167,26 @@ public class ModelManager {
     public void startGameReq(StartGameRequest request) {
         objectHandler.populateWorld(request, map, this);
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+    }
+
+    public PlayerUnitUpdateRequest createUnitUpdateRequest() {
+        ArrayList<UnitInfoDTO> unitUpdates = new ArrayList<>();
+        for(PlayerUnit unit : objectHandler.getMyUnits().values()) {
+            unitUpdates.add(new UnitInfoDTO(
+                    unit.getId(),
+                    unit.getPosition(),
+                    unit.getDestination(),
+                    unit.getMaxHp(),
+                    unit.getCurrentHp(),
+                    unit.getSpeed()));
+        }
+        return new PlayerUnitUpdateRequest(unitUpdates, player.id);
+    }
+
+    public ArrayList<Long> getPlayersToUpdate() {
+        // This function will maybe check which users are in L1, L2, L3?
+        // Could also be somewhere else?
+        return new ArrayList<>(lobbyHandler.getLobby().users.stream().map(user -> user.id).toList());
     }
 
 }

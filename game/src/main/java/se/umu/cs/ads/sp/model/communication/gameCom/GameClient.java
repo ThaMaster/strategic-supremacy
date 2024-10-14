@@ -11,8 +11,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.ns.util.NsGrpcUtil;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 
 import java.util.concurrent.TimeUnit;
@@ -64,6 +64,26 @@ public class GameClient {
             @Override
             public void onFailure(Throwable t) {
                 System.out.println("[Client] Failed to tell player to start ze game");
+                System.out.println("\t" + t.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void updateUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .updatePlayerUnit(GrpcUtil.toGrpcUpdatePlayerUnits(playerUnitUpdateRequest));
+
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {
+                System.out.println("[Server] Successfully updated enemy units!");
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("[Server] Failed to update enemy units...");
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());

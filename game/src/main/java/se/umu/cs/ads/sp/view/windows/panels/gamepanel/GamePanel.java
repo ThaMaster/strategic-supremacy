@@ -348,7 +348,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 entity.setHasAttacked(modelUnit.hasAttacked());
                 entity.setHasBeenHit(modelUnit.hasBeenHit());
                 entity.update();
-                if(entity.isMyUnit){
+                if (entity.isMyUnit) {
                     myUnits.add((PlayerUnitView) entity);
                 }
             }

@@ -1,16 +1,12 @@
 package se.umu.cs.ads.sp.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.util.Scanner;
 
 public class AppSettings {
     public static int HOST_PORT = 8080;
-    public static String NAMING_SERVICE_IP = "127.0.0.1";
-    public static int NAMING_SERVICE_PORT = 1337;
+    public static String NAMING_SERVICE_IP = "192.168.1.97";
+    public static int NAMING_SERVICE_PORT = 58727;
     public static boolean DEBUG = false;
 
     public static void SetGameConfig() {
@@ -22,18 +18,16 @@ public class AppSettings {
         }
 
         Scanner sc = new Scanner(settingsUrl);
-        int row = 0;
         while (sc.hasNext()) {
-        row++;
-        String[] words = sc.nextLine().split(" ");
-        if (words[0].startsWith("/")) {
-          // Comment
-          continue;
-        }
-        if (words.length != 2) {
-          return;
-        }
-        setConfigField(words[0], words[1]);
+            String[] words = sc.nextLine().split(" ");
+            if (words[0].startsWith("/")) {
+                // Comment
+                continue;
+            }
+            if (words.length != 2) {
+                return;
+            }
+            setConfigField(words[0], words[1]);
         }
         sc.close();
     }

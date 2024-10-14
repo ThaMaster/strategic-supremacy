@@ -8,7 +8,7 @@ import se.umu.cs.ads.sp.utils.Utils;
 
 public abstract class GameObject {
 
-    protected final long id;
+    protected long id;
     protected Position position;
     protected CollisionBox collisionBox;
 

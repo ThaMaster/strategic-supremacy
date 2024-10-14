@@ -4,6 +4,8 @@ import io.grpc.Context;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.model.ObjectHandler;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
@@ -15,12 +17,15 @@ import java.util.HashMap;
 public class ComHandler {
     private NsClient nsClient;
     private GameController controller;
+    private ObjectHandler objectHandler;
     private GameServer server;
     private HashMap<Long, GameClient> gameClients;
-    public ComHandler(int port, GameController controller) {
+
+    public ComHandler(int port, GameController controller, ObjectHandler objectHandler) {
         gameClients = new HashMap<>();
         nsClient = new NsClient();
         this.controller = controller;
+        this.objectHandler = objectHandler;
         server = new GameServer(port, this);
         server.start();
     }
@@ -34,9 +39,9 @@ public class ComHandler {
     }
 
     public void updateLobby(Lobby updatedLobby) {
-        for(User user : updatedLobby.users){
+        for (User user : updatedLobby.users) {
 
-            if(!gameClients.containsKey(user.id)){
+            if (!gameClients.containsKey(user.id)) {
                 GameClient client = new GameClient();
                 client.create(user.ip, user.port);
                 gameClients.put(user.id, client);
@@ -56,12 +61,21 @@ public class ComHandler {
         return nsClient.fetchLobbies();
     }
 
-    public void sendStartGameRequest(StartGameRequest req, User user){
+    public void sendStartGameRequest(StartGameRequest req, User user) {
         GameClient client = gameClients.get(user.id);
         client.startGame(req);
     }
 
-    public void startGame(StartGameRequest req){
+    public void updatePlayerUnits(PlayerUnitUpdateRequest req, ArrayList<Long> playerIds) {
+        for (Long id : playerIds) {
+            if (id == controller.getModelManager().getPlayer().id) {
+                continue;
+            }
+            gameClients.get(id).updateUnits(req);
+        }
+    }
+
+    public void startGame(StartGameRequest req) {
         controller.startGame(req);
     }
 
@@ -71,16 +85,16 @@ public class ComHandler {
         try {
             // Make all async calls here
             for (User user : lobby.users) {
-                //No need to send the update to ourself
-                if(user.id == controller.getModelManager().getPlayer().id){
+                //No need to send the update to ourselves
+                if (user.id == controller.getModelManager().getPlayer().id) {
                     continue;
                 }
                 GameClient client;
-                if(!gameClients.containsKey(user.id)){
+                if (!gameClients.containsKey(user.id)) {
                     client = new GameClient();
                     client.create(user.ip, user.port);
                     gameClients.put(user.id, client);
-                }else{
+                } else {
                     client = gameClients.get(user.id);
                 }
                 client.updateLobby(lobby, user);
@@ -89,5 +103,9 @@ public class ComHandler {
             // Return to old context
             newContext.detach(origContext);
         }
+    }
+
+    public void updateEnemyUnits(PlayerUnitUpdateRequest req) {
+        objectHandler.updateEnemyUnits(req.unitUpdates());
     }
 }

@@ -46,6 +46,21 @@ public class PlayerUnit extends Entity {
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
+    public PlayerUnit(long id, Position startPos, Map map) {
+        super(startPos, map);
+        miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
+        shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
+        hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
+        this.baseHp = 100;
+        this.maxHp = baseHp;
+        this.currentHp = maxHp;
+        this.attack = 10;
+        this.attackBuff = 0;
+        this.attackRange = 150;
+        this.attackBox = new CollisionBox(position, attackRange, attackRange);
+        this.id = id;
+    }
+
     @Override
     public void update() {
         switch (state) {
@@ -167,5 +182,13 @@ public class PlayerUnit extends Entity {
 
     public boolean hasBeenHit() {
         return hit;
+    }
+
+    public void setPosition(Position newPos) {
+        this.position = newPos;
+    }
+
+    public void setCurrentHp(int currentHp) {
+        this.currentHp = currentHp;
     }
 }

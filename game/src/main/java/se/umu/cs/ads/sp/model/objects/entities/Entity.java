@@ -104,6 +104,10 @@ public abstract class Entity extends GameObject {
         this.maxHp = hp;
     }
 
+    public int getMaxHp() {
+        return maxHp;
+    }
+
     public int getCurrentHp() {
         return this.currentHp;
     }

@@ -4,12 +4,8 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
-import se.umu.cs.ads.sp.model.communication.dto.CollectableDTO;
-import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.EnvironmentDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -17,6 +13,7 @@ import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
@@ -126,7 +123,6 @@ public class ObjectHandler {
         this.enemyUnits.put(unit.getId(), unit);
     }
 
-
     public HashMap<Long, PlayerUnit> getEnemyUnits() {
         return enemyUnits;
     }
@@ -146,7 +142,7 @@ public class ObjectHandler {
             long userId = user.id;
             Position basePos = basePositions.get(basePositions.size() - 1);
             //Spawning base
-            startGameRequest.getEnvironments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
+            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
             spawnBase(map, basePos);
 
             //Spawning 3 entities
@@ -157,8 +153,11 @@ public class ObjectHandler {
                             * Constants.TILE_HEIGHT) + Utils.getRandomInt(-15, 15),
                             (basePos.getY() * Constants.TILE_WIDTH) + Utils.getRandomInt(-15, 15));
                 } while (!modelManager.isWalkable(offsetPosition));
-                startGameRequest.getEntitySkeletons().add(new EntitySkeletonDTO(Utils.generateId(), userId, offsetPosition));
-                spawnUnit(map, offsetPosition, userId == modelManager.getPlayer().id);
+
+                EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), userId, offsetPosition);
+                spawnUnit(map, entitySkeletonDTO.id(), offsetPosition, userId == modelManager.getPlayer().id);
+
+                startGameRequest.entitySkeletons().add(entitySkeletonDTO);
             }
 
             if (!basePositions.isEmpty()) {
@@ -178,7 +177,7 @@ public class ObjectHandler {
 
     public void populateWorld(StartGameRequest request, Map map, ModelManager modelManager) {
 
-        for (EnvironmentDTO env : request.getEnvironments()) {
+        for (EnvironmentDTO env : request.environments()) {
             DtoTypes type = DtoTypes.fromLabel(env.type());
             switch (type) {
                 case BASE:
@@ -189,11 +188,14 @@ public class ObjectHandler {
             }
         }
 
-        for (CollectableDTO collectable : request.getCollectables()) {
+        for (CollectableDTO collectable : request.collectables()) {
             DtoTypes type = DtoTypes.fromLabel(collectable.type());
             switch (type) {
                 case GOLD:
                     spawnGold(map, collectable.position());
+                    break;
+                case CHEST:
+                    spawnChest(map, collectable.position(), collectable.reward());
                     break;
                 default:
                     System.out.println("Unexpected type on collectable");
@@ -201,8 +203,8 @@ public class ObjectHandler {
             }
         }
 
-        for (EntitySkeletonDTO unit : request.getEntitySkeletons()) {
-            spawnUnit(map, unit.position(), unit.userId() == modelManager.getPlayer().id);
+        for (EntitySkeletonDTO unit : request.entitySkeletons()) {
+            spawnUnit(map, unit.id(), unit.position(), unit.userId() == modelManager.getPlayer().id);
         }
     }
 
@@ -217,12 +219,29 @@ public class ObjectHandler {
         addCollectable(coin);
     }
 
-    private void spawnUnit(Map map, Position position, boolean myUnit) {
-        PlayerUnit unit = new PlayerUnit(position, map);
+    private void spawnChest(Map map, Position position, Reward reward) {
+        Chest chest = new Chest(position, map);
+        chest.setReward(reward);
+        addCollectable(chest);
+    }
+
+    private void spawnUnit(Map map, long unitId, Position position, boolean myUnit) {
+        PlayerUnit unit = new PlayerUnit(unitId, position, map);
         if (myUnit) {
             myUnits.put(unit.getId(), unit);
         } else {
             enemyUnits.put(unit.getId(), unit);
+        }
+    }
+
+    public void updateEnemyUnits(ArrayList<UnitInfoDTO> updates) {
+        for (UnitInfoDTO update : updates) {
+            PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
+            enemyUnit.setPosition(update.position());
+            enemyUnit.setDestination(update.destination());
+            enemyUnit.setCurrentHp(update.currentHp());
+            enemyUnit.setMaxHp(update.maxHp());
+            enemyUnit.setSpeed(update.speed());
         }
     }
 }
