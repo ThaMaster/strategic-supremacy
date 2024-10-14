@@ -1,15 +1,27 @@
 package se.umu.cs.ads.sp.model;
 
+import proto.EntitySkeleton;
+import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
+import se.umu.cs.ads.sp.model.communication.dto.CollectableDTO;
+import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
+import se.umu.cs.ads.sp.model.communication.dto.EnvironmentDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.map.Map;
+import se.umu.cs.ads.sp.model.objects.Environment.Base;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
+import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.DtoTypes;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.awt.*;
@@ -125,5 +137,92 @@ public class ObjectHandler {
 
     public HashMap<Long, Collectable> getCollectables() {
         return collectables;
+    }
+
+    public StartGameRequest initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager){
+        StartGameRequest startGameRequest = new StartGameRequest(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        ArrayList<Position> basePositions = map.getBasePositions();
+        for(User user : users){
+            long userId = user.id;
+            Position basePos = basePositions.get(basePositions.size()-1);
+            //Spawning base
+            startGameRequest.getEnvironments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
+            spawnBase(map, basePos);
+
+            //Spawning 3 entities
+            for(int i = 0; i < 3; i++){
+                Position offsetPosition = basePos;
+                do {
+                    offsetPosition = new Position((basePos.getX()
+                            * Constants.TILE_HEIGHT) + Utils.getRandomInt(-15, 15),
+                            (basePos.getY() * Constants.TILE_WIDTH) + Utils.getRandomInt(-15, 15));
+                } while (!modelManager.isWalkable(offsetPosition));
+                startGameRequest.getEntitySkeletons().add(new EntitySkeletonDTO(Utils.generateId(), userId, offsetPosition));
+                spawnUnit(map, offsetPosition, userId == modelManager.getPlayer().id);
+            }
+
+            if(!basePositions.isEmpty()){
+                basePositions.remove(basePositions.size()-1);
+            }
+        }
+        //TEMP
+        spawnGold(map, new Position(200,200));
+        startGameRequest.addCollectable(
+                new CollectableDTO(Utils.generateId(),
+                new Position(200,200),
+                DtoTypes.GOLD.type,
+                new Reward(10, Reward.RewardType.GOLD))
+        );
+        return startGameRequest;
+    }
+
+    public void populateWorld(StartGameRequest request, Map map, ModelManager modelManager){
+
+        for(EnvironmentDTO env : request.getEnvironments()){
+            DtoTypes type = DtoTypes.fromLabel(env.type());
+            switch(type){
+                case BASE:
+                    spawnBase(map, env.position());
+                    break;
+                case GOLDMINE:
+                    break;
+            }
+        }
+
+        for(CollectableDTO collectable : request.getCollectables()){
+            DtoTypes type = DtoTypes.fromLabel(collectable.type());
+            switch(type){
+                case GOLD:
+                    spawnGold(map, collectable.position());
+                    break;
+                default:
+                    System.out.println("Unexpected type on collectable");
+                    break;
+            }
+        }
+
+        for(EntitySkeletonDTO unit : request.getEntitySkeletons()){
+            spawnUnit(map, unit.position(), unit.userId() == modelManager.getPlayer().id);
+        }
+    }
+
+    private void spawnBase(Map map, Position position){
+        Base base = new Base(position);
+        base.spawn(map);
+    }
+
+    private void spawnGold(Map map, Position position){
+        Gold coin = new Gold(position, map);
+        coin.setReward(new Reward(10, Reward.RewardType.GOLD));
+        addCollectable(coin);
+    }
+
+    private void spawnUnit(Map map, Position position, boolean myUnit){
+        PlayerUnit unit = new PlayerUnit(position, map);
+        if(myUnit){
+            myUnits.put(unit.getId(), unit);
+        }else{
+            enemyUnits.put(unit.getId(), unit);
+        }
     }
 }

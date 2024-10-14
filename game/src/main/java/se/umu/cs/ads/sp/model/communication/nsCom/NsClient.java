@@ -91,13 +91,4 @@ public class NsClient {
             e.printStackTrace();
         }
     }
-
-    // Don't forget to shut down the channel when done
-    public void shutdown() {
-        try {
-            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.map;
 
+import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.utils.Constants;
@@ -16,7 +17,7 @@ public class Map {
 
     // Now we store a whole object for every tile even though they are the same, did we not decide to not do this?
     private ArrayList<ArrayList<TileModel>> map;
-
+    private ArrayList<Position> basePositions;
     private int cols;
     private int rows;
 
@@ -33,17 +34,24 @@ public class Map {
         try {
             InputStream is = getClass().getResourceAsStream("/" + file);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
+            basePositions = new ArrayList<>();
             String line;
             int row = 0;
             int maxCol = 0;
             int currentCols;
             this.map = new ArrayList<>();
             while ((line = br.readLine()) != null) {
+
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
+                int col = 0;
                 for (String number : numbers) {
+                    int tile = Integer.parseInt(number);
+                    if(tile == 8){
+                        basePositions.add(new Position(col, row));
+                    }
                     map.get(row).add(new TileModel(Integer.parseInt(number)));
+                    col++;
                 }
                 currentCols = map.get(row).size();
                 if (currentCols > maxCol) {
@@ -53,6 +61,7 @@ public class Map {
             }
             this.rows = row;
             this.cols = maxCol;
+
         } catch (IOException e) {
             System.out.println("ERROR");
             e.printStackTrace();
@@ -131,11 +140,13 @@ public class Map {
         return rows;
     }
 
+
+
     public boolean inBounds(int row, int col) {
         return row >= 0 && row < map.size() && col >= 0 && col < map.get(row).size();
     }
 
-    public ArrayList<Position> getStartPositions(int numPlayers){
-        return new ArrayList<>();
+    public ArrayList<Position> getBasePositions(){
+        return basePositions;
     }
 }

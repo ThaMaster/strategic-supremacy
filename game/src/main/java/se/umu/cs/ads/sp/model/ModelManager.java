@@ -1,11 +1,16 @@
 package se.umu.cs.ads.sp.model;
 
+import io.grpc.Context;
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
+import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -39,7 +44,6 @@ public class ModelManager {
     private final GameController gameController;
     private final User player;
     private final LobbyHandler lobbyHandler;
-
     public ModelManager(GameController controller, User player) {
         map = new Map();
         gameController = controller;
@@ -48,7 +52,6 @@ public class ModelManager {
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler();
-
     }
 
     public User getPlayer() {
@@ -152,12 +155,16 @@ public class ModelManager {
 
     public void loadMap(String mapName) {
         map.loadMap("maps/" + mapName + ".txt");
-        PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
+
+
+        //1. Set start positions for each player
+        //2. Set out positions for collectables
+
+        /*PlayerUnit firstUnit = new PlayerUnit(new Position(100, 100), map);
         PlayerUnit secondUnit = new PlayerUnit(new Position(100, 100), map);
 
         objectHandler.addMyUnit(firstUnit);
         objectHandler.addMyUnit(secondUnit);
-        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         spawnGold(new Position(120,120));
         PlayerUnit enemy = new PlayerUnit(new Position(150, 150), map);
         PlayerUnit enemy2 = new PlayerUnit(new Position(160, 150), map);
@@ -165,9 +172,6 @@ public class ModelManager {
         objectHandler.addEnemyUnit(enemy);
         objectHandler.addEnemyUnit(enemy2);
         objectHandler.addEnemyUnit(enemy3);
-
-        //1. Set start positions for each player
-        //2. Set out positions for collectables
 
         /*
 
@@ -207,7 +211,20 @@ public class ModelManager {
     }
 
     public void startGame() {
+        StartGameRequest req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
+        for(User user : lobbyHandler.getLobby().users){
+            if(user.id != player.id){
+                System.out.println("Sending out to start game to " + user.username);
+                comHandler.sendStartGameRequest(req, user);
+            }
+        }
+        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+    }
 
+    // A request has come in to start the game
+    public void startGameReq(StartGameRequest request){
+        objectHandler.populateWorld(request, map, this);
+        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
     }
 
 }

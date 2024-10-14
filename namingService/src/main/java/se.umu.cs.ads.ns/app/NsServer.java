@@ -90,7 +90,6 @@ public class NsServer {
             if (!lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
-                sendUpdatedLobby(lobby);
             } else {
                 System.out.println("\t User already exists!");
             }
@@ -121,29 +120,12 @@ public class NsServer {
                 System.out.println("\t Lobby became empty, removing...");
                 lobbies.remove(lobby.id);
             } else {
-                sendUpdatedLobby(lobby);
+                //sendUpdatedLobby(lobby);
             }
 
             System.out.println("\t Done.");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
-        }
-    }
-
-    private void sendUpdatedLobby(Lobby lobby) {
-        Context newContext = Context.current().fork();
-        Context origContext = newContext.attach();
-        try {
-            // Make all async calls here
-            for (User user : lobby.users) {
-                NsClient client = new NsClient(user.ip, user.port);
-                client.updateLobby(lobby, user);
-
-                client.shutDown();
-            }
-        } finally {
-            // Return to old context
-            newContext.detach(origContext);
         }
     }
 }

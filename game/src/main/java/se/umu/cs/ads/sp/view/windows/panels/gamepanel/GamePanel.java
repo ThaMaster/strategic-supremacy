@@ -245,7 +245,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         // Draw entities
         for (EntityView entity : gameEntitiesView.values()) {
             if (tileManager.isInFow(entity.getPosition())) {
-                if (entity instanceof PlayerUnitView) {
+                if (entity.isMyUnit) {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ALLY_COLOR, 50);
                 } else {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
@@ -297,7 +297,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (PlayerUnit unit : myUnits.values()) {
             PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getPosition());
             newUnit.setSelected(unit.isSelected());
+            newUnit.setIsMyUnit();
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
+            cameraWorldPosition.setX(newUnit.getPosition().getX());
+            cameraWorldPosition.setY(newUnit.getPosition().getY());
         }
 
         for (Entity entity : entities.values()) {
@@ -345,8 +348,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 entity.setHasAttacked(modelUnit.hasAttacked());
                 entity.setHasBeenHit(modelUnit.hasBeenHit());
                 entity.update();
-                if (entity instanceof PlayerUnitView playerUnitView) {
-                    myUnits.add(playerUnitView);
+                if(entity.isMyUnit){
+                    myUnits.add((PlayerUnitView) entity);
                 }
             }
         }
@@ -354,6 +357,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setGameController(GameController gc) {
+        System.out.println("Setting gController");
         this.gController = gc;
     }
 
@@ -370,7 +374,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         if (cameraWorldPosition.getY() + yAmount < 0) {
             return false;
         }
-        if ((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumCols())) {
+        if ((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumRows())) {
             return false;
         }
 
@@ -381,7 +385,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         if (cameraWorldPosition.getX() + xAmount < 0) {
             return false;
         }
-        return cameraWorldPosition.getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumRows();
+        return cameraWorldPosition.getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumCols();
     }
 
     public void setCameraWorldPosition(int xAmount, int yAmount) {

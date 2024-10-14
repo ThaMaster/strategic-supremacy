@@ -11,6 +11,9 @@ import java.util.ArrayList;
 public class NsGrpcUtil {
 
     public static User fromGrpc(nsProto.User request) {
+        if(request == null){
+                System.out.println("NULL NULL NULL rad 15 NsGrupc");
+        }
         return new User(request.getId(), request.getUsername(), request.getIp(), request.getPort());
     }
 
@@ -43,14 +46,6 @@ public class NsGrpcUtil {
                 setMaxPlayers(lobby.maxPlayers).build();
     }
 
-    /*
-    message NewLobby {
-  User lobbyCreator = 1;
-  string lobbyName = 2;
-  int32 maxPlayers = 3;
-}
-
-     */
     public static nsProto.NewLobby toGrpc(User creator, String name, int maxPlayers, String selectedMap) {
         return nsProto.NewLobby.newBuilder().
                 setLobbyCreator(toGrpc(creator)).
@@ -81,7 +76,7 @@ public class NsGrpcUtil {
         for (User user : lobby.users) {
             builder.addUsers(toGrpc(user));
         }
-        builder.setId(toGrpc(lobby.id));
+        builder.setId((lobby.id));
         builder.setLeader(toGrpc(lobby.leader));
         builder.setSelectedMap(selectedMap);
         builder.setMaxPlayers(lobby.maxPlayers);
@@ -104,11 +99,17 @@ public class NsGrpcUtil {
     }
 
     public static Lobby fromGrpc(nsProto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby(fromGrpc(request.getId()), request.getLobbyName(), request.getMaxPlayers());
+        System.out.println("Converting from Grpc");
+        Lobby lobby = new Lobby((request.getId()), request.getLobbyName(), request.getMaxPlayers());
         ArrayList<User> users = new ArrayList<>();
         for (nsProto.User user : request.getUsersList()) {
+            System.out.println("adding user: " + user.getUsername());
             users.add(fromGrpc(user));
         }
+        System.out.println("now time to add leader!!");
+        System.out.println("Leader -> " + request.getLeader().getUsername());
+        lobby.leader = fromGrpc(request.getLeader());
+
         lobby.setUsers(users);
         lobby.selectedMap = request.getSelectedMap();
         return lobby;

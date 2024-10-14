@@ -14,10 +14,15 @@ public abstract class EntityView extends ObjectView {
     protected boolean attacked = false;
     protected boolean selected = false;
     protected boolean hasBeenHit = false;
+    public boolean isMyUnit = false;
 
     public EntityView(long id, Position pos) {
         super(id, pos);
         this.animator = new Animator();
+    }
+
+    public void setIsMyUnit(){
+        isMyUnit = true;
     }
 
     public void setSelected(boolean b) {

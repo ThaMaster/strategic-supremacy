@@ -16,6 +16,7 @@ public class LobbyHandler {
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap){
         long id = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);
         lobby = new Lobby(id, lobbyName, maxPlayers);
+        lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
     }
 
@@ -30,5 +31,13 @@ public class LobbyHandler {
     public Lobby joinLobby(long lobbyId){
         lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
         return lobby;
+    }
+
+    public Lobby getLobby(){
+        return lobby;
+    }
+
+    public void setLobby(Lobby newLobby){
+        lobby = newLobby;
     }
 }

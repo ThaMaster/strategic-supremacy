@@ -7,10 +7,6 @@ option java_outer_classname = "Proto";
 
 package grpc;
 
-message UserId {
-   int64 id = 1;
-}
-
 message LobbyId {
   int64 id = 1;
 }
@@ -28,15 +24,6 @@ message LobbyInfo {
   string lobbyName = 3;
   int32 nrPlayers = 4;
   int32 maxPlayers = 5;
-}
-
-message DetailedLobbyInfo {
-  LobbyId id = 1;
-  string lobbyName = 2;
-  User leader = 3;
-  repeated User users = 4;
-  int32 maxPlayers = 5;
-  string selectedMap = 6;
 }
 
 message NewLobby {
@@ -60,11 +47,19 @@ message LeaveRequest {
   User user = 2;
 }
 
+message DetailedLobbyInfo {
+  int64 id = 1;
+  string lobbyName = 2;
+  User leader = 3;
+  repeated User users = 4;
+  int32 maxPlayers = 5;
+  string selectedMap = 6;
+}
+
 service GrpcNamingService {
   rpc createLobby (NewLobby) returns (LobbyId);
   rpc deleteLobby (LobbyId) returns (google.protobuf.Empty);
   rpc getLobbies (google.protobuf.Empty) returns (Lobbies);
   rpc joinLobby(JoinRequest) returns (DetailedLobbyInfo);
-  rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
   rpc leaveLobby(LeaveRequest) returns (google.protobuf.Empty);
 }

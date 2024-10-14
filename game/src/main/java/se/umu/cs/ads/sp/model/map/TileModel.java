@@ -31,7 +31,7 @@ public class TileModel {
                 this.type = TileType.WATER;
                 break;
             default:
-                this.type = TileType.UNKNOWN;
+                this.type = TileType.GRASS;
                 break;
         }
     }

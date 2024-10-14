@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
@@ -35,6 +36,22 @@ public class GameController implements ActionListener {
     public GameController() {
         mainFrame = new MainFrame();
         setActionListeners();
+    }
+
+    public void startGame(StartGameRequest req){
+        this.timer = new Timer(1000 / FPS, this);
+        modelManager.startGameReq(req);
+        mainFrame.showGamePanel(tileManager);
+        mainFrame.getGamePanel().startGame();
+        mainFrame.getGamePanel().setGameController(this);
+        mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
+                modelManager.getObjectHandler().getEnemyUnits());
+        mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
+        this.timer.start();
+    }
+
+    public ModelManager getModelManager(){
+        return this.modelManager;
     }
 
     public void startGame() {
@@ -212,8 +229,8 @@ public class GameController implements ActionListener {
     public class StartButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            startGame();
             modelManager.startGame();
+            startGame();
         }
     }
     //----------------------------------------
@@ -241,22 +258,14 @@ public class GameController implements ActionListener {
     private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         modelManager.getLobbyHandler().createLobby(lobbyName, maxPlayers, selectedMap);
         SwingUtilities.invokeLater(() -> {
-            String[][] lobbyData = {{String.valueOf(GameController.this.player.id), GameController.this.player.username}};
-            updateLobby(lobbyName, lobbyData, 1, maxPlayers, selectedMap);
+            updateLobby(lobbyName, modelManager.getLobbyHandler().getLobby(), 1, maxPlayers, selectedMap);
         });
     }
 
     private void joinLobby(long lobbyId) {
         Lobby lobby = modelManager.getLobbyHandler().joinLobby(lobbyId);
         SwingUtilities.invokeLater(() -> {
-            String[][] lobbyData = new String[lobby.users.size()][];
-            for (int i = 0; i < lobby.users.size(); i++) {
-                lobbyData[i] = new String[]{
-                        String.valueOf(lobby.users.get(i).id),
-                        lobby.users.get(i).username,
-                };
-            }
-            updateLobby(lobby.name, lobbyData, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
+            updateLobby(lobby.name, lobby, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
             mainFrame.switchPanel("Lobby");
 
         });
@@ -269,9 +278,18 @@ public class GameController implements ActionListener {
 
     //---------------------------------------//
 
-    public void updateLobby(String lobbyName, String[][] playerData, int currentPlayers, int maxPlayers, String selectedMap) {
+    public void updateLobby(String lobbyName, Lobby updatedLobby, int currentPlayers, int maxPlayers, String selectedMap) {
+
+        String[][] playerData = new String[updatedLobby.users.size()][];
+        for (int i = 0; i < updatedLobby.users.size(); i++) {
+            playerData[i] = new String[]{
+                    String.valueOf(updatedLobby.users.get(i).id),
+                    updatedLobby.users.get(i).username,
+            };
+        }
 
         modelManager.loadMap(selectedMap);
+        modelManager.getLobbyHandler().setLobby(updatedLobby);
         tileManager.setMap(modelManager.getMap().getModelMap());
         BufferedImage mapPreview = MiniMap.createMinimapPreview(
                 tileManager.getViewMap(),
