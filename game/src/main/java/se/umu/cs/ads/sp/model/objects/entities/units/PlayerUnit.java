@@ -5,7 +5,7 @@ import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.Environment.GoldMine;
+import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;

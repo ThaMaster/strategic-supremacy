@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model;
 
-import proto.EntitySkeleton;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
@@ -10,7 +9,7 @@ import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
 import se.umu.cs.ads.sp.model.communication.dto.EnvironmentDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.model.objects.Environment.Base;
+import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -35,38 +34,39 @@ public class ObjectHandler {
     private ArrayList<Long> selectedUnitIds = new ArrayList<>();
     private ArrayList<GameObject> environment;
 
-    public void update(){
+    public void update() {
         for (PlayerUnit entity : myUnits.values()) {
             entity.update();
             checkCollectables(entity);
         }
+
         for (PlayerUnit entity : enemyUnits.values()) {
             entity.update();
             checkCollectables(entity);
         }
     }
 
-    public ArrayList<PlayerUnit> getSelectedUnits(){
+    public ArrayList<PlayerUnit> getSelectedUnits() {
         ArrayList<PlayerUnit> selectedUnits = new ArrayList<>();
-        for(long id : selectedUnitIds){
+        for (long id : selectedUnitIds) {
             selectedUnits.add(myUnits.get(id));
         }
         return selectedUnits;
     }
 
-    public void clearSelectedUnitIds(){
-        for(long id : selectedUnitIds){
+    public void clearSelectedUnitIds() {
+        for (long id : selectedUnitIds) {
             myUnits.get(id).setSelected(false);
         }
         this.selectedUnitIds.clear();
     }
 
-    public void addSelectionId(long id){
+    public void addSelectionId(long id) {
         myUnits.get(id).setSelected(true);
         this.selectedUnitIds.add(id);
     }
 
-    public void setSelection(Position clickLocation){
+    public void setSelection(Position clickLocation) {
         clearSelectedUnitIds();
         for (PlayerUnit unit : myUnits.values()) {
             if (Position.distance(unit.getPosition(), clickLocation) / Constants.ENTITY_WIDTH <= 1) {
@@ -77,11 +77,11 @@ public class ObjectHandler {
         }
     }
 
-    public ArrayList<Long> getSelectedUnitIds(){
+    public ArrayList<Long> getSelectedUnitIds() {
         return selectedUnitIds;
     }
 
-    public void stopSelectedEntities(){
+    public void stopSelectedEntities() {
         for (PlayerUnit unit : getSelectedUnits()) {
             unit.setDestination(unit.getPosition());
         }
@@ -103,7 +103,7 @@ public class ObjectHandler {
         }
     }
 
-    private void checkCollectables(PlayerUnit playerUnit){
+    private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
             if (collected instanceof Chest) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
@@ -114,15 +114,15 @@ public class ObjectHandler {
         playerUnit.getCollected().clear();
     }
 
-    public void addCollectable(Collectable collectable){
+    public void addCollectable(Collectable collectable) {
         collectables.put(collectable.getId(), collectable);
     }
 
-    public void addMyUnit(PlayerUnit unit){
+    public void addMyUnit(PlayerUnit unit) {
         this.myUnits.put(unit.getId(), unit);
     }
 
-    public void addEnemyUnit(PlayerUnit unit){
+    public void addEnemyUnit(PlayerUnit unit) {
         this.enemyUnits.put(unit.getId(), unit);
     }
 
@@ -139,18 +139,18 @@ public class ObjectHandler {
         return collectables;
     }
 
-    public StartGameRequest initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager){
+    public StartGameRequest initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
         StartGameRequest startGameRequest = new StartGameRequest(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         ArrayList<Position> basePositions = map.getBasePositions();
-        for(User user : users){
+        for (User user : users) {
             long userId = user.id;
-            Position basePos = basePositions.get(basePositions.size()-1);
+            Position basePos = basePositions.get(basePositions.size() - 1);
             //Spawning base
             startGameRequest.getEnvironments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
             spawnBase(map, basePos);
 
             //Spawning 3 entities
-            for(int i = 0; i < 3; i++){
+            for (int i = 0; i < 3; i++) {
                 Position offsetPosition = basePos;
                 do {
                     offsetPosition = new Position((basePos.getX()
@@ -161,26 +161,26 @@ public class ObjectHandler {
                 spawnUnit(map, offsetPosition, userId == modelManager.getPlayer().id);
             }
 
-            if(!basePositions.isEmpty()){
-                basePositions.remove(basePositions.size()-1);
+            if (!basePositions.isEmpty()) {
+                basePositions.remove(basePositions.size() - 1);
             }
         }
         //TEMP
-        spawnGold(map, new Position(200,200));
+        spawnGold(map, new Position(200, 200));
         startGameRequest.addCollectable(
                 new CollectableDTO(Utils.generateId(),
-                new Position(200,200),
-                DtoTypes.GOLD.type,
-                new Reward(10, Reward.RewardType.GOLD))
+                        new Position(200, 200),
+                        DtoTypes.GOLD.type,
+                        new Reward(10, Reward.RewardType.GOLD))
         );
         return startGameRequest;
     }
 
-    public void populateWorld(StartGameRequest request, Map map, ModelManager modelManager){
+    public void populateWorld(StartGameRequest request, Map map, ModelManager modelManager) {
 
-        for(EnvironmentDTO env : request.getEnvironments()){
+        for (EnvironmentDTO env : request.getEnvironments()) {
             DtoTypes type = DtoTypes.fromLabel(env.type());
-            switch(type){
+            switch (type) {
                 case BASE:
                     spawnBase(map, env.position());
                     break;
@@ -189,9 +189,9 @@ public class ObjectHandler {
             }
         }
 
-        for(CollectableDTO collectable : request.getCollectables()){
+        for (CollectableDTO collectable : request.getCollectables()) {
             DtoTypes type = DtoTypes.fromLabel(collectable.type());
-            switch(type){
+            switch (type) {
                 case GOLD:
                     spawnGold(map, collectable.position());
                     break;
@@ -201,27 +201,27 @@ public class ObjectHandler {
             }
         }
 
-        for(EntitySkeletonDTO unit : request.getEntitySkeletons()){
+        for (EntitySkeletonDTO unit : request.getEntitySkeletons()) {
             spawnUnit(map, unit.position(), unit.userId() == modelManager.getPlayer().id);
         }
     }
 
-    private void spawnBase(Map map, Position position){
+    private void spawnBase(Map map, Position position) {
         Base base = new Base(position);
         base.spawn(map);
     }
 
-    private void spawnGold(Map map, Position position){
+    private void spawnGold(Map map, Position position) {
         Gold coin = new Gold(position, map);
         coin.setReward(new Reward(10, Reward.RewardType.GOLD));
         addCollectable(coin);
     }
 
-    private void spawnUnit(Map map, Position position, boolean myUnit){
+    private void spawnUnit(Map map, Position position, boolean myUnit) {
         PlayerUnit unit = new PlayerUnit(position, map);
-        if(myUnit){
+        if (myUnit) {
             myUnits.put(unit.getId(), unit);
-        }else{
+        } else {
             enemyUnits.put(unit.getId(), unit);
         }
     }
