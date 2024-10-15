@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.dialogs.AboutDialog;
 import se.umu.cs.ads.sp.view.windows.dialogs.HelpDialog;
 import se.umu.cs.ads.sp.view.windows.frames.CreateLobbyFrame;
+import se.umu.cs.ads.sp.view.windows.frames.QuitGameFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
@@ -20,6 +21,7 @@ public class MainFrame extends JFrame {
 
     private CreateLobbyFrame createLobbyFrame;
     private SettingsFrame settingsFrame;
+    private QuitGameFrame quitFrame;
     private JLabel playerLabel;
     private JMenuBar menuBar;
 
@@ -37,7 +39,7 @@ public class MainFrame extends JFrame {
         this.setTitle("Strategic Supremacy");
         createLobbyFrame = new CreateLobbyFrame();
         settingsFrame = new SettingsFrame();
-
+        quitFrame = new QuitGameFrame();
 
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
@@ -184,6 +186,10 @@ public class MainFrame extends JFrame {
         return createLobbyFrame;
     }
 
+    public QuitGameFrame getQuitFrame() {
+        return quitFrame;
+    }
+
     //----------------------------------------
     public void setEnterButtonListener(ActionListener actionListener) {
         this.startPanel.getEnterButton().addActionListener(actionListener);
@@ -210,6 +216,11 @@ public class MainFrame extends JFrame {
     public void setLeaveButtonListener(ActionListener actionListener) {
         this.lobbyPanel.getLeaveButton().addActionListener(actionListener);
     }
+
+    public void setQuitButtonListener(ActionListener actionListener) {
+        this.quitFrame.getQuitButton().addActionListener(actionListener);
+    }
+
     //----------------------------------------
     public void displayWarningMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);

@@ -75,6 +75,7 @@ message DetailedLobbyInfo {
 
 service GameService {
   rpc updatePlayerUnit (PlayerUnits) returns (google.protobuf.Empty);
+  rpc leaveOngoingGame (EntitySkeleton) returns (google.protobuf.Empty);
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
 }

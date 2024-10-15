@@ -1,14 +1,13 @@
 package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.model.communication.dto.CompleteUnitInfoDTO;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
-import se.umu.cs.ads.sp.model.communication.dto.UnitInfoDTO;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -170,9 +169,9 @@ public class ModelManager {
     }
 
     public PlayerUnitUpdateRequest createUnitUpdateRequest() {
-        ArrayList<UnitInfoDTO> unitUpdates = new ArrayList<>();
-        for(PlayerUnit unit : objectHandler.getMyUnits().values()) {
-            unitUpdates.add(new UnitInfoDTO(
+        ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
+        for (PlayerUnit unit : objectHandler.getMyUnits().values()) {
+            unitUpdates.add(new CompleteUnitInfoDTO(
                     unit.getId(),
                     unit.getPosition(),
                     unit.getDestination(),

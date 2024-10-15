@@ -4,7 +4,6 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
@@ -38,7 +37,7 @@ public class GameController implements ActionListener {
         setActionListeners();
     }
 
-    public void startGame(StartGameRequest req){
+    public void startGame(StartGameRequest req) {
         this.timer = new Timer(1000 / FPS, this);
         modelManager.startGameReq(req);
         mainFrame.showGamePanel(tileManager);
@@ -50,7 +49,7 @@ public class GameController implements ActionListener {
         this.timer.start();
     }
 
-    public ModelManager getModelManager(){
+    public ModelManager getModelManager() {
         return this.modelManager;
     }
 
@@ -71,10 +70,10 @@ public class GameController implements ActionListener {
         render();
     }
 
-    private ArrayList<Entity> getAllUnits(){
+    private ArrayList<Entity> getAllUnits() {
         ArrayList<Entity> allUnits = new ArrayList<>(modelManager.getObjectHandler().getEnemyUnits().values());
         allUnits.addAll(modelManager.getObjectHandler().getMyUnits().values());
-        return  allUnits;
+        return allUnits;
     }
 
     private void update() {
@@ -118,7 +117,8 @@ public class GameController implements ActionListener {
         modelManager.getObjectHandler().setSelection(clickLocation);
     }
 
-    public void setSelection(long entityId) {
+    public void setSelection(int index) {
+        long entityId = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(index).getId();
         modelManager.setSelection(entityId);
         Position newCameraPos = modelManager.getObjectHandler().getMyUnits().get(entityId).getPosition();
         mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos.getX(), newCameraPos.getY());
@@ -149,6 +149,7 @@ public class GameController implements ActionListener {
         mainFrame.setStartButtonListener(new StartButtonListener());
         mainFrame.setLeaveButtonListener(new LeaveButtonListener());
         mainFrame.setCreateLobbyListener(new CreateButtonListener());
+        mainFrame.setQuitButtonListener(new QuitButtonListener());
         mainFrame.getBrowseTable().getSelectionModel().addListSelectionListener(e -> {
             // If I do not have this if, it will fire an event when pressing and releasing the mouse
             if (!e.getValueIsAdjusting()) {
@@ -233,12 +234,15 @@ public class GameController implements ActionListener {
             startGame();
         }
     }
-    //----------------------------------------
-    public void updateLobbyData(String[][] lobbyData){
-        SwingUtilities.invokeLater(() -> {
-            mainFrame.setBrowsePanelData(lobbyData);
-        });
+
+    public class QuitButtonListener implements  ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            mainFrame.getQuitFrame().showFrame(false);
+        }
     }
+
     //------ALL-COMMUNICATION-FUNCTIONS------//
     private void fetchLobbies() {
         ArrayList<Lobby> lobbies = modelManager.getLobbyHandler().fetchLobbies();
@@ -269,11 +273,6 @@ public class GameController implements ActionListener {
             mainFrame.switchPanel("Lobby");
 
         });
-     //           .exceptionally(throwable -> {
-     //       mainFrame.displayWarningMessage(throwable.getLocalizedMessage());
-     //       GameController.this.joinedLobby = -1L;
-     //       return null;
-     //   });
     }
 
     //---------------------------------------//
@@ -296,9 +295,13 @@ public class GameController implements ActionListener {
                 tileManager.getMapWidth(),
                 tileManager.getMapHeight(),
                 100,
-        100);
+                100);
 
         mainFrame.setLobbyData(playerData, lobbyName, mapPreview, selectedMap,
                 true, currentPlayers, maxPlayers);
+    }
+
+    public void openQuitWindow() {
+        mainFrame.getQuitFrame().showFrame(true);
     }
 }

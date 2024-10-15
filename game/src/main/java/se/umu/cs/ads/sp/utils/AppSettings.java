@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class AppSettings {
     public static int HOST_PORT = 8080;
-    public static String NAMING_SERVICE_IP = "192.168.1.97";
+    public static String NAMING_SERVICE_IP = "130.239.42.246";
     public static int NAMING_SERVICE_PORT = 58727;
     public static boolean DEBUG = false;
 

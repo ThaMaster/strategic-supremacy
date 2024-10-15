@@ -196,6 +196,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             case KeyEvent.VK_S:
                 gController.stopSelectedEntities();
                 break;
+            case KeyEvent.VK_ESCAPE:
+                gController.openQuitWindow();
+                break;
             case KeyEvent.VK_RIGHT:
                 cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
                 break;

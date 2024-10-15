@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.view.util;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class StyleConstants {
@@ -10,7 +11,9 @@ public class StyleConstants {
     public static final Font TITLE_FONT = new Font("serif", Font.BOLD, 24);
     public static final Font LABEL_FONT = new Font("serif", Font.BOLD, 18);
     public static final Font BUTTON_FONT = new Font("serif", Font.BOLD, 16);
+    public static final Font PLAIN_TEXT_FONT = new Font("serif", Font.PLAIN, 14);
     public static final Font TEXT_FIELD_FONT = new Font("serif", Font.PLAIN, 14);
+
 
     // Default color definitions
     public static final Color PRIMARY_COLOR = new Color(0, 122, 255); // Blue
@@ -24,6 +27,7 @@ public class StyleConstants {
 
     // Add additional styles as needed
     public static final Border DEFAULT_BORDER = BorderFactory.createLineBorder(Color.GRAY, 1);
+    public static final EmptyBorder DEFAULT_EMPTY_BORDER = new EmptyBorder(10, 10, 10, 10);
 
     public static void applyLabelStyle(JLabel label) {
         label.setFont(LABEL_FONT);

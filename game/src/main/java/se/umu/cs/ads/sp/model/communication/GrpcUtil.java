@@ -157,7 +157,7 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static proto.PlayerUnit toGrpcPlayerUnit(UnitInfoDTO unit) {
+    public static proto.PlayerUnit toGrpcPlayerUnit(CompleteUnitInfoDTO unit) {
         return proto.PlayerUnit.newBuilder()
                 .setUnitId(unit.unitId())
                 .setPosition(toGrpcPosition(unit.position()))
@@ -168,21 +168,21 @@ public class GrpcUtil {
                 .build();
     }
 
-    public static UnitInfoDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
-        return new UnitInfoDTO(unit.getUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
+    public static CompleteUnitInfoDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
+        return new CompleteUnitInfoDTO(unit.getUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
     }
 
     public static proto.PlayerUnits toGrpcUpdatePlayerUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
         proto.PlayerUnits.Builder builder = proto.PlayerUnits.newBuilder()
                 .setUserId(playerUnitUpdateRequest.playerId());
-        for (UnitInfoDTO unit : playerUnitUpdateRequest.unitUpdates()) {
+        for (CompleteUnitInfoDTO unit : playerUnitUpdateRequest.unitUpdates()) {
             builder.addUnits(toGrpcPlayerUnit(unit));
         }
         return builder.build();
     }
 
     public static PlayerUnitUpdateRequest fromGrpcUpdatePlayerUnits(proto.PlayerUnits updateRequest) {
-        ArrayList<UnitInfoDTO> unitUpdates = new ArrayList<>();
+        ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
         for(proto.PlayerUnit unit : updateRequest.getUnitsList()) {
             unitUpdates.add(fromGrpcUnitInfo(unit));
         }

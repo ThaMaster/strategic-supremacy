@@ -234,8 +234,8 @@ public class ObjectHandler {
         }
     }
 
-    public void updateEnemyUnits(ArrayList<UnitInfoDTO> updates) {
-        for (UnitInfoDTO update : updates) {
+    public void updateEnemyUnits(ArrayList<CompleteUnitInfoDTO> updates) {
+        for (CompleteUnitInfoDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             enemyUnit.setPosition(update.position());
             enemyUnit.setDestination(update.destination());
