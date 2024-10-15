@@ -96,7 +96,7 @@ public class GameClient {
         System.out.println("[Client] Trying to update client " + currentUser.ip + ":" + currentUser.port);
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .updateLobby(GrpcUtil.toGrpcLobby(updatedLobby, updatedLobby.selectedMap));
+                .updateLobby(GrpcUtil.toGrpcLobby(updatedLobby));
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override

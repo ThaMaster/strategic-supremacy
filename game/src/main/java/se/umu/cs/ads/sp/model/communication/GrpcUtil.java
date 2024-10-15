@@ -145,21 +145,28 @@ public class GrpcUtil {
     }
 
     public static Lobby fromGrpcLobby(proto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby(request.getId(), request.getLobbyName(), request.getMaxPlayers());
+        Lobby lobby = new Lobby(
+                request.getId(),
+                request.getLobbyName(),
+                fromGrpcUser(request.getLeader()),
+                request.getUsersCount(),
+                request.getMaxPlayers(),
+                request.getSelectedMap());
+
         ArrayList<User> users = new ArrayList<>();
         for (proto.User user : request.getUsersList()) {
             users.add(fromGrpcUser(user));
         }
+
         lobby.setUsers(users);
-        lobby.selectedMap = request.getSelectedMap();
         return lobby;
     }
 
-    public static proto.DetailedLobbyInfo toGrpcLobby(Lobby lobby, String selectedMap) {
+    public static proto.DetailedLobbyInfo toGrpcLobby(Lobby lobby) {
         proto.DetailedLobbyInfo.Builder builder = proto.DetailedLobbyInfo.newBuilder()
                 .setId(lobby.id)
                 .setLeader(toGrpcUser(lobby.leader))
-                .setSelectedMap(selectedMap)
+                .setSelectedMap(lobby.selectedMap)
                 .setMaxPlayers(lobby.maxPlayers)
                 .setLobbyName(lobby.name);
         for (User user : lobby.users) {

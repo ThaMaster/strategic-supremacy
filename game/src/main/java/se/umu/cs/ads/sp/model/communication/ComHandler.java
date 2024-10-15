@@ -50,11 +50,12 @@ public class ComHandler {
             }
         }
 
-        controller.updateLobby(updatedLobby.name, updatedLobby, updatedLobby.currentPlayers, updatedLobby.maxPlayers, updatedLobby.selectedMap);
+        controller.updateLobby(updatedLobby);
     }
 
     public Lobby joinLobby(Long lobbyId, User user) {
         Lobby joinedLobby = nsClient.joinLobby(lobbyId, user);
+        System.out.println("Selected map -> " + joinedLobby.selectedMap);
         sendUpdatedLobby(joinedLobby);
         return joinedLobby;
     }

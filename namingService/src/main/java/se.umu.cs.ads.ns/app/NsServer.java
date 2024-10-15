@@ -98,7 +98,7 @@ public class NsServer {
             }
 
             System.out.println("\t Done.");
-            responseObserver.onNext(NsGrpcUtil.toGrpc(lobby, lobby.selectedMap));
+            responseObserver.onNext(NsGrpcUtil.toGrpcDetailedLobby(lobby));
             responseObserver.onCompleted();
         }
 

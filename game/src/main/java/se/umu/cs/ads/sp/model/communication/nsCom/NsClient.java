@@ -67,7 +67,7 @@ public class NsClient {
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
             if (detailedLobbyInfo != null) {
-                return NsGrpcUtil.fromGrpc(detailedLobbyInfo);
+                return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
             } else {
                 return null;
             }

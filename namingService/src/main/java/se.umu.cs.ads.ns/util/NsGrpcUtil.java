@@ -76,19 +76,6 @@ public class NsGrpcUtil {
         return lobby;
     }
 
-    public static nsProto.DetailedLobbyInfo toGrpc(Lobby lobby, String selectedMap) {
-        nsProto.DetailedLobbyInfo.Builder builder = nsProto.DetailedLobbyInfo.newBuilder()
-                .setId((lobby.id))
-                .setLeader(toGrpc(lobby.leader))
-                .setSelectedMap(selectedMap)
-                .setMaxPlayers(lobby.maxPlayers)
-                .setLobbyName(lobby.name);
-        for (User user : lobby.users) {
-            builder.addUsers(toGrpc(user));
-        }
-        return builder.build();
-    }
-
     public static nsProto.JoinRequest toGrpcJoin(Long id, User user) {
         return nsProto.JoinRequest.newBuilder()
                 .setId(toGrpc(id))
@@ -103,15 +90,35 @@ public class NsGrpcUtil {
                 .build();
     }
 
-    public static Lobby fromGrpc(nsProto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby((request.getId()), request.getLobbyName(), request.getMaxPlayers());
+    public static nsProto.DetailedLobbyInfo toGrpcDetailedLobby(Lobby lobby) {
+        nsProto.DetailedLobbyInfo.Builder builder = nsProto.DetailedLobbyInfo.newBuilder()
+                .setId((lobby.id))
+                .setLeader(toGrpc(lobby.leader))
+                .setSelectedMap(lobby.selectedMap)
+                .setMaxPlayers(lobby.maxPlayers)
+                .setLobbyName(lobby.name);
+        for (User user : lobby.users) {
+            builder.addUsers(toGrpc(user));
+        }
+        return builder.build();
+    }
+
+    public static Lobby fromGrpcDetailedLobby(nsProto.DetailedLobbyInfo request) {
+        Lobby lobby = new Lobby(
+                request.getId(),
+                request.getLobbyName(),
+                fromGrpc(request.getLeader()),
+                request.getUsersCount(),
+                request.getMaxPlayers(),
+                request.getSelectedMap());
+
+        System.out.println("NsUtil -> " + lobby.selectedMap);
+
         ArrayList<User> users = new ArrayList<>();
         for (nsProto.User user : request.getUsersList()) {
             users.add(fromGrpc(user));
         }
-        lobby.leader = fromGrpc(request.getLeader());
         lobby.setUsers(users);
-        lobby.selectedMap = request.getSelectedMap();
         return lobby;
     }
 }

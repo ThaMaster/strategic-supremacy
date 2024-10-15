@@ -18,8 +18,10 @@ public class LobbyHandler {
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         long id = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);
         lobby = new Lobby(id, lobbyName, maxPlayers);
+        lobby.leader = modelManager.getPlayer();
         lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
+        lobby.currentPlayers = 1;
 
     }
 

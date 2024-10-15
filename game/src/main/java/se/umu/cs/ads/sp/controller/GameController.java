@@ -175,6 +175,7 @@ public class GameController implements ActionListener {
             mainFrame.getCreateLobbyFrame().showFrame(false);
 
             createLobby(lobbyName, maxPlayers, selectedMap);
+            mainFrame.getLobbyPanel().showStartButton(true);
             mainFrame.switchPanel("Lobby");
         }
     }
@@ -264,31 +265,39 @@ public class GameController implements ActionListener {
     private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         modelManager.getLobbyHandler().createLobby(lobbyName, maxPlayers, selectedMap);
         SwingUtilities.invokeLater(() -> {
-            updateLobby(lobbyName, modelManager.getLobbyHandler().getLobby(), 1, maxPlayers, selectedMap);
+            updateLobby(modelManager.getLobbyHandler().getLobby());
         });
     }
 
     private void joinLobby(long lobbyId) {
         Lobby lobby = modelManager.getLobbyHandler().joinLobby(lobbyId);
         SwingUtilities.invokeLater(() -> {
-            updateLobby(lobby.name, lobby, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
+            updateLobby(lobby);
+            mainFrame.getLobbyPanel().showStartButton(false);
             mainFrame.switchPanel("Lobby");
         });
     }
 
     //---------------------------------------//
 
-    public void updateLobby(String lobbyName, Lobby updatedLobby, int currentPlayers, int maxPlayers, String selectedMap) {
+    public void updateLobby(Lobby updatedLobby) {
 
         String[][] playerData = new String[updatedLobby.users.size()][];
         for (int i = 0; i < updatedLobby.users.size(); i++) {
+            User currentUser = updatedLobby.users.get(i);
+            StringBuilder sBuilder = new StringBuilder();
+            if (currentUser.id == updatedLobby.leader.id) {
+                sBuilder.append("(Leader) ");
+            }
+            sBuilder.append(updatedLobby.users.get(i).username);
+
             playerData[i] = new String[]{
-                    String.valueOf(updatedLobby.users.get(i).id),
-                    updatedLobby.users.get(i).username,
+                    String.valueOf(currentUser.id),
+                    sBuilder.toString()
             };
         }
 
-        modelManager.loadMap(selectedMap);
+        modelManager.loadMap(updatedLobby.selectedMap);
         modelManager.getLobbyHandler().setLobby(updatedLobby);
         tileManager.setMap(modelManager.getMap().getModelMap());
         BufferedImage mapPreview = MiniMap.createMinimapPreview(
@@ -298,8 +307,8 @@ public class GameController implements ActionListener {
                 100,
                 100);
 
-        mainFrame.setLobbyData(playerData, lobbyName, mapPreview, selectedMap,
-                true, currentPlayers, maxPlayers);
+        mainFrame.setLobbyData(playerData, updatedLobby.name, mapPreview, updatedLobby.selectedMap,
+                true, updatedLobby.currentPlayers, updatedLobby.maxPlayers);
     }
 
     public void openQuitWindow() {
