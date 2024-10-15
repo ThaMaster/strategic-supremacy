@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model;
 
+import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
@@ -242,6 +243,16 @@ public class ObjectHandler {
             enemyUnit.setCurrentHp(update.currentHp());
             enemyUnit.setMaxHp(update.maxHp());
             enemyUnit.setSpeed(update.speed());
+        }
+    }
+
+    public ArrayList<Long> getMyUnitIds() {
+        return new ArrayList<>(myUnits.values().stream().map(GameObject::getId).toList());
+    }
+
+    public void removeEnemyUnits(ArrayList<Long> unitIds) {
+        for (Long id : unitIds) {
+            enemyUnits.remove(id);
         }
     }
 }

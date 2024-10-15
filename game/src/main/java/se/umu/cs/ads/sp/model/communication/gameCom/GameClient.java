@@ -12,9 +12,11 @@ import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
+import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class GameClient {
@@ -70,6 +72,7 @@ public class GameClient {
     }
 
     public void updateUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
+        System.out.println("[Client] Trying to update enemy units...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .updatePlayerUnit(GrpcUtil.toGrpcUpdatePlayerUnits(playerUnitUpdateRequest));
@@ -77,20 +80,20 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("[Server] Successfully updated enemy units!");
+                System.out.println("\t Successfully updated");
 
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("[Server] Failed to update enemy units...");
+                System.out.println("\t Failed to update enemy units...");
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
     }
 
     public void updateLobby(Lobby updatedLobby, User currentUser) {
-        System.out.println("[Server] Trying to update client " + currentUser.ip + ":" + currentUser.port);
+        System.out.println("[Client] Trying to update client " + currentUser.ip + ":" + currentUser.port);
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .updateLobby(GrpcUtil.toGrpcLobby(updatedLobby, updatedLobby.selectedMap));
@@ -98,21 +101,42 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("[Server] Successfully update client " + currentUser.ip + ":" + currentUser.port);
+                System.out.println("\t Successfully update client " + currentUser.ip + ":" + currentUser.port);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("[Server] Failed to update client " + currentUser.ip + ":" + currentUser.port);
+                System.out.println("[Client] Failed to update client " + currentUser.ip + ":" + currentUser.port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
     }
 
-    public void shutdown(){
+    public void removePlayerUnits(ArrayList<EntitySkeletonDTO> entitySkeletons) {
+        System.out.println("[Client] Trying to leave ongoing game...");
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .removePlayerUnits(GrpcUtil.toGrpcEntitySkeletons(entitySkeletons));
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {
+                System.out.println("\t Successfully left the game");
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("\t Failed to leave the ongoing game.");
+                System.out.println("\t" + t.getMessage());
+            }
+
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void shutdown() {
         channel.shutdown();
-        try{
-            while(!channel.awaitTermination(2000, TimeUnit.MILLISECONDS));
+        try {
+            while (!channel.awaitTermination(2000, TimeUnit.MILLISECONDS)) ;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

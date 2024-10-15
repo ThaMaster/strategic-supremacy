@@ -6,6 +6,7 @@ import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.CompleteUnitInfoDTO;
+import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.map.FowModel;
@@ -40,7 +41,7 @@ public class ModelManager {
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler();
-        comHandler = new ComHandler(player.port, controller, objectHandler);
+        comHandler = new ComHandler(player.port, controller, this);
     }
 
     public User getPlayer() {
@@ -67,6 +68,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(), getPlayersToUpdate());
             return true;
         }
 
@@ -168,6 +170,12 @@ public class ModelManager {
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
     }
 
+    public void leaveOngoingGame() {
+        comHandler.removePlayerUnits();
+        lobbyHandler.leaveLobby();
+
+    }
+
     public PlayerUnitUpdateRequest createUnitUpdateRequest() {
         ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getMyUnits().values()) {
@@ -184,8 +192,13 @@ public class ModelManager {
 
     public ArrayList<Long> getPlayersToUpdate() {
         // This function will maybe check which users are in L1, L2, L3?
-        // Could also be somewhere else?
         return new ArrayList<>(lobbyHandler.getLobby().users.stream().map(user -> user.id).toList());
     }
 
+    public ArrayList<EntitySkeletonDTO> createMySkeletonList() {
+        return new ArrayList<>(objectHandler.getMyUnits().values().stream()
+                .map(
+                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getPosition())
+                ).toList());
+    }
 }

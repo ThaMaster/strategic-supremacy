@@ -4,7 +4,7 @@ import io.grpc.Context;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
-import se.umu.cs.ads.sp.model.ObjectHandler;
+import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
@@ -17,15 +17,15 @@ import java.util.HashMap;
 public class ComHandler {
     private NsClient nsClient;
     private GameController controller;
-    private ObjectHandler objectHandler;
+    private ModelManager modelManager;
     private GameServer server;
     private HashMap<Long, GameClient> gameClients;
 
-    public ComHandler(int port, GameController controller, ObjectHandler objectHandler) {
+    public ComHandler(int port, GameController controller, ModelManager modelManager) {
         gameClients = new HashMap<>();
         nsClient = new NsClient();
         this.controller = controller;
-        this.objectHandler = objectHandler;
+        this.modelManager = modelManager;
         server = new GameServer(port, this);
         server.start();
     }
@@ -35,6 +35,7 @@ public class ComHandler {
     }
 
     public void leaveLobby(Long lobbyId, User user) {
+
         nsClient.leaveLobby(lobbyId, user);
     }
 
@@ -106,6 +107,29 @@ public class ComHandler {
     }
 
     public void updateEnemyUnits(PlayerUnitUpdateRequest req) {
-        objectHandler.updateEnemyUnits(req.unitUpdates());
+        modelManager.getObjectHandler().updateEnemyUnits(req.unitUpdates());
+    }
+
+    public void removePlayerUnits() {
+        for (User user : modelManager.getLobbyHandler().getLobby().users) {
+            //No need to send the update to ourselves
+            if (user.id == controller.getModelManager().getPlayer().id) {
+                continue;
+            }
+            gameClients.get(user.id).removePlayerUnits(modelManager.createMySkeletonList());
+        }
+    }
+
+    public void removePlayer(long userId, ArrayList<Long> unitIds) {
+        removeGameClient(userId);
+        controller.removeEnemyUnits(userId, unitIds);
+    }
+
+    private void removeGameClient(long userId) {
+        if (gameClients.containsKey(userId)) {
+            GameClient client = gameClients.get(userId);
+            client.shutdown();
+            gameClients.remove(userId);
+        }
     }
 }

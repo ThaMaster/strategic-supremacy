@@ -235,11 +235,14 @@ public class GameController implements ActionListener {
         }
     }
 
-    public class QuitButtonListener implements  ActionListener {
+    public class QuitButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            modelManager.leaveOngoingGame();
             mainFrame.getQuitFrame().showFrame(false);
+            mainFrame.switchPanel("Browse");
+            fetchLobbies();
         }
     }
 
@@ -271,7 +274,6 @@ public class GameController implements ActionListener {
         SwingUtilities.invokeLater(() -> {
             updateLobby(lobby.name, lobby, lobby.currentPlayers, lobby.maxPlayers, lobby.selectedMap);
             mainFrame.switchPanel("Lobby");
-
         });
     }
 
@@ -303,5 +305,11 @@ public class GameController implements ActionListener {
 
     public void openQuitWindow() {
         mainFrame.getQuitFrame().showFrame(true);
+    }
+
+    public void removeEnemyUnits(long playerId, ArrayList<Long> unitIds) {
+        modelManager.getObjectHandler().removeEnemyUnits(unitIds);
+        modelManager.getLobbyHandler().removePlayer(playerId);
+        mainFrame.getGamePanel().removeEntities(unitIds);
     }
 }

@@ -470,6 +470,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         addTextEvent(event, 25, EventColor.SUCCESS);
     }
 
+    public void removeEntities(ArrayList<Long> unitIds) {
+        for(Long id : unitIds) {
+            this.gameEntitiesView.remove(id);
+        }
+    }
+
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.isControlDown()) {

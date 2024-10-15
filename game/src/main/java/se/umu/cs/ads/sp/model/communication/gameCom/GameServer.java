@@ -4,14 +4,13 @@ import com.google.protobuf.Empty;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import proto.DetailedLobbyInfo;
-import proto.GameServiceGrpc;
-import proto.PlayerUnits;
-import proto.StartGameRequest;
+import proto.*;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
+import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameServer {
 
@@ -53,6 +52,15 @@ public class GameServer {
         @Override
         public void updatePlayerUnit(PlayerUnits request, StreamObserver<Empty> responseObserver) {
             comHandler.updateEnemyUnits(GrpcUtil.fromGrpcUpdatePlayerUnits(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
+        public void removePlayerUnits(EntitySkeletons request, StreamObserver<Empty> responseObserver) {
+            ArrayList<EntitySkeletonDTO> skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
+            long userId = skeletons.get(0).userId();
+            comHandler.removePlayer(userId, new ArrayList<>(skeletons.stream().map(EntitySkeletonDTO::id).toList()));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }

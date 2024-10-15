@@ -32,6 +32,10 @@ message EntitySkeleton {
     Position position = 3;
 }
 
+message EntitySkeletons {
+  repeated EntitySkeleton skeletons = 1;
+}
+
 message Reward {
     int32 quantity = 1;
     string reward = 2;
@@ -52,7 +56,7 @@ message Environment {
 }
 
 message StartGameRequest {
-    repeated EntitySkeleton entities = 1;
+    EntitySkeletons entities = 1;
     repeated Collectable collectables = 2;
     repeated Environment environments = 3;
 }
@@ -75,7 +79,7 @@ message DetailedLobbyInfo {
 
 service GameService {
   rpc updatePlayerUnit (PlayerUnits) returns (google.protobuf.Empty);
-  rpc leaveOngoingGame (EntitySkeleton) returns (google.protobuf.Empty);
+  rpc removePlayerUnits (EntitySkeletons) returns (google.protobuf.Empty);
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
 }
