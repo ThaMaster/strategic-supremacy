@@ -194,7 +194,7 @@ public class GameController implements ActionListener {
             tileManager.setMap(modelManager.getMap().getModelMap());
             System.out.println("[Client] Creating my user " + GameController.this.player.ip + ":" + GameController.this.player.port);
             mainFrame.switchPanel("Browse");
-            modelManager.getLobbyHandler().fetchLobbies();
+            fetchLobbies();
         }
     }
 
@@ -220,7 +220,6 @@ public class GameController implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //GameController.this.modelManager.leaveLobby();
             modelManager.getLobbyHandler().leaveLobby();
             mainFrame.switchPanel("Browse");
             fetchLobbies();

@@ -28,6 +28,7 @@ public class ComHandler {
         this.modelManager = modelManager;
         server = new GameServer(port, this);
         server.start();
+
     }
 
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {

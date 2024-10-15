@@ -9,10 +9,10 @@ public class LobbyHandler {
 
     private Lobby lobby;
     private final ModelManager modelManager;
-    private String[][] fetchedLobbies;
 
     public LobbyHandler(ModelManager modelManager) {
         this.modelManager = modelManager;
+
     }
 
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
@@ -20,10 +20,13 @@ public class LobbyHandler {
         lobby = new Lobby(id, lobbyName, maxPlayers);
         lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
+
     }
 
     public void leaveLobby() {
-        modelManager.getComHandler().leaveLobby(this.lobby.id, modelManager.getPlayer());
+        if (lobby != null) {
+            modelManager.getComHandler().leaveLobby(this.lobby.id, modelManager.getPlayer());
+        }
     }
 
     public ArrayList<Lobby> fetchLobbies() {
@@ -46,13 +49,13 @@ public class LobbyHandler {
     public void removePlayer(long playerId) {
         ArrayList<User> users = this.lobby.users;
         int userIndex = -1;
-        for(int i = 0; i < users.size(); i++) {
-            if(users.get(i).id == playerId) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).id == playerId) {
                 userIndex = i;
                 break;
             }
         }
-        if(userIndex != -1) {
+        if (userIndex != -1) {
             this.lobby.users.remove(userIndex);
         }
     }

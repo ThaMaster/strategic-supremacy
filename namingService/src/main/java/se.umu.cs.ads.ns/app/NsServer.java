@@ -1,7 +1,10 @@
 package se.umu.cs.ads.ns.app;
 
 import com.google.protobuf.Empty;
-import io.grpc.*;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import nsProto.*;
 import se.umu.cs.ads.ns.util.NsGrpcUtil;
@@ -103,7 +106,7 @@ public class NsServer {
         public void leaveLobby(LeaveRequest request, StreamObserver<Empty> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User leavingUser = NsGrpcUtil.fromGrpc(request.getUser());
-            System.out.println("[Server] User " + leavingUser.id + "leaving lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
+            System.out.println("[Server] User " + leavingUser.id + " leaving lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
             if (leavingUser.id == lobby.leader.id) {
                 // Change the leader of the lobby!
                 System.out.println("\t User was the leader, selecting new leader...");

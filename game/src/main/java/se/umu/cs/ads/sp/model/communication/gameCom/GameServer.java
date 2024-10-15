@@ -25,6 +25,7 @@ public class GameServer {
     }
 
     public void start() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
         try {
             server.start();
             System.out.println("Starting up server");
@@ -63,6 +64,12 @@ public class GameServer {
             comHandler.removePlayer(userId, new ArrayList<>(skeletons.stream().map(EntitySkeletonDTO::id).toList()));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
+        }
+    }
+
+    private void stop() {
+        if (server != null) {
+            server.shutdown();
         }
     }
 }
