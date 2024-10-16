@@ -1,5 +1,8 @@
 package se.umu.cs.ads.sp.view.util;
 
+import javax.swing.*;
+import java.awt.*;
+
 public class UtilView {
     // SCREEN SETTINGS
     public static final int originalTileSize = 64;
@@ -34,4 +37,11 @@ public class UtilView {
         objectSize = (int)(originalObjectSize * scale);
     }
 
+    public static void displayWarningMessage(Component parentComponent, String message) {
+        JOptionPane.showMessageDialog(parentComponent, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public static void displayInfoMessage(Component parentComponent, String message) {
+        JOptionPane.showMessageDialog(parentComponent, message, "Alert", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

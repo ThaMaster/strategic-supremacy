@@ -96,8 +96,6 @@ public class NsServer {
             } else {
                 System.out.println("\t User already exists!");
             }
-
-            System.out.println("\t Done.");
             responseObserver.onNext(NsGrpcUtil.toGrpcDetailedLobby(lobby));
             responseObserver.onCompleted();
         }
@@ -109,24 +107,20 @@ public class NsServer {
             System.out.println("[Server] User " + leavingUser.id + " leaving lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
             if (leavingUser.id == lobby.leader.id) {
                 // Change the leader of the lobby!
-                System.out.println("\t User was the leader, selecting new leader...");
+                System.out.println("\t User was the leader, selecting new leader.");
                 lobby.removeUser(leavingUser);
                 if (lobby.currentPlayers != 0) {
                     lobby.leader = lobby.users.get(0);
                 }
             } else if (lobby.hasUser(leavingUser)) {
-                System.out.println("\t User was regular player...");
+                System.out.println("\t Removed the user.");
                 lobby.removeUser(leavingUser);
             }
 
             if (lobby.currentPlayers == 0) {
-                System.out.println("\t Lobby became empty, removing...");
+                System.out.println("\t Lobby became empty, removing.");
                 lobbies.remove(lobby.id);
-            } else {
-                //sendUpdatedLobby(lobby);
             }
-
-            System.out.println("\t Done.");
             responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.leader));
             responseObserver.onCompleted();
 

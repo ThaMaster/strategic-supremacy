@@ -35,6 +35,8 @@ public class ModelManager {
     private final User player;
     private final LobbyHandler lobbyHandler;
 
+    private boolean started = false;
+
     public ModelManager(GameController controller, User player) {
         map = new Map();
         gameEvents = GameEvents.getInstance();
@@ -164,12 +166,14 @@ public class ModelManager {
             }
         }
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        started = true;
     }
 
     // A request has come in to start the game
     public void startGameReq(StartGameRequest request) {
         objectHandler.populateWorld(request, map, this);
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        started = true;
     }
 
     public void leaveOngoingGame() {
@@ -203,5 +207,9 @@ public class ModelManager {
                 .map(
                         playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getPosition())
                 ).toList());
+    }
+
+    public boolean hasGameStarted() {
+        return started;
     }
 }

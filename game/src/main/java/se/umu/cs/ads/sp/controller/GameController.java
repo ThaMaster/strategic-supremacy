@@ -8,6 +8,7 @@ import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
@@ -281,6 +282,7 @@ public class GameController implements ActionListener {
     //---------------------------------------//
 
     public void updateLobby(Lobby updatedLobby) {
+        Lobby oldLobby = modelManager.getLobbyHandler().getLobby();
         String[][] playerData = new String[updatedLobby.users.size()][];
         for (int i = 0; i < updatedLobby.users.size(); i++) {
             User currentUser = updatedLobby.users.get(i);
@@ -297,7 +299,6 @@ public class GameController implements ActionListener {
         }
 
         modelManager.loadMap(updatedLobby.selectedMap);
-        modelManager.getLobbyHandler().setLobby(updatedLobby);
         tileManager.setMap(modelManager.getMap().getModelMap());
         BufferedImage mapPreview = MiniMap.createMinimapPreview(
                 tileManager.getViewMap(),
@@ -308,6 +309,14 @@ public class GameController implements ActionListener {
 
         mainFrame.setLobbyData(playerData, updatedLobby.name, mapPreview, updatedLobby.selectedMap,
                 true, updatedLobby.currentPlayers, updatedLobby.maxPlayers);
+
+        if (modelManager.hasGameStarted() && (oldLobby.currentPlayers != updatedLobby.currentPlayers)) {
+            oldLobby.users.removeAll(updatedLobby.users);
+            for (User user : oldLobby.users) {
+                UtilView.displayInfoMessage(mainFrame, user.username + " has left the lobby!");
+            }
+        }
+        modelManager.getLobbyHandler().setLobby(updatedLobby);
     }
 
     public void openQuitWindow() {

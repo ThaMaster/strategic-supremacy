@@ -65,7 +65,7 @@ public class GameServer {
             ArrayList<EntitySkeletonDTO> skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
             long userId = skeletons.get(0).userId();
             comHandler.removePlayer(userId, new ArrayList<>(skeletons.stream().map(EntitySkeletonDTO::id).toList()));
-            System.out.println("[Server] Got request to remove " + skeletons.size() + " from player with id: " + userId);
+            System.out.println("[Server] Got request to remove " + skeletons.size() + " units from player with id: " + userId);
 
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();

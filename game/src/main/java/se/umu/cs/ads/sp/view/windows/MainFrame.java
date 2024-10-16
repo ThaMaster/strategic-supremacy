@@ -222,7 +222,5 @@ public class MainFrame extends JFrame {
     }
 
     //----------------------------------------
-    public void displayWarningMessage(String message) {
-        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
-    }
+
 }

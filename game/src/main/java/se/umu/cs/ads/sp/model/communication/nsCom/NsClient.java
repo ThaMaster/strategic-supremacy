@@ -32,7 +32,6 @@ public class NsClient {
         try {
             System.out.println("[Client] Trying to create new lobby...");
             LobbyId lobbyId = blockingStub
-                    .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers, selectedMap));
             System.out.println("\t Created lobby with Id: " + lobbyId);
             return NsGrpcUtil.fromGrpc(lobbyId);
@@ -48,7 +47,6 @@ public class NsClient {
         System.out.println("[Client] Trying to fetch lobbies...");
         try {
             Lobbies lobbies = blockingStub
-                    .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .getLobbies(Empty.newBuilder().build());
             if (lobbies == null) {
                 System.out.println("\t Could not find any lobbies.");
@@ -68,7 +66,6 @@ public class NsClient {
         System.out.println("[Client] Trying to join lobby with id: " + lobbyId);
         try {
             DetailedLobbyInfo detailedLobbyInfo = blockingStub
-                    .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
             if (detailedLobbyInfo == null) {
                 System.out.println("\t No lobby found with given id.");
@@ -88,7 +85,6 @@ public class NsClient {
         try {
             System.out.println("[Client] Leaving lobby with id: " + lobbyId);
             nsProto.User leader = blockingStub
-                    .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .leaveLobby(NsGrpcUtil.toGrpcLeave(lobbyId, user));
             System.out.println("\t Left the lobby.");
 
