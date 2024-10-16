@@ -30,13 +30,14 @@ public class NsClient {
     // Blocking version of createLobby
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
         try {
+            System.out.println("[Client] Trying to create new lobby...");
             LobbyId lobbyId = blockingStub
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers, selectedMap));
-            System.out.println("[Client] Created lobby with Id: " + lobbyId);
+            System.out.println("\t Created lobby with Id: " + lobbyId);
             return NsGrpcUtil.fromGrpc(lobbyId);
         } catch (Exception e) {
-            System.out.println("[Client] Failed to create new lobby using address '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+            System.out.println("\t Failed to create new lobby.");
             e.printStackTrace();
             return null;
         }
@@ -44,17 +45,19 @@ public class NsClient {
 
     // Blocking version of fetchLobbies
     public ArrayList<Lobby> fetchLobbies() {
+        System.out.println("[Client] Trying to fetch lobbies...");
         try {
             Lobbies lobbies = blockingStub
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .getLobbies(Empty.newBuilder().build());
             if (lobbies == null) {
-                System.out.println("[Client] Did not find any lobbies!");
+                System.out.println("\t Could not find any lobbies.");
                 return new ArrayList<>();
             }
+            System.out.println("\t Found lobbies.");
             return NsGrpcUtil.fromGrpc(lobbies);
         } catch (Exception e) {
-            System.out.println("[Client] Failed to fetch lobbies from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+            System.out.println("\t Failed to fetch lobbies.");
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -62,17 +65,19 @@ public class NsClient {
 
     // Blocking version of joinLobby
     public Lobby joinLobby(Long lobbyId, User user) {
+        System.out.println("[Client] Trying to join lobby with id: " + lobbyId);
         try {
             DetailedLobbyInfo detailedLobbyInfo = blockingStub
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
-            if (detailedLobbyInfo != null) {
-                return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
-            } else {
+            if (detailedLobbyInfo == null) {
+                System.out.println("\t No lobby found with given id.");
                 return null;
             }
+            System.out.println("\t Joined the lobby.");
+            return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
         } catch (Exception e) {
-            System.out.println("[Client] Failed to join lobby with id: " + lobbyId);
+            System.out.println("\t Failed to join lobby.");
             e.printStackTrace();
             return null;
         }
@@ -85,11 +90,11 @@ public class NsClient {
             nsProto.User leader = blockingStub
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .leaveLobby(NsGrpcUtil.toGrpcLeave(lobbyId, user));
-            System.out.println("[Client] Successfully left the lobby!");
+            System.out.println("\t Left the lobby.");
 
             return NsGrpcUtil.fromGrpc(leader);
         } catch (Exception e) {
-            System.out.println("[Client] Failed to leave lobby from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
+            System.out.println("\t Failed to leave lobby.");
             e.printStackTrace();
         }
         return null;

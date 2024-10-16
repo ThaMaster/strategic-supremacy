@@ -26,14 +26,16 @@ public class LobbyHandler {
     }
 
     public void leaveLobby() {
-        if (lobby != null) {
-            lobby.users.removeIf(user -> user.id == modelManager.getPlayer().id);
-            lobby.currentPlayers--;
-            modelManager.getComHandler().leaveLobby(lobby, modelManager.getPlayer());
-            
-            // Remove the lobby
-            lobby = null;
+        if (lobby == null) {
+            return;
         }
+
+        lobby.users.removeIf(user -> user.id == modelManager.getPlayer().id);
+        lobby.currentPlayers--;
+        modelManager.getComHandler().leaveLobby(lobby, modelManager.getPlayer());
+
+        // Remove the lobby
+        lobby = null;
     }
 
     public ArrayList<Lobby> fetchLobbies() {

@@ -60,12 +60,12 @@ public class GameClient {
 
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("[Client] Successfully told a player to start game");
+                System.out.println("\t Told a player to start game");
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("[Client] Failed to tell player to start ze game");
+                System.out.println("\t Failed to tell player to start the game");
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
@@ -80,13 +80,13 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("\t Successfully updated");
+                System.out.println("\t Updated enemy units.");
 
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("\t Failed to update enemy units...");
+                System.out.println("\t Failed to update enemy units.");
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
@@ -101,12 +101,12 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("\t Successfully update client " + currentUser.ip + ":" + currentUser.port);
+                System.out.println("\t Updated client " + currentUser.ip + ":" + currentUser.port);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("[Client] Failed to update client " + currentUser.ip + ":" + currentUser.port);
+                System.out.println("\t Failed to update client " + currentUser.ip + ":" + currentUser.port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());

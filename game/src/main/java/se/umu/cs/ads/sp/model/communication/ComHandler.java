@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ComHandler {
+
     private NsClient nsClient;
     private GameController controller;
     private ModelManager modelManager;
@@ -28,7 +29,6 @@ public class ComHandler {
         this.modelManager = modelManager;
         server = new GameServer(port, this);
         server.start();
-
     }
 
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
@@ -115,6 +115,10 @@ public class ComHandler {
     }
 
     public void removePlayerUnits() {
+        if(modelManager.getObjectHandler().getMyUnits().isEmpty()) {
+            return;
+        }
+
         for (User user : modelManager.getLobbyHandler().getLobby().users) {
             //No need to send the update to ourselves
             if (user.id == controller.getModelManager().getPlayer().id) {

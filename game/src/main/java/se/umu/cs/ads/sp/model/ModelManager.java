@@ -42,6 +42,8 @@ public class ModelManager {
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler();
         comHandler = new ComHandler(player.port, controller, this);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::leaveOngoingGame));
     }
 
     public User getPlayer() {
@@ -154,10 +156,10 @@ public class ModelManager {
     }
 
     public void startGame() {
+        System.out.println("[Client] Sending out start request to lobby...");
         StartGameRequest req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
         for (User user : lobbyHandler.getLobby().users) {
             if (user.id != player.id) {
-                System.out.println("Sending out to start game to " + user.username);
                 comHandler.sendStartGameRequest(req, user);
             }
         }
@@ -171,9 +173,10 @@ public class ModelManager {
     }
 
     public void leaveOngoingGame() {
+        System.out.println("[Client] Leaving ongoing game...");
         comHandler.removePlayerUnits();
+        objectHandler.getMyUnits().clear();
         lobbyHandler.leaveLobby();
-
     }
 
     public PlayerUnitUpdateRequest createUnitUpdateRequest() {
