@@ -61,5 +61,5 @@ service GrpcNamingService {
   rpc deleteLobby (LobbyId) returns (google.protobuf.Empty);
   rpc getLobbies (google.protobuf.Empty) returns (Lobbies);
   rpc joinLobby(JoinRequest) returns (DetailedLobbyInfo);
-  rpc leaveLobby(LeaveRequest) returns (google.protobuf.Empty);
+  rpc leaveLobby(LeaveRequest) returns (User);
 }

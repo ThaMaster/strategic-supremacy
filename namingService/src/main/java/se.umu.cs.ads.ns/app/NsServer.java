@@ -103,7 +103,7 @@ public class NsServer {
         }
 
         @Override
-        public void leaveLobby(LeaveRequest request, StreamObserver<Empty> responseObserver) {
+        public void leaveLobby(LeaveRequest request, StreamObserver<nsProto.User> responseObserver) {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User leavingUser = NsGrpcUtil.fromGrpc(request.getUser());
             System.out.println("[Server] User " + leavingUser.id + " leaving lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
@@ -127,8 +127,9 @@ public class NsServer {
             }
 
             System.out.println("\t Done.");
-            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.leader));
             responseObserver.onCompleted();
+
         }
     }
 }

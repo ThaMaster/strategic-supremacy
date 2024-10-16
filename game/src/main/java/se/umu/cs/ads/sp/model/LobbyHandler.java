@@ -27,7 +27,12 @@ public class LobbyHandler {
 
     public void leaveLobby() {
         if (lobby != null) {
-            modelManager.getComHandler().leaveLobby(this.lobby.id, modelManager.getPlayer());
+            lobby.users.removeIf(user -> user.id == modelManager.getPlayer().id);
+            lobby.currentPlayers--;
+            modelManager.getComHandler().leaveLobby(lobby, modelManager.getPlayer());
+            
+            // Remove the lobby
+            lobby = null;
         }
     }
 

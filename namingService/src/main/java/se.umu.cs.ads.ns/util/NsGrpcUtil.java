@@ -112,8 +112,6 @@ public class NsGrpcUtil {
                 request.getMaxPlayers(),
                 request.getSelectedMap());
 
-        System.out.println("NsUtil -> " + lobby.selectedMap);
-
         ArrayList<User> users = new ArrayList<>();
         for (nsProto.User user : request.getUsersList()) {
             users.add(fromGrpc(user));

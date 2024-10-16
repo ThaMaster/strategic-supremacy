@@ -79,16 +79,19 @@ public class NsClient {
     }
 
     // Blocking version of leaveLobby
-    public void leaveLobby(Long lobbyId, User user) {
+    public User leaveLobby(Long lobbyId, User user) {
         try {
             System.out.println("[Client] Leaving lobby with id: " + lobbyId);
-            blockingStub
+            nsProto.User leader = blockingStub
                     .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                     .leaveLobby(NsGrpcUtil.toGrpcLeave(lobbyId, user));
             System.out.println("[Client] Successfully left the lobby!");
+
+            return NsGrpcUtil.fromGrpc(leader);
         } catch (Exception e) {
             System.out.println("[Client] Failed to leave lobby from '" + AppSettings.NAMING_SERVICE_IP + ":" + AppSettings.NAMING_SERVICE_PORT + "'");
             e.printStackTrace();
         }
+        return null;
     }
 }

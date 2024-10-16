@@ -281,7 +281,6 @@ public class GameController implements ActionListener {
     //---------------------------------------//
 
     public void updateLobby(Lobby updatedLobby) {
-
         String[][] playerData = new String[updatedLobby.users.size()][];
         for (int i = 0; i < updatedLobby.users.size(); i++) {
             User currentUser = updatedLobby.users.get(i);

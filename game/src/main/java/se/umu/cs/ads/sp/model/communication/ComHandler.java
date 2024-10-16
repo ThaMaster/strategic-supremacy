@@ -35,9 +35,12 @@ public class ComHandler {
         return nsClient.createLobby(user, name, maxPlayers, selectedMap);
     }
 
-    public void leaveLobby(Long lobbyId, User user) {
-
-        nsClient.leaveLobby(lobbyId, user);
+    public void leaveLobby(Lobby lobbyToLeave, User user) {
+        User newLeader = nsClient.leaveLobby(lobbyToLeave.id, user);
+        if (newLeader != null) {
+            lobbyToLeave.leader = newLeader;
+            sendUpdatedLobby(lobbyToLeave);
+        }
     }
 
     public void updateLobby(Lobby updatedLobby) {
@@ -55,7 +58,6 @@ public class ComHandler {
 
     public Lobby joinLobby(Long lobbyId, User user) {
         Lobby joinedLobby = nsClient.joinLobby(lobbyId, user);
-        System.out.println("Selected map -> " + joinedLobby.selectedMap);
         sendUpdatedLobby(joinedLobby);
         return joinedLobby;
     }
