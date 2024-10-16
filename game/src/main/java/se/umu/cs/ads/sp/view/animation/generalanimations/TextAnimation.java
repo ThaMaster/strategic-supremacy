@@ -49,9 +49,9 @@ public class TextAnimation extends JLabel {
                 blue = 0;
                 break;
             case ALERT:
-                red = 23;
-                green = 23; //Fix later
-                blue = 23;
+                red = 250;
+                green = 10; //Fix later
+                blue = 10;
                 break;
             case WARNING:
                 red = 255;

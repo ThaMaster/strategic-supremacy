@@ -145,6 +145,15 @@ public class PlayerUnit extends Entity {
         state = EntityState.ATTACKING;
     }
 
+    @Override
+    public void setDestination(Position newDestination) {
+        if(this.state == EntityState.ATTACKING){
+            this.targetedUnit = null;
+        }
+        super.setDestination(newDestination);
+
+    }
+
     public ArrayList<Collectable> getCollected() {
         return this.collected;
     }

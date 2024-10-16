@@ -73,7 +73,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(), getPlayersToUpdate());
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
             return true;
         }
 
@@ -86,7 +86,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(), getPlayersToUpdate());
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
             return true;
         }
         return false;
@@ -167,7 +167,7 @@ public class ModelManager {
 
     // A request has come in to start the game
     public void startGameReq(StartGameRequest request) {
-        objectHandler.populateWorld(request, map, this);
+        objectHandler.populateWorld(request, map);
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
     }
@@ -183,11 +183,12 @@ public class ModelManager {
         lobbyHandler.leaveLobby();
     }
 
-    public PlayerUnitUpdateRequest createUnitUpdateRequest() {
+    public PlayerUnitUpdateRequest createUnitUpdateRequest(long targetId) {
         ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
-        for (PlayerUnit unit : objectHandler.getMyUnits().values()) {
+        for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
             unitUpdates.add(new CompleteUnitInfoDTO(
                     unit.getId(),
+                    targetId,
                     unit.getPosition(),
                     unit.getDestination(),
                     unit.getMaxHp(),

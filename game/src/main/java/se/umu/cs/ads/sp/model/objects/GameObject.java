@@ -12,14 +12,15 @@ public abstract class GameObject {
     protected Position position;
     protected CollisionBox collisionBox;
 
-    public GameObject(Position pos) {
+    public GameObject(Position pos, Map map) {
         // Should the object generate it or should you need to input it to the constructor?
         this.id = Utils.generateId();
         this.position = pos;
         collisionBox = new CollisionBox(position, Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
+        this.spawn(map);
     }
 
-    public void spawn(Map map) {
+    private void spawn(Map map) {
         map.setInhabitant(this, position);
     }
 

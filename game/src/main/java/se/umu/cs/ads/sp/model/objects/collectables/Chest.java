@@ -9,8 +9,7 @@ public class Chest extends Collectable {
     private boolean open = false;
 
     public Chest(Position pos, Map map) {
-        super(pos);
-        this.spawn(map);
+        super(pos, map);
     }
 
     @Override

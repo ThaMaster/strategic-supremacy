@@ -27,7 +27,7 @@ public abstract class Entity extends GameObject {
     private long userId;
 
     public Entity(Position startPos, Map map) {
-        super(startPos);
+        super(startPos, map);
         this.position = startPos;
         this.state = EntityState.IDLE;
         this.speed = 2;
@@ -35,7 +35,6 @@ public abstract class Entity extends GameObject {
         this.map = map;
         // Place the hitbox around the entity rather than
         this.collisionBox = new CollisionBox(position, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
-        spawn(map);
     }
 
     public void setUserId(long id){
@@ -127,8 +126,8 @@ public abstract class Entity extends GameObject {
         this.currentHp -= damage;
         hitCooldown.start();
         if (currentHp <= 0) {
-            this.state = EntityState.DEAD;
             GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
+            this.state = EntityState.DEAD;
             this.destroy(map);
         } else {
             GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));

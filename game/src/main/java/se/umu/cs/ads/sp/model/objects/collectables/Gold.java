@@ -8,7 +8,6 @@ public class Gold extends Collectable {
     private int amount;
     private boolean open = false;
     public Gold(Position pos, Map map) {
-        super(pos);
-        this.spawn(map);
+        super(pos, map);
     }
 }

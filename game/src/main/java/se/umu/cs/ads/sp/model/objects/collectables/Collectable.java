@@ -8,8 +8,8 @@ public abstract class Collectable extends GameObject {
     protected boolean hasBeenCollected;
     protected Reward reward;
 
-    public Collectable(Position pos) {
-        super(pos);
+    public Collectable(Position pos, Map map) {
+        super(pos, map);
         hasBeenCollected = false;
     }
 

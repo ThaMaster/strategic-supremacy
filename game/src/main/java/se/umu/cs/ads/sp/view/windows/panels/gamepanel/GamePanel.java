@@ -445,6 +445,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     break;
                 case DEATH:
                     SoundManager.getInstance().play("DEATH");
+                    addTextEvent(event, 15, EventColor.ALERT);
                     break;
                 case ATTACK:
                     SoundManager.getInstance().play("ATTACK");

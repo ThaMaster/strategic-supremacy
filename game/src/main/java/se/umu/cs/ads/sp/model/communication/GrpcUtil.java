@@ -178,6 +178,7 @@ public class GrpcUtil {
     public static proto.PlayerUnit toGrpcPlayerUnit(CompleteUnitInfoDTO unit) {
         return proto.PlayerUnit.newBuilder()
                 .setUnitId(unit.unitId())
+                .setTargetUnitId(unit.targetUnitId())
                 .setPosition(toGrpcPosition(unit.position()))
                 .setDestination(toGrpcPosition(unit.destination()))
                 .setCurrentHealth(unit.currentHp())
@@ -187,7 +188,7 @@ public class GrpcUtil {
     }
 
     public static CompleteUnitInfoDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
-        return new CompleteUnitInfoDTO(unit.getUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
+        return new CompleteUnitInfoDTO(unit.getUnitId(), unit.getTargetUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
     }
 
     public static proto.PlayerUnits toGrpcUpdatePlayerUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
