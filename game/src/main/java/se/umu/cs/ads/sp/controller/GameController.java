@@ -272,6 +272,10 @@ public class GameController implements ActionListener {
 
     private void joinLobby(long lobbyId) {
         Lobby lobby = modelManager.getLobbyHandler().joinLobby(lobbyId);
+        if (lobby == null) {
+            UtilView.displayWarningMessage(mainFrame, "Failed to join lobby! (Lobby is already full)");
+            return;
+        }
         SwingUtilities.invokeLater(() -> {
             updateLobby(lobby);
             mainFrame.getLobbyPanel().showStartButton(false);

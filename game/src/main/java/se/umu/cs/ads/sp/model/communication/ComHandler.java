@@ -58,7 +58,9 @@ public class ComHandler {
 
     public Lobby joinLobby(Long lobbyId, User user) {
         Lobby joinedLobby = nsClient.joinLobby(lobbyId, user);
-        sendUpdatedLobby(joinedLobby);
+        if(joinedLobby != null) {
+            sendUpdatedLobby(joinedLobby);
+        }
         return joinedLobby;
     }
 

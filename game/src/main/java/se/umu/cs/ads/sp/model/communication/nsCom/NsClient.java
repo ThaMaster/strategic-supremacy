@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.model.communication.nsCom;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import nsProto.DetailedLobbyInfo;
 import nsProto.GrpcNamingServiceGrpc;
 import nsProto.Lobbies;
@@ -62,7 +63,7 @@ public class NsClient {
     }
 
     // Blocking version of joinLobby
-    public Lobby joinLobby(Long lobbyId, User user) {
+    public Lobby joinLobby(Long lobbyId, User user) throws StatusRuntimeException {
         System.out.println("[Client] Trying to join lobby with id: " + lobbyId);
         try {
             DetailedLobbyInfo detailedLobbyInfo = blockingStub
@@ -73,9 +74,8 @@ public class NsClient {
             }
             System.out.println("\t Joined the lobby.");
             return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
-        } catch (Exception e) {
-            System.out.println("\t Failed to join lobby.");
-            e.printStackTrace();
+        } catch (StatusRuntimeException e) {
+            System.out.println("\t Failed to join lobby (Lobby is already full).");
             return null;
         }
     }
