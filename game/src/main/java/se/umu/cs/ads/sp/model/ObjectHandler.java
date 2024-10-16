@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model;
 
-import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
@@ -15,6 +14,8 @@ import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
+import se.umu.cs.ads.sp.model.objects.environment.Environment;
+import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
@@ -29,8 +30,8 @@ public class ObjectHandler {
     private HashMap<Long, PlayerUnit> myUnits = new HashMap<>();
     private HashMap<Long, PlayerUnit> enemyUnits = new HashMap<>();
     private HashMap<Long, Collectable> collectables = new HashMap<>();
+    private HashMap<Long, Environment> environments = new HashMap<>();
     private ArrayList<Long> selectedUnitIds = new ArrayList<>();
-    private ArrayList<GameObject> environment;
 
     public void update() {
         for (PlayerUnit entity : myUnits.values()) {
@@ -136,23 +137,28 @@ public class ObjectHandler {
         return collectables;
     }
 
+    public HashMap<Long, Environment> getEnvironments() {
+        return environments;
+    }
+
     public StartGameRequest initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
         StartGameRequest startGameRequest = new StartGameRequest(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        ArrayList<Position> basePositions = map.getBasePositions();
+        ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
         for (User user : users) {
             long userId = user.id;
-            Position basePos = basePositions.get(basePositions.size() - 1);
+            Position basePos = basePositions.get(0);
+
             //Spawning base
             startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
             spawnBase(map, basePos);
 
             //Spawning 3 entities
             for (int i = 0; i < 3; i++) {
-                Position offsetPosition = basePos;
+                Position offsetPosition;
+
                 do {
-                    offsetPosition = new Position((basePos.getX()
-                            * Constants.TILE_HEIGHT) + Utils.getRandomInt(-15, 15),
-                            (basePos.getY() * Constants.TILE_WIDTH) + Utils.getRandomInt(-15, 15));
+                    offsetPosition = new Position((basePos.getX() + Utils.getRandomInt(-30, 30)),
+                            (basePos.getY() + Utils.getRandomInt(-30, 30)));
                 } while (!modelManager.isWalkable(offsetPosition));
 
                 EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), userId, offsetPosition);
@@ -162,7 +168,7 @@ public class ObjectHandler {
             }
 
             if (!basePositions.isEmpty()) {
-                basePositions.remove(basePositions.size() - 1);
+                basePositions.remove(0);
             }
         }
         //TEMP
@@ -185,6 +191,10 @@ public class ObjectHandler {
                     spawnBase(map, env.position());
                     break;
                 case GOLDMINE:
+                    spawnGoldMine(map, env.position());
+                    break;
+                default:
+                    System.out.println("Unexpected type on collectable");
                     break;
             }
         }
@@ -211,7 +221,12 @@ public class ObjectHandler {
 
     private void spawnBase(Map map, Position position) {
         Base base = new Base(position);
-        base.spawn(map);
+        addEnvironment(base);
+    }
+
+    private void spawnGoldMine(Map map, Position position) {
+        GoldMine goldMine = new GoldMine(position, 100);
+        addEnvironment(goldMine);
     }
 
     private void spawnGold(Map map, Position position) {
@@ -254,5 +269,9 @@ public class ObjectHandler {
         for (Long id : unitIds) {
             enemyUnits.remove(id);
         }
+    }
+
+    public void addEnvironment(Environment environment) {
+        environments.put(environment.getId(), environment);
     }
 }

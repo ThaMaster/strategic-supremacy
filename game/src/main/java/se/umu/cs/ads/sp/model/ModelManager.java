@@ -101,12 +101,7 @@ public class ModelManager {
     }
 
     public boolean isWalkable(Position position) {
-        int col = position.getX() / Constants.TILE_HEIGHT;
-        int row = position.getY() / Constants.TILE_WIDTH;
-        if (map.inBounds(row, col)) {
-            return !map.getModelMap().get(row).get(col).hasCollision();
-        }
-        return false;
+        return map.isWalkable(position);
     }
 
     private long checkEntityHit(Position position) {
@@ -178,8 +173,12 @@ public class ModelManager {
 
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
+
         comHandler.removePlayerUnits();
         objectHandler.getMyUnits().clear();
+        objectHandler.getSelectedUnits().clear();
+        objectHandler.getEnvironments().clear();
+        objectHandler.getCollectables().clear();
         lobbyHandler.leaveLobby();
     }
 

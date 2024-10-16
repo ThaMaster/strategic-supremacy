@@ -18,7 +18,6 @@ public class TileModel {
     }
 
     private void initTile(int type) {
-        //Switch type
         switch (type) {
             case 0:
                 this.type = TileType.GRASS;
@@ -29,9 +28,11 @@ public class TileModel {
                 break;
             case 2:
                 this.type = TileType.WATER;
+                hasCollision = true;
                 break;
             default:
-                this.type = TileType.GRASS;
+                System.out.println("Random tile detected when initializing the map!");
+                hasCollision = true;
                 break;
         }
     }

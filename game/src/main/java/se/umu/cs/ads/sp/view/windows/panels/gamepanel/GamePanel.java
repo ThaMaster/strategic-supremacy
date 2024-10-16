@@ -8,6 +8,9 @@ import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.model.objects.environment.Base;
+import se.umu.cs.ads.sp.model.objects.environment.Environment;
+import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
@@ -15,13 +18,15 @@ import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
-import se.umu.cs.ads.sp.view.objects.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.EnemyUnitView;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
+import se.umu.cs.ads.sp.view.objects.environments.BaseView;
+import se.umu.cs.ads.sp.view.objects.environments.EnvironmentView;
+import se.umu.cs.ads.sp.view.objects.environments.GoldMineView;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
@@ -45,13 +50,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
     private HashMap<Long, CollectableView> collectables = new HashMap<>();
+    private HashMap<Long, EnvironmentView> environments = new HashMap<>();
+
     private final int edgeThreshold = 50;
 
     private Point startDragPoint;
     private Point endDragPoint;
 
     private ArrayList<TextAnimation> textAnimations = new ArrayList<>();
-    private EnvironmentView goldPile;
 
     public GamePanel(TileManager tm) {
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
@@ -66,7 +72,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.addMouseWheelListener(this);
         this.setFocusable(true);  // Ensure the panel can receive key events
         this.addKeyListener(this); // Add KeyListener
-        this.goldPile = new EnvironmentView(52, new Position(200, 200));
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
     }
 
@@ -235,14 +240,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         // Draw collectables
         for (CollectableView collectableView : collectables.values()) {
             if (tileManager.isInFow(collectableView.getPosition())) {
-                miniMap.addPoint(goldPile.getPosition(), Color.BLACK, 50);
+                miniMap.addPoint(collectableView.getPosition(), Color.BLACK, 50);
                 collectableView.draw(g2d, cameraWorldPosition);
             }
         }
 
-        if (tileManager.isInFow(this.goldPile.getPosition())) {
-            miniMap.addPoint(goldPile.getPosition(), StyleConstants.GOLD_COLOR, 100);
-            this.goldPile.draw(g2d, cameraWorldPosition);
+        // Draw environment objects
+        for (EnvironmentView environmentView : environments.values()) {
+            if (tileManager.isInFow(environmentView.getPosition())) {
+                miniMap.addPoint(environmentView.getPosition(), StyleConstants.GOLD_COLOR, 100);
+                environmentView.draw(g2d, cameraWorldPosition);
+            }
         }
 
         // Draw entities
@@ -300,7 +308,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (PlayerUnit unit : myUnits.values()) {
             PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getPosition());
             newUnit.setSelected(unit.isSelected());
-            newUnit.setIsMyUnit();
+            newUnit.isMyUnit = true;
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
             cameraWorldPosition.setX(newUnit.getPosition().getX());
             cameraWorldPosition.setY(newUnit.getPosition().getY());
@@ -308,24 +316,37 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         for (Entity entity : entities.values()) {
             EntityView newEntity = new EnemyUnitView(entity.getId(), entity.getPosition());
-            newEntity.setSelected(entity.isSelected());
             this.gameEntitiesView.put(newEntity.getId(), newEntity);
         }
     }
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
         this.collectables.clear();
-        CollectableView newCollectable = null;
+        CollectableView newCollectableView = null;
         for (Collectable collectable : collectables.values()) {
             if (collectable instanceof Chest) {
-                newCollectable = new ChestView(collectable.getId(), collectable.getPosition());
+                newCollectableView = new ChestView(collectable.getId(), collectable.getPosition());
             } else if (collectable instanceof Gold) {
-                collectable.getPosition().printPosition("Gold");
-                newCollectable = new GoldView(collectable.getId(), collectable.getPosition());
-                newCollectable.setCollisionBox(collectable.getCollisionBox());
+                newCollectableView = new GoldView(collectable.getId(), collectable.getPosition());
+                newCollectableView.setCollisionBox(collectable.getCollisionBox());
             }
-            if (newCollectable != null) {
-                this.collectables.put(collectable.getId(), newCollectable);
+            if (newCollectableView != null) {
+                this.collectables.put(collectable.getId(), newCollectableView);
+            }
+        }
+    }
+
+    public void setEnvironemnts(HashMap<Long, Environment> environments) {
+        this.environments.clear();
+        EnvironmentView newEnvironmentView = null;
+        for (Environment environment : environments.values()) {
+            if (environment instanceof GoldMine) {
+                newEnvironmentView = new GoldMineView(environment.getId(), environment.getPosition());
+            } else if (environment instanceof Base) {
+                newEnvironmentView = new BaseView(environment.getId(), environment.getPosition());
+            }
+            if (newEnvironmentView != null) {
+                this.environments.put(newEnvironmentView.getId(), newEnvironmentView);
             }
         }
     }
@@ -333,6 +354,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void updateCollectables() {
         for (CollectableView collectable : collectables.values()) {
             collectable.update();
+        }
+    }
+
+    public void updateEnvironments() {
+        for (EnvironmentView environment : environments.values()) {
+            environment.update();
         }
     }
 
@@ -410,8 +437,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     addTextEvent(event, 15, EventColor.DEFAULT);
                     break;
                 case MINE_DEPLETED:
-                    // Change this to hashmap and get the goldpile with specific id.
-                    this.goldPile.setDepleted(true);
+                    GoldMineView goldMine = (GoldMineView) environments.get(event.getId());
+                    goldMine.setDepleted(true);
                     break;
                 case MINING:
                     break;
@@ -471,7 +498,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void removeEntities(ArrayList<Long> unitIds) {
-        for(Long id : unitIds) {
+        for (Long id : unitIds) {
             this.gameEntitiesView.remove(id);
         }
     }

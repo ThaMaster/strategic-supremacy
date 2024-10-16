@@ -36,10 +36,10 @@ public class GameController implements ActionListener {
     public GameController() {
         mainFrame = new MainFrame();
         setActionListeners();
+        this.timer = new Timer(1000 / FPS, this);
     }
 
     public void startGame(StartGameRequest req) {
-        this.timer = new Timer(1000 / FPS, this);
         modelManager.startGameReq(req);
         mainFrame.showGamePanel(tileManager);
         mainFrame.getGamePanel().setGameController(this);
@@ -55,14 +55,14 @@ public class GameController implements ActionListener {
     }
 
     public void startGame() {
-        this.timer = new Timer(1000 / FPS, this);
         mainFrame.showGamePanel(tileManager);
         mainFrame.getGamePanel().setGameController(this);
         mainFrame.getGamePanel().startGame();
         mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
                 modelManager.getObjectHandler().getEnemyUnits());
         mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
-        this.timer.start();
+        mainFrame.getGamePanel().setEnvironemnts(modelManager.getObjectHandler().getEnvironments());
+        timer.start();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class GameController implements ActionListener {
         modelManager.update();
         mainFrame.getGamePanel().updateEntityViews(getAllUnits());
         mainFrame.getGamePanel().updateCollectables();
-
+        mainFrame.getGamePanel().updateEnvironments();
         // Check where to move the camera.
         if (cameraPanningDirection != Direction.NONE) {
             switch (cameraPanningDirection) {
@@ -240,6 +240,7 @@ public class GameController implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            timer.stop();
             modelManager.leaveOngoingGame();
             mainFrame.getQuitFrame().showFrame(false);
             mainFrame.switchPanel("Browse");

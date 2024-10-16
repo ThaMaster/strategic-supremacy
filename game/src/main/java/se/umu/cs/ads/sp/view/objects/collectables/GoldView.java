@@ -17,11 +17,6 @@ public class GoldView extends CollectableView {
     }
 
     @Override
-    public void update() {
-        this.animator.update();
-    }
-
-    @Override
     public void pickup() {
         this.hasBeenPickedUp = true;
     }

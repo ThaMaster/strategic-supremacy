@@ -28,8 +28,8 @@ public class PlayerUnitView extends EntityView {
 
             g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
             g2d.fillRect(desScreenX - 4, desScreenY - 4, 8, 8);
-
         }
+        
         if (AppSettings.DEBUG) {
             drawCollisionBox(g2d, cameraWorldPosition);
             g2d.setColor(Color.RED);

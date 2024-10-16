@@ -12,4 +12,8 @@ public abstract class CollectableView extends ObjectView {
     public boolean hasBeenCollected() {
         return hasBeenPickedUp;
     }
+
+    public void update() {
+        this.animator.update();
+    }
 }

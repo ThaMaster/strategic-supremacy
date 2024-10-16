@@ -21,10 +21,6 @@ public abstract class EntityView extends ObjectView {
         this.animator = new Animator();
     }
 
-    public void setIsMyUnit(){
-        isMyUnit = true;
-    }
-
     public void setSelected(boolean b) {
         this.selected = b;
     }

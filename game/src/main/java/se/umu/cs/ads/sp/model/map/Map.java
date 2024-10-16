@@ -1,23 +1,21 @@
 package se.umu.cs.ads.sp.model.map;
 
-import org.checkerframework.checker.units.qual.A;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Map {
 
     // Now we store a whole object for every tile even though they are the same, did we not decide to not do this?
     private ArrayList<ArrayList<TileModel>> map;
-    private ArrayList<Position> basePositions;
     private int cols;
     private int rows;
 
@@ -34,7 +32,6 @@ public class Map {
         try {
             InputStream is = getClass().getResourceAsStream("/" + file);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            basePositions = new ArrayList<>();
             String line;
             int row = 0;
             int maxCol = 0;
@@ -44,14 +41,8 @@ public class Map {
 
                 map.add(new ArrayList<>());
                 String[] numbers = line.split(" ");
-                int col = 0;
                 for (String number : numbers) {
-                    int tile = Integer.parseInt(number);
-                    if(tile == 8){
-                        basePositions.add(new Position(col, row));
-                    }
                     map.get(row).add(new TileModel(Integer.parseInt(number)));
-                    col++;
                 }
                 currentCols = map.get(row).size();
                 if (currentCols > maxCol) {
@@ -140,13 +131,84 @@ public class Map {
         return rows;
     }
 
-
-
     public boolean inBounds(int row, int col) {
         return row >= 0 && row < map.size() && col >= 0 && col < map.get(row).size();
     }
 
-    public ArrayList<Position> getBasePositions(){
-        return basePositions;
+    public ArrayList<Position> generateSpawnPoints(int numberOfPlayers) {
+        ArrayList<Position> spawnPositions = new ArrayList<>();
+
+        // Generate the first random spawn point
+        spawnPositions.add(getRandomWalkableTile());
+
+        // Generate remaining spawn points
+        for (int i = 1; i < numberOfPlayers; i++) {
+            Position nextSpawn = getMaxMinDistanceSpawn(spawnPositions);
+            if (nextSpawn != null) {
+                spawnPositions.add(nextSpawn);
+            }
+        }
+
+        return spawnPositions;
+
+    }
+
+    // Get a random walkable tile
+    private Position getRandomWalkableTile() {
+        int row, col;
+        Position randomPosition;
+        do {
+            randomPosition = new Position(
+                    Utils.getRandomInt(0, cols) * Constants.TILE_WIDTH + Utils.getRandomInt(0, Constants.TILE_WIDTH),
+                    Utils.getRandomInt(0, rows) * Constants.TILE_HEIGHT + Utils.getRandomInt(0, Constants.TILE_HEIGHT));
+        } while (!isWalkable(randomPosition));
+        return randomPosition;
+    }
+
+    // Find the tile that maximizes the minimum distance from existing spawn points
+    private Position getMaxMinDistanceSpawn(ArrayList<Position> spawnPositions) {
+        Position bestSpawn = null;
+        double maxMinDistance = -1;
+
+        // Iterate over all walkable tiles in the map
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (!map.get(row).get(col).hasCollision()) {
+                    Position currentTile =
+                            new Position(
+                                    col * Constants.TILE_WIDTH + Utils.getRandomInt(0, Constants.TILE_WIDTH),
+                                    row * Constants.TILE_HEIGHT + Utils.getRandomInt(0, Constants.TILE_HEIGHT));
+                    double minDistance = getMinDistance(currentTile, spawnPositions);
+                    // Find the spawn point with the maximum of these minimum distances
+                    if (minDistance > maxMinDistance) {
+                        maxMinDistance = minDistance;
+                        bestSpawn = currentTile;
+                    }
+                }
+            }
+        }
+
+        return bestSpawn;
+    }
+
+    // Get the minimum distance from a given tile to any of the current spawn points
+    private double getMinDistance(Position tile, ArrayList<Position> spawnPositions) {
+        double minDistance = Double.MAX_VALUE;
+        for (Position spawn : spawnPositions) {
+            double distance = Math.sqrt(Math.pow(spawn.getX() - tile.getX(), 2) + Math.pow(spawn.getY() - tile.getY(), 2));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        return minDistance;
+    }
+
+    public boolean isWalkable(Position position) {
+        int col = position.getX() / Constants.TILE_HEIGHT;
+        int row = position.getY() / Constants.TILE_WIDTH;
+        if (inBounds(row, col)) {
+            return !getModelMap().get(row).get(col).hasCollision();
+        }
+        return false;
     }
 }

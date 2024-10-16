@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.objects.collectables;
+package se.umu.cs.ads.sp.view.objects.environments;
 
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
@@ -8,26 +8,12 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
-public class ChestView extends CollectableView {
+public class BaseView extends EnvironmentView {
 
-    public ChestView(long id, Position pos) {
-        super(id, pos);
+    public BaseView(long id, Position position) {
+        super(id, position);
         initAnimator();
-        this.animator.changeAnimation("opening");
-        this.animator.pause();
-    }
-
-    @Override
-    public void pickup() {
-        this.hasBeenPickedUp = true;
-        animator.start();
-    }
-
-    @Override
-    protected void initAnimator() {
-        Animation openingAnimation = new Animation("opening", ImageLoader.loadImages("/sprites/collectables/chests", "wodden_chest", 4), 7);
-        openingAnimation.setOneShot(true);
-        this.animator.addAnimation(openingAnimation);
+        this.animator.changeAnimation("default");
     }
 
     @Override
@@ -35,5 +21,14 @@ public class ChestView extends CollectableView {
         int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
         int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
         this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
+    }
+
+    @Override
+    protected void initAnimator() {
+        this.animator.addAnimation(
+                new Animation(
+                        "default",
+                        ImageLoader.loadImages("/sprites/environment/base", "base", 4),
+                        7));
     }
 }
