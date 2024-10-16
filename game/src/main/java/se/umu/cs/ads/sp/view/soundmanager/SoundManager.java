@@ -1,16 +1,14 @@
 package se.umu.cs.ads.sp.view.soundmanager;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
 public class SoundManager {
 
     private static SoundManager instance;
-    private static final HashMap<String, String> sounds = new HashMap<>(); //Name, Path
+    private static final HashMap<String, Clip> sounds = new HashMap<>(); //Name, Path
     private float globalVolume = 75.0f;
     private float musicVolume = 75.0f;
     private float sfxVolume = 100.0f;
@@ -24,18 +22,11 @@ public class SoundManager {
     }
 
     public void play(String soundFx) {
-        String soundPath = sounds.get(soundFx);
-        if (soundPath != null) {
+        Clip clip = sounds.get(soundFx);
+        if (clip != null) {
             try {
-                // Play sound using Clip from AudioSystem
-                URL soundURL = new URL(soundPath);
-                AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundURL);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioStream);
-
-                // Adjust the volume of the sound
+                clip.setMicrosecondPosition(0);
                 adjustVolume(clip, globalVolume, sfxVolume);
-
                 clip.start();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -54,6 +45,11 @@ public class SoundManager {
 
             // Play music using Clip from AudioSystem
             URL musicURL = getClass().getClassLoader().getResource("audio/music/backgroundMusic.wav");
+
+            if (musicURL == null) {
+                return;
+            }
+
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicURL);
             musicClip = AudioSystem.getClip();
             musicClip.open(audioStream);
@@ -133,38 +129,17 @@ public class SoundManager {
 
     private void init() {
         try {
-            URL audioSrc = getClass().getClassLoader().getResource("audio/sfx/chestOpen.wav");
-            sounds.put(SoundFX.OPEN_CHEST, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move1.wav");
-            sounds.put(SoundFX.MOVE_1, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move2.wav");
-            sounds.put(SoundFX.MOVE_2, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move3.wav");
-            sounds.put(SoundFX.MOVE_3, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move4.wav");
-            sounds.put(SoundFX.MOVE_4, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move5.wav");
-            sounds.put(SoundFX.MOVE_5, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/move6.wav");
-            sounds.put(SoundFX.MOVE_6, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/gold.wav");
-            sounds.put(SoundFX.GOLD, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/attack.wav");
-            sounds.put(SoundFX.ATTACK, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/death.wav");
-            sounds.put(SoundFX.DEATH, audioSrc != null ? audioSrc.toExternalForm() : null);
-
-            audioSrc = getClass().getClassLoader().getResource("audio/sfx/takeDmg.wav");
-            sounds.put(SoundFX.TAKE_DMG, audioSrc != null ? audioSrc.toExternalForm() : null);
+            sounds.put(SoundFX.OPEN_CHEST, getClip("audio/sfx/chestOpen.wav"));
+            sounds.put(SoundFX.MOVE_1, getClip("audio/sfx/move1.wav"));
+            sounds.put(SoundFX.MOVE_2, getClip("audio/sfx/move2.wav"));
+            sounds.put(SoundFX.MOVE_3, getClip("audio/sfx/move3.wav"));
+            sounds.put(SoundFX.MOVE_4, getClip("audio/sfx/move4.wav"));
+            sounds.put(SoundFX.MOVE_5, getClip("audio/sfx/move5.wav"));
+            sounds.put(SoundFX.MOVE_6, getClip("audio/sfx/move6.wav"));
+            sounds.put(SoundFX.GOLD, getClip("audio/sfx/gold.wav"));
+            sounds.put(SoundFX.ATTACK, getClip("audio/sfx/attack.wav"));
+            sounds.put(SoundFX.DEATH, getClip("audio/sfx/death.wav"));
+            sounds.put(SoundFX.TAKE_DMG, getClip("audio/sfx/takeDmg.wav"));
 
         } catch (NullPointerException e) {
             System.out.println("Could not load audio file");
@@ -188,5 +163,19 @@ public class SoundManager {
             instance = new SoundManager();
         }
         return instance;
+    }
+
+    private Clip getClip(String path) {
+        try {
+            URL musicURL = getClass().getClassLoader().getResource(path);
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicURL);
+            Clip sfxClip = AudioSystem.getClip();
+            sfxClip.open(audioStream);
+            return sfxClip;
+        } catch (NullPointerException | UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

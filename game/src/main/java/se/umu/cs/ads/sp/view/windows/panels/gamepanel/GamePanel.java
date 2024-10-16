@@ -444,14 +444,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 case MINING:
                     break;
                 case DEATH:
-                    SoundManager.getInstance().play("DEATH");
+                    SoundManager.getInstance().play(SoundFX.DEATH);
                     addTextEvent(event, 15, EventColor.ALERT);
                     break;
                 case ATTACK:
-                    SoundManager.getInstance().play("ATTACK");
+                    SoundManager.getInstance().play(SoundFX.ATTACK);
                     break;
                 case TAKE_DMG:
-                    SoundManager.getInstance().play("TAKE_DMG");
+                    SoundManager.getInstance().play(SoundFX.TAKE_DMG);
                     break;
                 default:
                     //This is default case, it's a collectable we have stored
