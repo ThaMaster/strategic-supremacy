@@ -33,6 +33,12 @@ public class ObjectHandler {
     private HashMap<Long, Environment> environments = new HashMap<>();
     private ArrayList<Long> selectedUnitIds = new ArrayList<>();
 
+    private User user;
+
+    public ObjectHandler(User user){
+        this.user = user;
+    }
+
     public void update() {
         for (PlayerUnit entity : myUnits.values()) {
             entity.update();
@@ -162,7 +168,7 @@ public class ObjectHandler {
                 } while (!modelManager.isWalkable(offsetPosition));
 
                 EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), userId, offsetPosition);
-                spawnUnit(map, entitySkeletonDTO.id(), offsetPosition, userId == modelManager.getPlayer().id);
+                spawnUnit(map, entitySkeletonDTO.id(), offsetPosition, user);
 
                 startGameRequest.entitySkeletons().add(entitySkeletonDTO);
             }
@@ -241,9 +247,9 @@ public class ObjectHandler {
         addCollectable(chest);
     }
 
-    private void spawnUnit(Map map, long unitId, Position position, boolean myUnit) {
+    private void spawnUnit(Map map, long unitId, Position position, User user) {
         PlayerUnit unit = new PlayerUnit(unitId, position, map);
-        if (myUnit) {
+        if (this.user.id == modelManager.getPlayer().id) {
             myUnits.put(unit.getId(), unit);
         } else {
             enemyUnits.put(unit.getId(), unit);

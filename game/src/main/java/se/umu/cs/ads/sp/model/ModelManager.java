@@ -42,7 +42,7 @@ public class ModelManager {
         gameEvents = GameEvents.getInstance();
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
-        objectHandler = new ObjectHandler();
+        objectHandler = new ObjectHandler(player);
         comHandler = new ComHandler(player.port, controller, this);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::leaveOngoingGame));
@@ -60,6 +60,7 @@ public class ModelManager {
         // Update all entities in game, including my units.
         objectHandler.update();
         fow.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
+
     }
 
     public ObjectHandler getObjectHandler() {
@@ -198,6 +199,7 @@ public class ModelManager {
 
     public ArrayList<Long> getPlayersToUpdate() {
         // This function will maybe check which users are in L1, L2, L3?
+
         return new ArrayList<>(lobbyHandler.getLobby().users.stream().map(user -> user.id).toList());
     }
 

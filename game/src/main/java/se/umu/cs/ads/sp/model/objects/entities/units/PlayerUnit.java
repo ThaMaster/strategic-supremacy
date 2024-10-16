@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerUnit extends Entity {
-
     private ArrayList<Collectable> collected = new ArrayList<>();
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;

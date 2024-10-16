@@ -24,6 +24,8 @@ public abstract class Entity extends GameObject {
     protected Position destination;
     private boolean selected = false;
 
+    private long userId;
+
     public Entity(Position startPos, Map map) {
         super(startPos);
         this.position = startPos;
@@ -34,6 +36,14 @@ public abstract class Entity extends GameObject {
         // Place the hitbox around the entity rather than
         this.collisionBox = new CollisionBox(position, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
         spawn(map);
+    }
+
+    public void setUserId(long id){
+        userId = id;
+    }
+
+    public long getUserid(){
+        return userId;
     }
 
     public abstract void update();

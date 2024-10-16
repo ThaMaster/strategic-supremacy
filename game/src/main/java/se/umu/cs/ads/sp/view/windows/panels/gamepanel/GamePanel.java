@@ -76,6 +76,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void startGame() {
+        this.requestFocusInWindow();
         SoundManager.getInstance().playMusic();
     }
 
