@@ -9,10 +9,12 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.GameServiceGrpc;
+import proto.L3Message;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 
@@ -66,6 +68,24 @@ public class GameClient {
             @Override
             public void onFailure(Throwable t) {
                 System.out.println("\t Failed to tell player to start the game");
+                System.out.println("\t" + t.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void sendL3Message(L3UpdateDTO msg){
+        System.out.println("[Client] Sending L3 update");
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .l3Update(GrpcUtil.toGrpcL3Message(msg));
+
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {}
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("\t Failed to send L3 Update to client " + ip+":"+port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());

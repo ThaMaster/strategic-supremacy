@@ -32,6 +32,7 @@ public class ObjectHandler {
     private HashMap<Long, Collectable> collectables = new HashMap<>();
     private HashMap<Long, Environment> environments = new HashMap<>();
     private ArrayList<Long> selectedUnitIds = new ArrayList<>();
+    private ArrayList<Long> pickedUpCollectableIds = new ArrayList<>();
 
     private User user;
 
@@ -118,6 +119,7 @@ public class ObjectHandler {
             } else if (collected instanceof Gold) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
             }
+            pickedUpCollectableIds.add(collected.getId());
         }
         playerUnit.getCollected().clear();
     }
@@ -229,6 +231,35 @@ public class ObjectHandler {
         for (EntitySkeletonDTO unit : request.entitySkeletons()) {
             spawnUnit(map, unit.id(), unit.position(), unit.userId());
         }
+    }
+    public ArrayList<Long> getCollectedIds(){
+        return pickedUpCollectableIds;
+    }
+
+    public ArrayList<EntitySkeletonDTO> getAllEntitySkeletons(){
+        ArrayList<EntitySkeletonDTO> skeletons = getMyUnitsToEntitySkeletons();
+        for(PlayerUnit unit : enemyUnits.values()){
+            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getId(), unit.getPosition());
+            skeletons.add(skeletonDTO);
+        }
+        return skeletons;
+    }
+
+    public void updateUnitPositions(ArrayList<EntitySkeletonDTO> skeletons){
+        for(EntitySkeletonDTO unit : skeletons){
+            if(enemyUnits.containsKey(unit.id())){
+                enemyUnits.get(unit.id()).setPosition(unit.position());
+            }
+        }
+    }
+
+    public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons(){
+        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
+        for(PlayerUnit unit : myUnits.values()){
+            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), user.id, unit.getPosition());
+            skeletons.add(skeletonDTO);
+        }
+        return skeletons;
     }
 
     private void spawnBase(Map map, Position position) {

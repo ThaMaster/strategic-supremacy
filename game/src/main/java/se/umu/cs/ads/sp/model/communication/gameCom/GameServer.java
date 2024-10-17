@@ -61,6 +61,14 @@ public class GameServer {
         }
 
         @Override
+        public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received L3 update");
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+            comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
+        }
+
+        @Override
         public void removePlayerUnits(EntitySkeletons request, StreamObserver<Empty> responseObserver) {
             ArrayList<EntitySkeletonDTO> skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
             long userId = skeletons.get(0).userId();

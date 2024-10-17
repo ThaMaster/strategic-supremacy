@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.ModelManager;
+import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
@@ -33,18 +34,21 @@ public class ComHandler {
         server.start();
     }
 
-    public void sendL3Update(boolean fromLeader){
+    public void sendL3Update(L3UpdateDTO message, boolean fromLeader){
         if(fromLeader){
             for(GameClient client : l3Clients.values()){
                 //Send l3 update to everyone
-                System.out.println("SENDING UPDATE FROM LEADER");
+                client.sendL3Message(message);
             }
         }else{
             User leader = modelManager.getLobbyHandler().getLobby().leader;
             GameClient client = l3Clients.get(leader.id);
-            System.out.println("SENDING UPDATE TO LEADER");
-            //Send l3 to leader
+            client.sendL3Message(message);
         }
+    }
+
+    public void handleReceiveL3Msg(L3UpdateDTO message){
+        modelManager.receiveL3Update(message);
     }
 
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {

@@ -93,4 +93,5 @@ service GameService {
   rpc removePlayerUnits (EntitySkeletons) returns (google.protobuf.Empty);
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
+  rpc l3Update(L3Message) returns (google.protobuf.Empty);
 }

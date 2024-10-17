@@ -5,13 +5,11 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
-import se.umu.cs.ads.sp.model.communication.dto.CompleteUnitInfoDTO;
-import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -76,7 +74,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
+            //comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
             return true;
         }
 
@@ -89,7 +87,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
+            //comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
             return true;
         }
         return false;
@@ -180,13 +178,39 @@ public class ModelManager {
     }
 
     private void sendL3Update(){
-        comHandler.sendL3Update(lobbyHandler.getLobby().leader.id == player.id);
+        boolean isLeader = lobbyHandler.getLobby().leader.id == player.id;
+        comHandler.sendL3Update(constructL3Message(isLeader), isLeader);
+    }
+
+    public L3UpdateDTO constructL3Message(boolean fromLeader){
+        L3UpdateDTO dto;
+        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+        if(fromLeader){
+            //Get the current state of the world
+            entities = objectHandler.getAllEntitySkeletons();
+        }else{
+            //Only send my units to leader
+            entities = objectHandler.getMyUnitsToEntitySkeletons();
+
+        }
+        ArrayList<Long> collectedIds = objectHandler.getCollectedIds();
+        return new L3UpdateDTO(entities,
+                objectHandler.getCollectedIds(),
+                10L, //Todo send remaining time
+                1L, //Todo send current leader
+                new ArrayList<>(), //Todo sent environment
+                Constants.LOW_SEVERITY
+        );
+    }
+
+    public void receiveL3Update(L3UpdateDTO update){
+        //Todo
+        objectHandler.updateUnitPositions(update.entities());
     }
     // A request has come in to start the game
     public void startGameReq(StartGameRequestDTO request) {
         //Check bounding boxes
         objectHandler.populateWorld(request, map);
-        //comhandler.addL2(
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
