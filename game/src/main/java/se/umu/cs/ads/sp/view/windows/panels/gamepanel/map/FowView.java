@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
+import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 
@@ -15,6 +16,9 @@ public class FowView {
     }
 
     public boolean isInFow(Position posToCheck) {
+        if(AppSettings.DEBUG){
+            return true;
+        }
         for (PlayerUnitView unit : units) {
             if (Position.distance(unit.getPosition(), posToCheck) < fowRange) {
                 return true;

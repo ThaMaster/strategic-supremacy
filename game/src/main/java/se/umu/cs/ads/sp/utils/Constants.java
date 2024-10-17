@@ -10,6 +10,10 @@ public class Constants {
     public static final int OBJECT_WIDTH = 16;
     public static final int OBJECT_HEIGHT = 16;
 
+    public static final long L3_UPDATE_TIME = 2000L;
 
+    public static final int HIGH_SEVERITY = 1;
+    public static final int MID_SEVERITY = 2;
+    public static final int LOW_SEVERITY = 3;
 
 }

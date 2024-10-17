@@ -2,7 +2,9 @@ package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.CompleteUnitInfoDTO;
@@ -18,8 +20,11 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ModelManager {
 
@@ -34,8 +39,8 @@ public class ModelManager {
     private final ComHandler comHandler;
     private final User player;
     private final LobbyHandler lobbyHandler;
-
     private boolean started = false;
+    private Timer l3Timer;
 
     public ModelManager(GameController controller, User player) {
         map = new Map();
@@ -58,6 +63,7 @@ public class ModelManager {
 
     public void update() {
         // Update all entities in game, including my units.
+
         objectHandler.update();
         fow.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
 
@@ -163,13 +169,31 @@ public class ModelManager {
         }
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
+        l3Timer = new Timer();
+        startL3Timer(Constants.L3_UPDATE_TIME);
     }
 
+    private void startL3Timer(long updateTime){
+        l3Timer.schedule(new TimerTask() {
+            @Override
+          public void run() {
+              sendL3Update();
+          }
+       }, 0, updateTime);
+    }
+
+    private void sendL3Update(){
+        comHandler.sendL3Update(lobbyHandler.getLobby().leader.id == player.id);
+    }
     // A request has come in to start the game
     public void startGameReq(StartGameRequest request) {
+        //Check bounding boxes
         objectHandler.populateWorld(request, map);
+        //comhandler.addL2(
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
+        l3Timer = new Timer();
+        startL3Timer(Constants.L3_UPDATE_TIME/2);
     }
 
     public void leaveOngoingGame() {

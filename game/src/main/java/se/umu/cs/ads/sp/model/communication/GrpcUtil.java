@@ -40,8 +40,10 @@ public class GrpcUtil {
     public static proto.Environment toGrpcEnvironment(EnvironmentDTO environmentDTO) {
         return proto.Environment.newBuilder()
                 .setId(environmentDTO.id())
+                .setUserId(environmentDTO.userId())
                 .setPosition(toGrpcPosition(environmentDTO.position().getX(), environmentDTO.position().getY()))
                 .setType(environmentDTO.type())
+                .setRemainingResource(environmentDTO.remainingResource())
                 .build();
     }
 
@@ -100,9 +102,8 @@ public class GrpcUtil {
         return skeletons;
     }
 
-
     public static EnvironmentDTO fromGrpcEnv(proto.Environment env) {
-        return new EnvironmentDTO(env.getId(), env.getUserId(), fromGrpcPosition(env.getPosition()), env.getType());
+        return new EnvironmentDTO(env.getId(), env.getUserId(), fromGrpcPosition(env.getPosition()), env.getType(), env.getRemainingResource());
     }
 
     public static Reward fromGrpcReward(proto.Reward reward) {

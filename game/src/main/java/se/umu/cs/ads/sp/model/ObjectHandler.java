@@ -158,8 +158,11 @@ public class ObjectHandler {
             Position basePos = basePositions.get(0);
 
             //Spawning base
-            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type));
+            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.type, 0));
             spawnBase(map, basePos);
+
+            //TODO
+            //Spawn goldMine
 
             //Spawning 3 entities
             for (int i = 0; i < 3; i++) {

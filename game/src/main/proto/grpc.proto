@@ -54,12 +54,22 @@ message Environment {
     int64 userId = 3;
     Position position = 4;
     string type = 5;
+    int32 remainingResource = 6;
 }
 
 message StartGameRequest {
     EntitySkeletons entities = 1;
     repeated Collectable collectables = 2;
     repeated Environment environments = 3;
+}
+
+message L3Message {
+  EntitySkeletons entities = 1;
+  repeated int64 pickedUpCollectables = 2;
+  int64 remainingTime = 3;
+  int64 currentScoreLeader = 4;
+  repeated Environment environments = 5;
+  int32 severity = 6;
 }
 
 message User {

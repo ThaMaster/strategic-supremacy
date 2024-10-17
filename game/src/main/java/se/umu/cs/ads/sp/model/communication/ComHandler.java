@@ -20,15 +20,31 @@ public class ComHandler {
     private GameController controller;
     private ModelManager modelManager;
     private GameServer server;
-    private HashMap<Long, GameClient> gameClients;
+    private HashMap<Long, GameClient> l1Clients;
+    private HashMap<Long, GameClient> l2Clients;
+    private HashMap<Long, GameClient> l3Clients;
 
     public ComHandler(int port, GameController controller, ModelManager modelManager) {
-        gameClients = new HashMap<>();
+        l3Clients = new HashMap<>();
         nsClient = new NsClient();
         this.controller = controller;
         this.modelManager = modelManager;
         server = new GameServer(port, this);
         server.start();
+    }
+
+    public void sendL3Update(boolean fromLeader){
+        if(fromLeader){
+            for(GameClient client : l3Clients.values()){
+                //Send l3 update to everyone
+                System.out.println("SENDING UPDATE FROM LEADER");
+            }
+        }else{
+            User leader = modelManager.getLobbyHandler().getLobby().leader;
+            GameClient client = l3Clients.get(leader.id);
+            System.out.println("SENDING UPDATE TO LEADER");
+            //Send l3 to leader
+        }
     }
 
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
@@ -46,13 +62,12 @@ public class ComHandler {
     public void updateLobby(Lobby updatedLobby) {
         for (User user : updatedLobby.users) {
 
-            if (!gameClients.containsKey(user.id)) {
+            if (!l3Clients.containsKey(user.id)) {
                 GameClient client = new GameClient();
                 client.create(user.ip, user.port);
-                gameClients.put(user.id, client);
+                l3Clients.put(user.id, client);
             }
         }
-
         controller.updateLobby(updatedLobby);
     }
 
@@ -69,7 +84,7 @@ public class ComHandler {
     }
 
     public void sendStartGameRequest(StartGameRequest req, User user) {
-        GameClient client = gameClients.get(user.id);
+        GameClient client = l3Clients.get(user.id);
         client.startGame(req);
     }
 
@@ -78,7 +93,7 @@ public class ComHandler {
             if (id == controller.getModelManager().getPlayer().id) {
                 continue;
             }
-            gameClients.get(id).updateUnits(req);
+            l3Clients.get(id).updateUnits(req);
         }
     }
 
@@ -97,12 +112,12 @@ public class ComHandler {
                     continue;
                 }
                 GameClient client;
-                if (!gameClients.containsKey(user.id)) {
+                if (!l3Clients.containsKey(user.id)) {
                     client = new GameClient();
                     client.create(user.ip, user.port);
-                    gameClients.put(user.id, client);
+                    l3Clients.put(user.id, client);
                 } else {
-                    client = gameClients.get(user.id);
+                    client = l3Clients.get(user.id);
                 }
                 client.updateLobby(lobby, user);
             }
@@ -126,7 +141,7 @@ public class ComHandler {
             if (user.id == controller.getModelManager().getPlayer().id) {
                 continue;
             }
-            gameClients.get(user.id).removePlayerUnits(modelManager.createMySkeletonList());
+            l3Clients.get(user.id).removePlayerUnits(modelManager.createMySkeletonList());
         }
     }
 
@@ -136,10 +151,10 @@ public class ComHandler {
     }
 
     private void removeGameClient(long userId) {
-        if (gameClients.containsKey(userId)) {
-            GameClient client = gameClients.get(userId);
+        if (l3Clients.containsKey(userId)) {
+            GameClient client = l3Clients.get(userId);
             client.shutdown();
-            gameClients.remove(userId);
+            l3Clients.remove(userId);
         }
     }
 }
