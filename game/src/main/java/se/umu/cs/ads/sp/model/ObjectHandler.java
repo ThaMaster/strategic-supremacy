@@ -155,6 +155,14 @@ public class ObjectHandler {
     public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
+        this.collectables = map.generateCollectables();
+        for(Collectable collectable : collectables.values()){
+            startGameRequest.addCollectable(
+                    new CollectableDTO(collectable.getId(),
+                            collectable.getPosition(),
+                            collectable.getReward().getType(),
+                            collectable.getReward()));
+        }
         for (User user : users) {
             long userId = user.id;
             Position basePos = basePositions.get(0);
@@ -185,8 +193,8 @@ public class ObjectHandler {
                 basePositions.remove(0);
             }
         }
-        //TEMP
-        spawnGold(map, new Position(200, 200));
+
+
         startGameRequest.addCollectable(
                 new CollectableDTO(Utils.generateId(),
                         new Position(200, 200),

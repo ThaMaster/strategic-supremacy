@@ -2,6 +2,10 @@ package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
+import se.umu.cs.ads.sp.model.objects.collectables.Chest;
+import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
+import se.umu.cs.ads.sp.model.objects.collectables.Gold;
+import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
@@ -11,6 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static se.umu.cs.ads.sp.utils.Utils.getRandomSuccess;
 
 public class Map {
 
@@ -148,9 +155,34 @@ public class Map {
                 spawnPositions.add(nextSpawn);
             }
         }
-
         return spawnPositions;
+    }
 
+    public HashMap<Long, Collectable> generateCollectables(){
+        HashMap<Long, Collectable> collectables = new HashMap<>();
+        for(int row = 0; row < map.size(); row++){
+            for(int col = 0; col < map.get(row).size(); col++){
+                if(!inBounds(row, col) || getModelMap().get(row).get(col).hasCollision()){
+                    continue;
+                }
+
+                Position pos = new Position(col*Constants.TILE_HEIGHT, row * Constants.TILE_WIDTH);
+
+                // 2 % chance of generating a chest
+                if(getRandomSuccess(2)){
+                    Chest chest = new Chest(pos, this);
+                    chest.setReward(Reward.getRandomReward());
+                    collectables.put(chest.getId(), chest);
+                }
+                // 10 % chance of generating a coin
+                else if(getRandomSuccess(10)){
+                    Gold coin = new Gold(pos, this);
+                    coin.setReward(new Reward(10, Reward.RewardType.GOLD));
+                    collectables.put(coin.getId(), coin);
+                }
+            }
+        }
+        return collectables;
     }
 
     // Get a random walkable tile
