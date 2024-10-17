@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.view.objects.environments;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.animation.Animation;
+import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
@@ -17,10 +18,9 @@ public class BaseView extends EnvironmentView {
     }
 
     @Override
-    public void draw(Graphics2D g2d, Position cameraWorldPosition) {
-        int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
-        int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
-        this.animator.draw(g2d, new Position(posScreenX - Constants.ENTITY_WIDTH / 2, posScreenY - Constants.ENTITY_HEIGHT / 2));
+    public void draw(Graphics2D g2d) {
+        Position screenPos = Camera.worldToScreen(position);
+        this.animator.draw(g2d, new Position(screenPos.getX() - Constants.ENTITY_WIDTH / 2, screenPos.getY() - Constants.ENTITY_HEIGHT / 2));
     }
 
     @Override

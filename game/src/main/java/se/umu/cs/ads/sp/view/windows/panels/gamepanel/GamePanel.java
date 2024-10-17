@@ -29,6 +29,7 @@ import se.umu.cs.ads.sp.view.objects.environments.EnvironmentView;
 import se.umu.cs.ads.sp.view.objects.environments.GoldMineView;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
+import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
@@ -41,9 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
-
-    // TODO: Handle the camera world position in a better way, how i do not know...
-    private Position cameraWorldPosition;
 
     private TileManager tileManager;
     private GameController gController;
@@ -63,8 +61,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-        this.cameraWorldPosition = new Position((int) (((double) UtilView.screenWidth / 2) * UtilView.scale), (int) (((double) UtilView.screenHeight / 2) * UtilView.scale));
-
         this.tileManager = tm;
 
         this.addMouseListener(this);
@@ -73,6 +69,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.setFocusable(true);  // Ensure the panel can receive key events
         this.addKeyListener(this); // Add KeyListener
         this.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
+        this.setBounds(0, 0, UtilView.screenWidth, UtilView.screenHeight);
     }
 
     public void startGame() {
@@ -84,11 +81,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void mouseClicked(MouseEvent e) {
         // Only select a single unit if the user clicked
         // Convert the mouse screen coordinates to world coordinates.
-        int worldX = e.getX() - UtilView.screenX + cameraWorldPosition.getX();
-        int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            gController.setSelection(new Position(worldX, worldY));
+            gController.setSelection(Camera.screenToWorld(e.getX(), e.getY()));
 
             for (long key : gController.getSelectedUnits()) {
                 gameEntitiesView.get(key).setSelected(true);
@@ -100,16 +95,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void mousePressed(MouseEvent e) {
 
         // Convert the mouse screen coordinates to world coordinates.
-        int worldX = e.getX() - UtilView.screenX + cameraWorldPosition.getX();
-        int worldY = e.getY() - UtilView.screenY + cameraWorldPosition.getY();
-
         if (e.getButton() == MouseEvent.BUTTON1) {
             for (long key : gController.getSelectedUnits()) {
                 gameEntitiesView.get(key).setSelected(false);
             }
             startDragPoint = e.getPoint();
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            boolean allowedDestination = gController.setEntityDestination(new Position(worldX, worldY));
+            boolean allowedDestination = gController.setEntityDestination(Camera.screenToWorld(e.getX(), e.getY()));
 
             if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
                 //20 % chance we play move sound
@@ -127,7 +119,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             int y = Math.min(startDragPoint.y, endDragPoint.y);
             int width = Math.abs(startDragPoint.x - endDragPoint.x);
             int height = Math.abs(startDragPoint.y - endDragPoint.y);
-            Rectangle area = new Rectangle(x - UtilView.screenX + cameraWorldPosition.getX(), y - UtilView.screenY + cameraWorldPosition.getY(), width, height);
+            Position dragWorldPosition = Camera.screenToWorld(x, y);
+            Rectangle area = new Rectangle(dragWorldPosition.getX(), dragWorldPosition.getY(), width, height);
             gController.setSelectedUnit(area);
         }
 
@@ -206,18 +199,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 gController.openQuitWindow();
                 break;
             case KeyEvent.VK_RIGHT:
-                cameraWorldPosition.setX(cameraWorldPosition.getX() + 10);
+                Camera.setXPosition(Camera.getPosition().getX() + 20);
                 break;
             case KeyEvent.VK_LEFT:
-                if (cameraWorldPosition.getX() < 0)
+                if (Camera.getPosition().getX() < 0)
                     return;
-                cameraWorldPosition.setX(cameraWorldPosition.getX() - 10);
+                Camera.setXPosition(Camera.getPosition().getX() - 20);
                 break;
             case KeyEvent.VK_UP:
-                cameraWorldPosition.setY(cameraWorldPosition.getY() - 10);
+                Camera.setYPosition(Camera.getPosition().getY() - 20);
                 break;
             case KeyEvent.VK_DOWN:
-                cameraWorldPosition.setY(cameraWorldPosition.getY() + 10);
+                Camera.setYPosition(Camera.getPosition().getY() + 20);
                 break;
             default:
                 break;
@@ -236,13 +229,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         Graphics2D g2d = (Graphics2D) g;
 
         // Draw tile set
-        MiniMap miniMap = tileManager.draw(g2d, cameraWorldPosition);
+        MiniMap miniMap = tileManager.draw(g2d);
 
         // Draw collectables
         for (CollectableView collectableView : collectables.values()) {
             if (tileManager.isInFow(collectableView.getPosition())) {
                 miniMap.addPoint(collectableView.getPosition(), Color.BLACK, 50);
-                collectableView.draw(g2d, cameraWorldPosition);
+                collectableView.draw(g2d);
             }
         }
 
@@ -250,7 +243,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (EnvironmentView environmentView : environments.values()) {
             if (tileManager.isInFow(environmentView.getPosition())) {
                 miniMap.addPoint(environmentView.getPosition(), StyleConstants.GOLD_COLOR, 100);
-                environmentView.draw(g2d, cameraWorldPosition);
+                environmentView.draw(g2d);
             }
         }
 
@@ -262,7 +255,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 } else {
                     miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
                 }
-                entity.draw(g2d, cameraWorldPosition);
+                entity.draw(g2d);
             }
         }
 
@@ -311,8 +304,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             newUnit.setSelected(unit.isSelected());
             newUnit.isMyUnit = true;
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
-            cameraWorldPosition.setX(newUnit.getPosition().getX());
-            cameraWorldPosition.setY(newUnit.getPosition().getY());
+            Camera.setCameraWorldPosition(newUnit.getPosition());
         }
 
         for (Entity entity : entities.values()) {
@@ -394,18 +386,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void moveCamera(int xAmount, int yAmount) {
         if (canMoveCameraHorizontaly(xAmount)) {
-            cameraWorldPosition.setX(cameraWorldPosition.getX() + xAmount);
+            Camera.setXPosition(Camera.getPosition().getX() + xAmount);
         }
         if (canMoveCameraVertically(yAmount)) {
-            cameraWorldPosition.setY(cameraWorldPosition.getY() + yAmount);
+            Camera.setYPosition(Camera.getPosition().getY() + yAmount);
         }
     }
 
     private boolean canMoveCameraVertically(int yAmount) {
-        if (cameraWorldPosition.getY() + yAmount < 0) {
+        if (Camera.getPosition().getY() + yAmount < 0) {
             return false;
         }
-        if ((cameraWorldPosition.getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumRows())) {
+        if ((Camera.getPosition().getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumRows())) {
             return false;
         }
 
@@ -413,15 +405,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     private boolean canMoveCameraHorizontaly(int xAmount) {
-        if (cameraWorldPosition.getX() + xAmount < 0) {
+        if (Camera.getPosition().getX() + xAmount < 0) {
             return false;
         }
-        return cameraWorldPosition.getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumCols();
+        return Camera.getPosition().getX() + xAmount <= Constants.TILE_WIDTH * tileManager.getNumCols();
     }
 
-    public void setCameraWorldPosition(int xAmount, int yAmount) {
-        cameraWorldPosition.setX(xAmount);
-        cameraWorldPosition.setY(yAmount);
+    public void setCameraWorldPosition(Position newCameraPosition) {
+        Camera.setCameraWorldPosition(newCameraPosition);
     }
 
     private void collectEvents() {

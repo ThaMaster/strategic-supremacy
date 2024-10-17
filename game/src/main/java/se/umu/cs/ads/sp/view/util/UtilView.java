@@ -13,7 +13,6 @@ public class UtilView {
     public static int entitySize = (int)(originalEntitySize * scale);
     public static int objectSize = (int)(originalObjectSize * scale);
 
-
     // Should this be here or somewhere else?
     public static final int maxScreenCol = 10;
     public static final int maxScreenRow = 10;

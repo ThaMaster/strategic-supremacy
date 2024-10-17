@@ -8,6 +8,7 @@ import se.umu.cs.ads.sp.view.windows.frames.QuitGameFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.HUDPanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
 import se.umu.cs.ads.sp.view.windows.panels.lobbypanel.LobbyPanel;
 import se.umu.cs.ads.sp.view.windows.panels.start.StartPanel;
@@ -30,6 +31,7 @@ public class MainFrame extends JFrame {
 
     private JLayeredPane layeredPane;
     private GamePanel gamePanel;
+    private HUDPanel hudPanel;
     private LobbyPanel lobbyPanel;
     private StartPanel startPanel;
     private BrowsePanel browsePanel;
@@ -98,8 +100,25 @@ public class MainFrame extends JFrame {
         layeredPane = new JLayeredPane();
         // Add game panel to the layered pane
         gamePanel = new GamePanel(tm);
-        gamePanel.setBounds(0, 0, UtilView.screenWidth, UtilView.screenHeight);
         layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER);
+        // Add palette layer that is the UI here!
+        hudPanel = new HUDPanel();
+        layeredPane.add(hudPanel, JLayeredPane.PALETTE_LAYER);
+
+        // Add a MouseListener to the layeredPane to allow clicks to pass through non-interactive areas
+        layeredPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                // Check if the mouse event is over a UI component (like a button)
+                Component clickedComponent = SwingUtilities.getDeepestComponentAt(hudPanel, e.getX(), e.getY());
+
+                // If it's null, let the game panel handle it
+                if (clickedComponent == null || clickedComponent == hudPanel) {
+                    gamePanel.dispatchEvent(e); // Forward the event to the game panel
+                }
+            }
+        });
+
         layeredPane.setPreferredSize(new Dimension(UtilView.screenWidth, UtilView.screenHeight));
         cardPanel.add(layeredPane, "Game");
         switchPanel("Game");

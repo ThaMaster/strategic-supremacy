@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.model.map.TileModel;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
+import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles.GrassTile;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.tiles.StoneTile;
@@ -60,7 +61,7 @@ public class TileManager {
         return numRows;
     }
 
-    public MiniMap draw(Graphics2D g2d, Position cameraWorldPosition) {
+    public MiniMap draw(Graphics2D g2d) {
         MiniMap miniMap = new MiniMap(150, 150, numCols * UtilView.tileSize, numRows * UtilView.tileSize);
         for (int y = 0; y < viewMap.size(); y++) {
             for (int x = 0; x < viewMap.get(y).size(); x++) {
@@ -68,8 +69,7 @@ public class TileManager {
                 int worldY = y * UtilView.tileSize;
                 if (insideScreen(worldX, worldY)) {
                     TileType type = viewMap.get(y).get(x);
-                    int screenX = worldX - cameraWorldPosition.getX() + UtilView.screenX;
-                    int screenY = worldY - cameraWorldPosition.getY() + UtilView.screenY;
+                    Position screenPos = Camera.worldToScreen(worldX, worldY);
 
                     BufferedImage image;
                     if (fowView.isInFow(new Position(worldX, worldY))) {
@@ -79,7 +79,7 @@ public class TileManager {
                         image = tileMap.get(type).getImage("dark", getTileVariant(x, y));
                         miniMap.addTile(worldX, worldY, type, "dark");
                     }
-                    g2d.drawImage(image, screenX, screenY, UtilView.tileSize, UtilView.tileSize, null);
+                    g2d.drawImage(image, screenPos.getX(), screenPos.getY(), UtilView.tileSize, UtilView.tileSize, null);
                 }
             }
         }

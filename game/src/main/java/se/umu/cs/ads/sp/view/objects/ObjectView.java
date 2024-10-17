@@ -3,7 +3,7 @@ package se.umu.cs.ads.sp.view.objects;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.animation.Animator;
-import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.util.Camera;
 
 import java.awt.*;
 
@@ -17,7 +17,7 @@ public abstract class ObjectView {
 
 
     public ObjectView(long id, Position pos) {
-        this.collisionBox = new CollisionBox(pos, 0,0);
+        this.collisionBox = new CollisionBox(pos, 0, 0);
         this.id = id;
         position = pos;
         animator = new Animator();
@@ -39,19 +39,18 @@ public abstract class ObjectView {
         this.collisionBox = cBox;
     }
 
-    public void drawCollisionBox(Graphics2D g2d, Position cameraPosition) {
-        int colX = collisionBox.getX() - cameraPosition.getX() + UtilView.screenX;
-        int colY = collisionBox.getY() - cameraPosition.getY() + UtilView.screenY;
-        g2d.drawRect(colX, colY,
-                (int)collisionBox.getCollisionShape().getWidth(),
-                (int)collisionBox.getCollisionShape().getHeight());
+    public void drawCollisionBox(Graphics2D g2d) {
+        Position screenPos = Camera.worldToScreen(collisionBox.getX(), collisionBox.getY());
+        g2d.drawRect(screenPos.getX(), screenPos.getY(),
+                (int) collisionBox.getCollisionShape().getWidth(),
+                (int) collisionBox.getCollisionShape().getHeight());
     }
+
     public abstract void update();
 
-    public abstract void draw(Graphics2D g2d, Position cameraWorldPosition);
+    public abstract void draw(Graphics2D g2d);
 
     protected abstract void initAnimator();
-
 
 
 }

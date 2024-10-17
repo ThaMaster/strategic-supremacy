@@ -6,6 +6,8 @@ import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Utils;
 
 import javax.swing.*;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,6 +23,7 @@ public class Main {
                 System.err.println(e.getMessage());
             }
         };
+
         SwingUtilities.invokeLater(startApp);
 
     }

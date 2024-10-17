@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
+import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
@@ -17,26 +18,24 @@ public class PlayerUnitView extends EntityView {
     }
 
     @Override
-    public void draw(Graphics2D g2d, Position cameraWorldPosition) {
-        int posScreenX = position.getX() - cameraWorldPosition.getX() + UtilView.screenX;
-        int posScreenY = position.getY() - cameraWorldPosition.getY() + UtilView.screenY;
+    public void draw(Graphics2D g2d) {
+        Position screenPos = Camera.worldToScreen(position);
 
         if (state == EntityState.RUNNING && selected) {
             g2d.setColor(Color.GREEN);
-            int desScreenX = destination.getX() - cameraWorldPosition.getX() + UtilView.screenX;
-            int desScreenY = destination.getY() - cameraWorldPosition.getY() + UtilView.screenY;
+            Position screenDestination = Camera.worldToScreen(destination);
 
-            g2d.drawLine(posScreenX, posScreenY, desScreenX, desScreenY);
-            g2d.fillRect(desScreenX - 4, desScreenY - 4, 8, 8);
+            g2d.drawLine(screenPos.getX(), screenPos.getY(), screenDestination.getX(), screenDestination.getY());
+            g2d.fillRect(screenDestination.getX() - 4, screenDestination.getY() - 4, 8, 8);
         }
         
         if (AppSettings.DEBUG) {
-            drawCollisionBox(g2d, cameraWorldPosition);
+            drawCollisionBox(g2d);
             g2d.setColor(Color.RED);
-            g2d.drawOval(posScreenX - attackRange, posScreenY - attackRange, attackRange * 2, attackRange * 2);
+            g2d.drawOval(screenPos.getX() - attackRange, screenPos.getY() - attackRange, attackRange * 2, attackRange * 2);
         }
 
-        this.animator.draw(g2d, new Position(posScreenX, posScreenY));
+        this.animator.draw(g2d, screenPos);
     }
 
     @Override
