@@ -13,8 +13,8 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +51,7 @@ public class GameClient {
         }
     }
 
-    public void startGame(StartGameRequest req) {
+    public void startGame(StartGameRequestDTO req) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .startGame(GrpcUtil.toGrpcStartGameReq(req));
@@ -71,7 +71,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void updateUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
+    public void updateUnits(PlayerUnitUpdateRequestDTO playerUnitUpdateRequest) {
         System.out.println("[Client] Trying to update enemy units...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)

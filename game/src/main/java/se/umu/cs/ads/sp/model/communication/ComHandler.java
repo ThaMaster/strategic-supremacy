@@ -5,8 +5,8 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
@@ -83,12 +83,12 @@ public class ComHandler {
         return nsClient.fetchLobbies();
     }
 
-    public void sendStartGameRequest(StartGameRequest req, User user) {
+    public void sendStartGameRequest(StartGameRequestDTO req, User user) {
         GameClient client = l3Clients.get(user.id);
         client.startGame(req);
     }
 
-    public void updatePlayerUnits(PlayerUnitUpdateRequest req, ArrayList<Long> playerIds) {
+    public void updatePlayerUnits(PlayerUnitUpdateRequestDTO req, ArrayList<Long> playerIds) {
         for (Long id : playerIds) {
             if (id == controller.getModelManager().getPlayer().id) {
                 continue;
@@ -97,7 +97,7 @@ public class ComHandler {
         }
     }
 
-    public void startGame(StartGameRequest req) {
+    public void startGame(StartGameRequestDTO req) {
         controller.startGame(req);
     }
 
@@ -127,7 +127,7 @@ public class ComHandler {
         }
     }
 
-    public void updateEnemyUnits(PlayerUnitUpdateRequest req) {
+    public void updateEnemyUnits(PlayerUnitUpdateRequestDTO req) {
         modelManager.getObjectHandler().updateEnemyUnits(req.unitUpdates());
     }
 

@@ -2,15 +2,13 @@ package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.controller.GameController;
-import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.CompleteUnitInfoDTO;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequest;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -20,7 +18,6 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -161,7 +158,7 @@ public class ModelManager {
 
     public void startGame() {
         System.out.println("[Client] Sending out start request to lobby...");
-        StartGameRequest req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
+        StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
         for (User user : lobbyHandler.getLobby().users) {
             if (user.id != player.id) {
                 comHandler.sendStartGameRequest(req, user);
@@ -186,7 +183,7 @@ public class ModelManager {
         comHandler.sendL3Update(lobbyHandler.getLobby().leader.id == player.id);
     }
     // A request has come in to start the game
-    public void startGameReq(StartGameRequest request) {
+    public void startGameReq(StartGameRequestDTO request) {
         //Check bounding boxes
         objectHandler.populateWorld(request, map);
         //comhandler.addL2(
@@ -207,7 +204,7 @@ public class ModelManager {
         lobbyHandler.leaveLobby();
     }
 
-    public PlayerUnitUpdateRequest createUnitUpdateRequest(long targetId) {
+    public PlayerUnitUpdateRequestDTO createUnitUpdateRequest(long targetId) {
         ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
             unitUpdates.add(new CompleteUnitInfoDTO(
@@ -219,7 +216,7 @@ public class ModelManager {
                     unit.getCurrentHp(),
                     unit.getSpeed()));
         }
-        return new PlayerUnitUpdateRequest(unitUpdates, player.id);
+        return new PlayerUnitUpdateRequestDTO(unitUpdates, player.id);
     }
 
     public ArrayList<Long> getPlayersToUpdate() {

@@ -1,5 +1,8 @@
 package se.umu.cs.ads.sp.model.communication;
 
+import org.checkerframework.checker.units.qual.A;
+import proto.Environment;
+import proto.L3Message;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.dto.*;
@@ -63,7 +66,7 @@ public class GrpcUtil {
                 .build();
     }
 
-    public static proto.StartGameRequest toGrpcStartGameReq(StartGameRequest req) {
+    public static proto.StartGameRequest toGrpcStartGameReq(StartGameRequestDTO req) {
         proto.StartGameRequest.Builder builder = proto.StartGameRequest.newBuilder();
 
         builder.setEntities(toGrpcEntitySkeletons(req.entitySkeletons()));
@@ -117,8 +120,8 @@ public class GrpcUtil {
                 fromGrpcReward(collectable.getReward()));
     }
 
-    public static StartGameRequest fromGrpcStartGameReq(proto.StartGameRequest req) {
-        StartGameRequest data = new StartGameRequest(fromGrpcEntitySkeletons(req.getEntities()), new ArrayList<>(), new ArrayList<>());
+    public static StartGameRequestDTO fromGrpcStartGameReq(proto.StartGameRequest req) {
+        StartGameRequestDTO data = new StartGameRequestDTO(fromGrpcEntitySkeletons(req.getEntities()), new ArrayList<>(), new ArrayList<>());
 
         for (proto.Environment env : req.getEnvironmentsList()) {
             data.addEnvironment(fromGrpcEnv(env));
@@ -143,6 +146,48 @@ public class GrpcUtil {
                 .setIp(user.ip)
                 .setUsername(user.username)
                 .build();
+    }
+
+
+    public static proto.L3Message toGrpcL3Message(L3UpdateDTO message){
+        proto.L3Message.Builder builder = proto.L3Message.newBuilder();
+
+        for(long pickedUpCollectables : message.pickedUpCollectables()){
+            builder.addPickedUpCollectables(pickedUpCollectables);
+        }
+        for(EnvironmentDTO env : message.environments()){
+            builder.addEnvironments(toGrpcEnvironment(env));
+        }
+
+        builder.setEntities(toGrpcEntitySkeletons(message.entities()))
+                .setRemainingTime(message.remainingTime())
+                .setCurrentScoreLeader(message.currentScoreLeader())
+                .setSeverity(message.msgSeverity());
+
+        return builder.build();
+    }
+
+    public static L3UpdateDTO fromGrpcL3Message(proto.L3Message message){
+        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+        ArrayList<EnvironmentDTO> environments = new ArrayList<>();
+        ArrayList<Long> pickedUp = new ArrayList<>();
+
+        entities = fromGrpcEntitySkeletons(message.getEntities());
+        for(int i = 0; i < message.getEnvironmentsCount(); i++){
+            environments.add(fromGrpcEnv(message.getEnvironments(i)));
+        }
+        for(int i = 0; i < message.getPickedUpCollectablesCount(); i++){
+            pickedUp.add(message.getPickedUpCollectables(i));
+        }
+
+        return new L3UpdateDTO(
+                entities,
+                pickedUp,
+                message.getRemainingTime(),
+                message.getCurrentScoreLeader(),
+                environments,
+                message.getSeverity()
+        );
     }
 
     public static Lobby fromGrpcLobby(proto.DetailedLobbyInfo request) {
@@ -192,7 +237,7 @@ public class GrpcUtil {
         return new CompleteUnitInfoDTO(unit.getUnitId(), unit.getTargetUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
     }
 
-    public static proto.PlayerUnits toGrpcUpdatePlayerUnits(PlayerUnitUpdateRequest playerUnitUpdateRequest) {
+    public static proto.PlayerUnits toGrpcUpdatePlayerUnits(PlayerUnitUpdateRequestDTO playerUnitUpdateRequest) {
         proto.PlayerUnits.Builder builder = proto.PlayerUnits.newBuilder()
                 .setUserId(playerUnitUpdateRequest.playerId());
         for (CompleteUnitInfoDTO unit : playerUnitUpdateRequest.unitUpdates()) {
@@ -201,11 +246,11 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static PlayerUnitUpdateRequest fromGrpcUpdatePlayerUnits(proto.PlayerUnits updateRequest) {
+    public static PlayerUnitUpdateRequestDTO fromGrpcUpdatePlayerUnits(proto.PlayerUnits updateRequest) {
         ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
         for (proto.PlayerUnit unit : updateRequest.getUnitsList()) {
             unitUpdates.add(fromGrpcUnitInfo(unit));
         }
-        return new PlayerUnitUpdateRequest(unitUpdates, updateRequest.getUserId());
+        return new PlayerUnitUpdateRequestDTO(unitUpdates, updateRequest.getUserId());
     }
 }

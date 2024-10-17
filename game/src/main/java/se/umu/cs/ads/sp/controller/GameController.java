@@ -4,7 +4,7 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequest;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.Direction;
@@ -39,7 +39,7 @@ public class GameController implements ActionListener {
         this.timer = new Timer(1000 / FPS, this);
     }
 
-    public void startGame(StartGameRequest req) {
+    public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
         mainFrame.showGamePanel(tileManager);
         mainFrame.getGamePanel().setGameController(this);

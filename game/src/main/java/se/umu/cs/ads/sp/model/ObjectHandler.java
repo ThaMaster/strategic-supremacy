@@ -150,8 +150,8 @@ public class ObjectHandler {
         return environments;
     }
 
-    public StartGameRequest initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
-        StartGameRequest startGameRequest = new StartGameRequest(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
+        StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
         for (User user : users) {
             long userId = user.id;
@@ -194,7 +194,7 @@ public class ObjectHandler {
         return startGameRequest;
     }
 
-    public void populateWorld(StartGameRequest request, Map map) {
+    public void populateWorld(StartGameRequestDTO request, Map map) {
 
         for (EnvironmentDTO env : request.environments()) {
             DtoTypes type = DtoTypes.fromLabel(env.type());
