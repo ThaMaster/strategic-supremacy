@@ -1,8 +1,7 @@
 package se.umu.cs.ads.sp.view.animation;
 
-import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.util.Camera;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -34,7 +33,7 @@ public class Animator {
 
     public void update() {
         // Change animation frame
-        if(currentAnimation != null && !paused) {
+        if (currentAnimation != null && !paused) {
             currentAnimation.update();
         }
     }
@@ -45,13 +44,12 @@ public class Animator {
 
     public void draw(Graphics2D g2d, Position pos) {
         // Draw the current frame of animation
-        if(currentAnimation != null) {
-            BufferedImage frame = currentAnimation.getCurrentFrame();
-            if(flipped) {
-                g2d.drawImage(frame, frame.getWidth()+pos.getX() - (frame.getWidth()/2), pos.getY() - (frame.getHeight()/2), -frame.getWidth(), frame.getHeight(), null);
-            } else {
-                g2d.drawImage(frame, pos.getX() - (frame.getWidth()/2), pos.getY() - (frame.getHeight()/2), frame.getWidth(), frame.getHeight(), null);
-            }
+        BufferedImage frame = currentAnimation.getCurrentFrame();
+        Position screenPos = new Position(
+                flipped ? frame.getWidth() + pos.getX() - (frame.getWidth() / 2) : pos.getX() - (frame.getWidth() / 2),
+                pos.getY() - (frame.getHeight() / 2));
+        if (currentAnimation != null && Camera.screenPosInsideScreen(screenPos, frame.getWidth(), frame.getHeight())) {
+            g2d.drawImage(frame, screenPos.getX(), screenPos.getY(), -frame.getWidth(), frame.getHeight(), null);
         }
     }
 

@@ -4,8 +4,7 @@ import se.umu.cs.ads.sp.utils.Position;
 
 public class Camera {
 
-    private static Position camPos = new Position(0, 0);
-
+    private static final Position camPos = new Position(0, 0);
 
     public static void setXPosition(int x) {
         camPos.setX(x);
@@ -25,36 +24,36 @@ public class Camera {
     }
 
     public static Position screenToWorld(int screenX, int screenY) {
-        int worldX = camPos.getX() + (screenX - UtilView.screenWidth / 2) / (int) UtilView.scale;
-        int worldY = camPos.getY() + (screenY - UtilView.screenHeight / 2) / (int) UtilView.scale;
-        return new Position(worldX, worldY);
+        return new Position(
+                camPos.getX() + (screenX - UtilView.screenWidth / 2) / (int) UtilView.scale,
+                camPos.getY() + (screenY - UtilView.screenHeight / 2) / (int) UtilView.scale);
     }
 
     public static Position worldToScreen(int worldX, int worldY) {
-        int screenX = ((worldX - camPos.getX()) * (int) UtilView.scale + UtilView.screenWidth / 2);
-        int screenY = ((worldY - camPos.getY()) * (int) UtilView.scale + UtilView.screenHeight / 2);
-        return new Position(screenX, screenY);
+        return new Position(
+                (worldX - camPos.getX()) * (int) UtilView.scale + UtilView.screenWidth / 2,
+                (worldY - camPos.getY()) * (int) UtilView.scale + UtilView.screenHeight / 2);
     }
 
     public static Position worldToScreen(Position position) {
-        int screenX = ((position.getX() - camPos.getX()) * (int) UtilView.scale + UtilView.screenWidth / 2);
-        int screenY = ((position.getY() - camPos.getY()) * (int) UtilView.scale + UtilView.screenHeight / 2);
-        return new Position(screenX, screenY);
+        return new Position(
+                (position.getX() - camPos.getX()) * (int) UtilView.scale + UtilView.screenWidth / 2,
+                (position.getY() - camPos.getY()) * (int) UtilView.scale + UtilView.screenHeight / 2);
     }
 
-    public static boolean insideScreen(Position position, int tileSize) {
+    public static boolean worldPosInsideScreen(Position worldPos, int width, int height) {
         // Convert the world position to screen position
-        Position screenPos = worldToScreen(position);
-
-        // Check if the tile is within the screen bounds, taking its size into account
-        int screenX = screenPos.getX();
-        int screenY = screenPos.getY();
+        Position screenPos = worldToScreen(worldPos);
 
         // Check if any part of the tile is within the screen
-        boolean withinXBounds = screenX + tileSize >= 0 && screenX <= UtilView.screenWidth;
-        boolean withinYBounds = screenY + tileSize >= 0 && screenY <= UtilView.screenHeight;
+        return screenPos.getX() + width >= 0 && screenPos.getX() + 500 <= UtilView.screenWidth &&
+                screenPos.getY() + height >= 0 && screenPos.getY() + 500 <= UtilView.screenHeight;
+    }
 
-        return withinXBounds && withinYBounds;
+    public static boolean screenPosInsideScreen(Position screenPos, int width, int height) {
+        // Check if any part of the tile is within the screen
+        return screenPos.getX() + width >= 0 && screenPos.getX() <= UtilView.screenWidth &&
+                screenPos.getY() + height >= 0 && screenPos.getY() <= UtilView.screenHeight;
     }
 
 }

@@ -71,7 +71,7 @@ public class TileManager {
                 TileType type = viewMap.get(y).get(x);
                 miniMap.addTile(tileWorldPosition.getX(), tileWorldPosition.getY(), type, variant);
 
-                if (Camera.insideScreen(tileWorldPosition, UtilView.tileSize)) {
+                if (Camera.worldPosInsideScreen(tileWorldPosition, UtilView.tileSize, UtilView.tileSize)) {
                     Position screenPos = Camera.worldToScreen(tileWorldPosition);
                     BufferedImage image = tileMap.get(type).getImage(variant, getTileVariant(x, y));
                     g2d.drawImage(image, screenPos.getX(), screenPos.getY(), UtilView.tileSize, UtilView.tileSize, null);

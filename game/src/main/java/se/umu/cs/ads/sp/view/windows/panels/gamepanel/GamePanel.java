@@ -18,6 +18,7 @@ import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
+import se.umu.cs.ads.sp.view.objects.ObjectView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
@@ -104,7 +105,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             boolean allowedDestination = gController.setEntityDestination(Camera.screenToWorld(e.getX(), e.getY()));
 
             if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
-                //20 % chance we play move sound
+                // 80 % chance we play move sound
                 if (Utils.getRandomSuccess(80)) {
                     SoundManager.getInstance().playMove();
                 }
@@ -119,6 +120,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             int y = Math.min(startDragPoint.y, endDragPoint.y);
             int width = Math.abs(startDragPoint.x - endDragPoint.x);
             int height = Math.abs(startDragPoint.y - endDragPoint.y);
+
             Position dragWorldPosition = Camera.screenToWorld(x, y);
             Rectangle area = new Rectangle(dragWorldPosition.getX(), dragWorldPosition.getY(), width, height);
             gController.setSelectedUnit(area);
@@ -179,9 +181,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void keyPressed(KeyEvent e) {
+
         for (long unitIds : gController.getSelectedUnits()) {
             gameEntitiesView.get(unitIds).setSelected(false);
         }
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_1:
                 gController.setSelection(0);
@@ -231,32 +235,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         // Draw tile set
         MiniMap miniMap = tileManager.draw(g2d);
 
-        // Draw collectables
-        for (CollectableView collectableView : collectables.values()) {
-            if (tileManager.isInFow(collectableView.getPosition())) {
-                miniMap.addPoint(collectableView.getPosition(), Color.BLACK, 50);
-                collectableView.draw(g2d);
-            }
+        // Collectable, Environment, and Entity rendering loop
+        for (var collectableView : collectables.values()) {
+            renderObject(g2d, miniMap, collectableView, Color.BLACK, 50);
         }
-
-        // Draw environment objects
-        for (EnvironmentView environmentView : environments.values()) {
-            if (tileManager.isInFow(environmentView.getPosition())) {
-                miniMap.addPoint(environmentView.getPosition(), StyleConstants.GOLD_COLOR, 100);
-                environmentView.draw(g2d);
-            }
+        for (var environmentView : environments.values()) {
+            renderObject(g2d, miniMap, environmentView, StyleConstants.GOLD_COLOR, 100);
         }
-
-        // Draw entities
-        for (EntityView entity : gameEntitiesView.values()) {
-            if (tileManager.isInFow(entity.getPosition())) {
-                if (entity.isMyUnit) {
-                    miniMap.addPoint(entity.getPosition(), StyleConstants.ALLY_COLOR, 50);
-                } else {
-                    miniMap.addPoint(entity.getPosition(), StyleConstants.ENEMY_COLOR, 50);
-                }
-                entity.draw(g2d);
-            }
+        for (var entity : gameEntitiesView.values()) {
+            Color entityColor = entity.isMyUnit ? StyleConstants.ALLY_COLOR : StyleConstants.ENEMY_COLOR;
+            renderObject(g2d, miniMap, entity, entityColor, 50);
         }
 
         collectEvents();
@@ -277,6 +265,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 break;
             }
             animation.update();
+        }
+    }
+
+    private void renderObject(Graphics2D g2d, MiniMap miniMap, ObjectView entity, Color minimapColor, int pointSize) {
+        if (tileManager.isInFow(entity.getPosition())) {
+            miniMap.addPoint(entity.getPosition(), minimapColor, pointSize);
+            entity.draw(g2d);
         }
     }
 

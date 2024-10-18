@@ -56,6 +56,7 @@ public class MiniMap {
     public void addCameraBox() {
         int topLeftX = Camera.getPosition().getX() - UtilView.screenWidth / 2;
         int topLeftY = Camera.getPosition().getY() - UtilView.screenHeight / 2;
+
         int minimapX = (int) Math.floor(topLeftX * scaleX);
         int minimapY = (int) Math.floor(topLeftY * scaleY);
         // Convert the camera's width and height to minimap dimensions
@@ -92,7 +93,7 @@ public class MiniMap {
                 mapGraphics.fillRect(minimapX, minimapY, mapTileWidth, mapTileHeight);
             }
         }
-
+        mapGraphics.dispose();
         return mapImage;
     }
 }

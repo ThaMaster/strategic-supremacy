@@ -7,7 +7,6 @@ import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
-import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
@@ -28,7 +27,7 @@ public class PlayerUnitView extends EntityView {
             g2d.drawLine(screenPos.getX(), screenPos.getY(), screenDestination.getX(), screenDestination.getY());
             g2d.fillRect(screenDestination.getX() - 4, screenDestination.getY() - 4, 8, 8);
         }
-        
+
         if (AppSettings.DEBUG) {
             drawCollisionBox(g2d);
             g2d.setColor(Color.RED);

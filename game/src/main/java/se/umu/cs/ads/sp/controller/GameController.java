@@ -2,11 +2,11 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
@@ -190,7 +190,7 @@ public class GameController implements ActionListener {
                 inputName = "Default User";
             }
             mainFrame.setPlayerName(inputName);
-            GameController.this.player = new User(inputName, Util.getLocalIP(), Util.getFreePort());
+            GameController.this.player = new User(inputName, Utils.getLocalIP(), Utils.getFreePort());
             modelManager = new ModelManager(GameController.this, GameController.this.player);
             tileManager = new TileManager();
             tileManager.setMap(modelManager.getMap().getModelMap());
