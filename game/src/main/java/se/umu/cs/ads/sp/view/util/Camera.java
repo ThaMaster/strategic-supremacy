@@ -46,8 +46,8 @@ public class Camera {
         Position screenPos = worldToScreen(worldPos);
 
         // Check if any part of the tile is within the screen
-        return screenPos.getX() + width >= 0 && screenPos.getX() + 500 <= UtilView.screenWidth &&
-                screenPos.getY() + height >= 0 && screenPos.getY() + 500 <= UtilView.screenHeight;
+        return screenPos.getX() + width >= 0 && screenPos.getX() <= UtilView.screenWidth &&
+                screenPos.getY() + height >= 0 && screenPos.getY() <= UtilView.screenHeight;
     }
 
     public static boolean screenPosInsideScreen(Position screenPos, int width, int height) {
