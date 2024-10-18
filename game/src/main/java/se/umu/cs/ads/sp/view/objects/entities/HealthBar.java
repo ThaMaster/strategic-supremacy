@@ -11,14 +11,18 @@ public class HealthBar {
     private BufferedImage healthContainer;  // The container image (e.g., a frame with background)
     private BufferedImage healthBar;        // The red health bar image
     private int maxHealth = 100;
-    private int currentHealth = 60;
+    private int currentHealth = 100;
 
     public HealthBar() {
         healthContainer = ImageLoader.loadImage("/sprites/hud/healthContainer.png");
         healthBar = ImageLoader.loadImage("/sprites/hud/healthBar.png");  // Load the red health bar image
     }
 
-    public void setHealth(int currentHealth) {
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    public void setCurrentHealth(int currentHealth) {
         this.currentHealth = Math.max(0, Math.min(currentHealth, maxHealth));  // Ensure health is within bounds
     }
 

@@ -1,11 +1,11 @@
 package se.umu.cs.ads.sp.controller;
 
-import proto.PlayerUnit;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
@@ -118,13 +118,17 @@ public class GameController implements ActionListener {
 
     public void setSelection(Position clickLocation) {
         modelManager.getObjectHandler().setSelection(clickLocation);
+        updateHudSelectionInfo();
     }
 
     public void setSelection(int index) {
-        long entityId = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(index).getId();
-        modelManager.setSelection(entityId);
-        Position newCameraPos = modelManager.getObjectHandler().getMyUnits().get(entityId).getPosition();
+        PlayerUnit unit = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(index);
+        modelManager.setSelection(unit.getId());
+
+        Position newCameraPos = unit.getPosition();
         mainFrame.getGamePanel().setCameraWorldPosition(newCameraPos);
+
+        updateHudSelectionInfo();
     }
 
     public ArrayList<Long> getSelectedUnits() {
@@ -141,6 +145,17 @@ public class GameController implements ActionListener {
 
     public void setSelectedUnit(Rectangle area) {
         this.modelManager.getObjectHandler().setSelectedUnits(area);
+        updateHudSelectionInfo();
+    }
+
+    private void updateHudSelectionInfo() {
+        ArrayList<PlayerUnit> selectedUnits = modelManager.getObjectHandler().getSelectedUnits();
+
+        ArrayList<String> unitNames = new ArrayList<>();
+        for (PlayerUnit unit : selectedUnits) {
+            unitNames.add(unit.getEntityName());
+        }
+        mainFrame.getHudPanel().updateSelectedUnit(unitNames);
     }
 
     // Action listener things

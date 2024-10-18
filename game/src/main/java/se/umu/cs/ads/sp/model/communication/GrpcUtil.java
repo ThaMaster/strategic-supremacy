@@ -94,6 +94,7 @@ public class GrpcUtil {
         return new EntitySkeletonDTO(
                 skeletons.getId(),
                 skeletons.getUserId(),
+                skeletons.getUnitType(),
                 fromGrpcPosition(skeletons.getPosition()));
     }
 

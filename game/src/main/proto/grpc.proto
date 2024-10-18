@@ -28,9 +28,10 @@ message PlayerUnits {
 }
 
 message EntitySkeleton {
-    int64 id = 1;
-    int64 userId = 2;
-    Position position = 3;
+  int64 id = 1;
+  int64 userId = 2;
+  string unitType = 3;
+  Position position = 4;
 }
 
 message EntitySkeletons {
@@ -38,29 +39,29 @@ message EntitySkeletons {
 }
 
 message Reward {
-    int32 quantity = 1;
-    string reward = 2;
+  int32 quantity = 1;
+  string reward = 2;
 }
 
 message Collectable {
-    int64 id = 1;
-    Position position = 2;
-    string type = 3;
-    Reward reward = 4;
+  int64 id = 1;
+  Position position = 2;
+  string type = 3;
+  Reward reward = 4;
 }
 
 message Environment {
-    int64 id = 1;
-    int64 userId = 3;
-    Position position = 4;
-    string type = 5;
-    int32 remainingResource = 6;
+  int64 id = 1;
+  int64 userId = 3;
+  Position position = 4;
+  string type = 5;
+  int32 remainingResource = 6;
 }
 
 message StartGameRequest {
-    EntitySkeletons entities = 1;
-    repeated Collectable collectables = 2;
-    repeated Environment environments = 3;
+  EntitySkeletons entities = 1;
+  repeated Collectable collectables = 2;
+  repeated Environment environments = 3;
 }
 
 message L3Message {

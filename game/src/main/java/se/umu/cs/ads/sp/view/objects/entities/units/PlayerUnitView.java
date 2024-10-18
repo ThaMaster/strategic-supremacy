@@ -8,13 +8,16 @@ import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
-import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
 public class PlayerUnitView extends EntityView {
-    public PlayerUnitView(long id, Position pos) {
+
+    public String unitName = "";
+
+    public PlayerUnitView(long id, String name, Position pos) {
         super(id, pos);
+        this.unitName = name;
         initAnimator();
     }
 
@@ -22,12 +25,17 @@ public class PlayerUnitView extends EntityView {
     public void draw(Graphics2D g2d) {
         Position screenPos = Camera.worldToScreen(position);
 
-        if (state == EntityState.RUNNING && selected) {
-            g2d.setColor(Color.GREEN);
-            Position screenDestination = Camera.worldToScreen(destination);
+        if (selected) {
+            Position hpBarPosition = new Position(screenPos.getX(), screenPos.getY() - (int) (Constants.ENTITY_HEIGHT * 0.75));
+            this.healthBar.draw(g2d, hpBarPosition, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT / 4);
 
-            g2d.drawLine(screenPos.getX(), screenPos.getY(), screenDestination.getX(), screenDestination.getY());
-            g2d.fillRect(screenDestination.getX() - 4, screenDestination.getY() - 4, 8, 8);
+            if (state == EntityState.RUNNING) {
+                g2d.setColor(Color.GREEN);
+                Position screenDestination = Camera.worldToScreen(destination);
+
+                g2d.drawLine(screenPos.getX(), screenPos.getY(), screenDestination.getX(), screenDestination.getY());
+                g2d.fillRect(screenDestination.getX() - 4, screenDestination.getY() - 4, 8, 8);
+            }
         }
 
         if (AppSettings.DEBUG) {
@@ -35,9 +43,7 @@ public class PlayerUnitView extends EntityView {
             g2d.setColor(Color.RED);
             g2d.drawOval(screenPos.getX() - attackRange, screenPos.getY() - attackRange, attackRange * 2, attackRange * 2);
         }
-
         this.animator.draw(g2d, screenPos);
-        this.healthBar.draw(g2d, screenPos, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT/4);
     }
 
     @Override

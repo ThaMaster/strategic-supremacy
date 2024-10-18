@@ -59,7 +59,9 @@ public abstract class EntityView extends ObjectView {
     public void setHasBeenHit(boolean bool) {
         this.hasBeenHit = bool;
     }
-    public HealthBar getHealthBar() {
-        return healthBar;
+
+    public void setHealthBarValues(int maxHp, int currentHp) {
+        this.healthBar.setMaxHealth(maxHp);
+        this.healthBar.setCurrentHealth(currentHp);
     }
 }

@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class HUDPanel extends JPanel {
@@ -55,10 +57,10 @@ public class HUDPanel extends JPanel {
         selectedUnitLabel = createHUDLabel("", 20, UtilView.screenHeight - 100, 300, 30);
         selectedUnitHealthLabel = createHUDLabel("", 20, UtilView.screenHeight - 60, 150, 30);
 
-        openShopButton = createHUDUpgradeButton(UtilView.screenWidth - 100, UtilView.screenHeight - 60, 75, 50);
+        openShopButton = createHUDShopButton(UtilView.screenWidth - 100, UtilView.screenHeight - 60, 75, 50);
 
-        upgradePanel = new UpgradePanel(316, 316);
-        upgradePanel.setBounds(UtilView.screenWidth / 2 - 158, UtilView.screenHeight / 2 - 158, 316, 316);
+        upgradePanel = new UpgradePanel(500, 500, 2);
+        upgradePanel.setBounds(UtilView.screenWidth / 2 - 250, UtilView.screenHeight / 2 - 250, 500, 500);
 
         // Add components to HUDPanel
         this.add(timerPanel);
@@ -81,7 +83,7 @@ public class HUDPanel extends JPanel {
         return label;
     }
 
-    private JButton createHUDUpgradeButton(int x, int y, int width, int height) {
+    private JButton createHUDShopButton(int x, int y, int width, int height) {
         Image defaultImage = Objects.requireNonNull(
                         ImageLoader.loadImage("/sprites/hud/buttons/buttonLarge.png"))
                 .getScaledInstance(width, height, Image.SCALE_FAST);
@@ -93,6 +95,7 @@ public class HUDPanel extends JPanel {
         ImageIcon pressedIcon = new ImageIcon(pressedImage);
         JButton button = new JButton(defaultIcon);
         button.setBounds(x, y, width, height);
+
         // Remove any default button decorations like borders
         button.setBorderPainted(false);
         button.setFocusPainted(false);
@@ -133,26 +136,43 @@ public class HUDPanel extends JPanel {
         scoreLabel.setText("Score: " + score);
     }
 
-    public void updateSelectedUnit(ArrayList<String> unitNames, ArrayList<Integer> health) {
+    public void updateSelectedUnit(ArrayList<String> unitNames) {
         StringBuilder nameBuilder = new StringBuilder();
-        StringBuilder statsBuilder = new StringBuilder();
+
         if (unitNames.size() == 1) {
-            nameBuilder.append("Selected Unit: ").append(unitNames.get(0));
-            statsBuilder.append("Health: ").append(health.get(0));
-        } else {
-            nameBuilder.append("Selected Units: ");
-            statsBuilder.append("Health: ");
-            for (int i = 0; i < unitNames.size(); i++) {
-                nameBuilder.append(unitNames.get(i));
-                statsBuilder.append(health.get(i));
-                if (i + 1 != unitNames.size()) {
-                    statsBuilder.append(", ");
-                }
+            // If only one unit is selected, simply append its name
+            nameBuilder.append("Selected: ").append(unitNames.get(0));
+        } else if (!unitNames.isEmpty()) {
+            nameBuilder.append("Selected: ");
+
+            // Use a LinkedHashMap to count the occurrences of each unit name
+            Map<String, Integer> unitCountMap = new LinkedHashMap<>();
+            for (String unitName : unitNames) {
+                unitCountMap.put(unitName, unitCountMap.getOrDefault(unitName, 0) + 1);
             }
+            // Build the names string
+            for (Map.Entry<String, Integer> entry : unitCountMap.entrySet()) {
+                String unitName = entry.getKey();
+                int count = entry.getValue();
+                // Append the unit name with its count if greater than 1
+                if (count > 1) {
+                    nameBuilder.append("[").append(count).append("] ").append(unitName);
+                } else {
+                    nameBuilder.append(unitName);
+                }
+                // Append comma if there are more units to process
+                nameBuilder.append(", ");
+            }
+
+            // Remove trailing comma
+            nameBuilder.setLength(nameBuilder.length() - 2);
         }
+
+        // Update the label with the built names string
         selectedUnitLabel.setText(nameBuilder.toString());
-        selectedUnitHealthLabel.setText(statsBuilder.toString());
     }
+
+
 
     /**
      * Clear the selected unit's information (when no unit is selected).

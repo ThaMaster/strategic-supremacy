@@ -291,20 +291,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g2d.drawRect(x, y, width, height);
     }
 
-    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, PlayerUnit> entities) {
+    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, PlayerUnit> enemyUnits) {
         this.gameEntitiesView.clear();
 
         for (PlayerUnit unit : myUnits.values()) {
-            PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getPosition());
+            PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getEntityName(), unit.getPosition());
             newUnit.setSelected(unit.isSelected());
             newUnit.isMyUnit = true;
+            newUnit.setHealthBarValues(unit.getMaxHp(), unit.getCurrentHp());
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
             Camera.setPosition(newUnit.getPosition());
         }
 
-        for (Entity entity : entities.values()) {
-            EntityView newEntity = new EnemyUnitView(entity.getId(), entity.getPosition());
-            this.gameEntitiesView.put(newEntity.getId(), newEntity);
+        for (PlayerUnit enemyUnit : enemyUnits.values()) {
+            EnemyUnitView newUnit = new EnemyUnitView(enemyUnit.getId(), enemyUnit.getEntityName(), enemyUnit.getPosition());
+            newUnit.setHealthBarValues(enemyUnit.getMaxHp(), enemyUnit.getCurrentHp());
+            this.gameEntitiesView.put(newUnit.getId(), newUnit);
         }
     }
 
@@ -365,6 +367,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 entity.setInRange(modelUnit.isInAttackRange());
                 entity.setHasAttacked(modelUnit.hasAttacked());
                 entity.setHasBeenHit(modelUnit.hasBeenHit());
+                entity.setHealthBarValues(entityModel.getMaxHp(), entityModel.getCurrentHp());
                 entity.update();
                 if (entity.isMyUnit) {
                     myUnits.add((PlayerUnitView) entity);

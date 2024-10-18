@@ -12,7 +12,6 @@ public class LobbyHandler {
 
     public LobbyHandler(ModelManager modelManager) {
         this.modelManager = modelManager;
-
     }
 
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
@@ -22,7 +21,6 @@ public class LobbyHandler {
         lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
         lobby.currentPlayers = 1;
-
     }
 
     public void leaveLobby() {

@@ -7,16 +7,16 @@ public enum DtoTypes {
     GOLDMINE("GOLDMINE"),
     GOLD("GOLD");
 
-    public final String type;
-    DtoTypes(String type){
-        this.type = type;
-    }
+    public final String label;
 
+    DtoTypes(String label) {
+        this.label = label;
+    }
 
 
     public static DtoTypes fromLabel(String label) {
         for (DtoTypes typeEnum : DtoTypes.values()) {
-            if (typeEnum.type.equalsIgnoreCase(label)) {
+            if (typeEnum.label.equalsIgnoreCase(label)) {
                 return typeEnum;
             }
         }

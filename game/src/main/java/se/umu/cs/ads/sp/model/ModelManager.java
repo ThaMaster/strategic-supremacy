@@ -9,7 +9,6 @@ import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -168,27 +167,27 @@ public class ModelManager {
         startL3Timer(Constants.L3_UPDATE_TIME);
     }
 
-    private void startL3Timer(long updateTime){
+    private void startL3Timer(long updateTime) {
         l3Timer.schedule(new TimerTask() {
             @Override
-          public void run() {
-              sendL3Update();
-          }
-       }, 0, updateTime);
+            public void run() {
+                sendL3Update();
+            }
+        }, 0, updateTime);
     }
 
-    private void sendL3Update(){
+    private void sendL3Update() {
         boolean isLeader = lobbyHandler.getLobby().leader.id == player.id;
         comHandler.sendL3Update(constructL3Message(isLeader), isLeader);
     }
 
-    public L3UpdateDTO constructL3Message(boolean fromLeader){
+    public L3UpdateDTO constructL3Message(boolean fromLeader) {
         L3UpdateDTO dto;
         ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
-        if(fromLeader){
+        if (fromLeader) {
             //Get the current state of the world
             entities = objectHandler.getAllEntitySkeletons();
-        }else{
+        } else {
             //Only send my units to leader
             entities = objectHandler.getMyUnitsToEntitySkeletons();
 
@@ -203,10 +202,11 @@ public class ModelManager {
         );
     }
 
-    public void receiveL3Update(L3UpdateDTO update){
+    public void receiveL3Update(L3UpdateDTO update) {
         //Todo
         objectHandler.updateUnitPositions(update.entities());
     }
+
     // A request has come in to start the game
     public void startGameReq(StartGameRequestDTO request) {
         //Check bounding boxes
@@ -214,7 +214,7 @@ public class ModelManager {
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
-        startL3Timer(Constants.L3_UPDATE_TIME/2);
+        startL3Timer(Constants.L3_UPDATE_TIME / 2);
     }
 
     public void leaveOngoingGame() {
@@ -252,7 +252,7 @@ public class ModelManager {
     public ArrayList<EntitySkeletonDTO> createMySkeletonList() {
         return new ArrayList<>(objectHandler.getMyUnits().values().stream()
                 .map(
-                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getPosition())
+                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getEntityName(), playerUnit.getPosition())
                 ).toList());
     }
 

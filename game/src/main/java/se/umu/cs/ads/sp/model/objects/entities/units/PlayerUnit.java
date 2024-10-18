@@ -5,11 +5,11 @@ import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerUnit extends Entity {
+
     private ArrayList<Collectable> collected = new ArrayList<>();
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;
@@ -31,8 +32,8 @@ public class PlayerUnit extends Entity {
     private boolean attacked = false;
     private boolean hit = false;
 
-    public PlayerUnit(Position startPos, Map map) {
-        super(startPos, map);
+    public PlayerUnit(String name, Position startPos, Map map) {
+        super(name, startPos, map);
         miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
         shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
         hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
@@ -45,8 +46,8 @@ public class PlayerUnit extends Entity {
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
-    public PlayerUnit(long id, Position startPos, Map map) {
-        super(startPos, map);
+    public PlayerUnit(long id, String name, Position startPos, Map map) {
+        super(name, startPos, map);
         miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
         shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
         hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
@@ -147,7 +148,7 @@ public class PlayerUnit extends Entity {
 
     @Override
     public void setDestination(Position newDestination) {
-        if(this.state == EntityState.ATTACKING){
+        if (this.state == EntityState.ATTACKING) {
             this.targetedUnit = null;
         }
         super.setDestination(newDestination);
