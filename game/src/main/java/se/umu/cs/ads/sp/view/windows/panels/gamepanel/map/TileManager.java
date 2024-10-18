@@ -65,22 +65,18 @@ public class TileManager {
         MiniMap miniMap = new MiniMap(150, 150, numCols * UtilView.tileSize, numRows * UtilView.tileSize);
         for (int y = 0; y < viewMap.size(); y++) {
             for (int x = 0; x < viewMap.get(y).size(); x++) {
-                int worldX = x * UtilView.tileSize;
-                int worldY = y * UtilView.tileSize;
-                if (insideScreen(worldX, worldY)) {
-                    TileType type = viewMap.get(y).get(x);
-                    Position screenPos = Camera.worldToScreen(worldX, worldY);
+                Position tileWorldPosition = new Position(x * UtilView.tileSize, y * UtilView.tileSize);
+                boolean inFow = fowView.isInFow(tileWorldPosition);
+                String variant = inFow ? "light" : "dark";
+                TileType type = viewMap.get(y).get(x);
+                miniMap.addTile(tileWorldPosition.getX(), tileWorldPosition.getY(), type, variant);
 
-                    BufferedImage image;
-                    if (fowView.isInFow(new Position(worldX, worldY))) {
-                        image = tileMap.get(type).getImage("light", getTileVariant(x, y));
-                        miniMap.addTile(worldX, worldY, type, "light");
-                    } else {
-                        image = tileMap.get(type).getImage("dark", getTileVariant(x, y));
-                        miniMap.addTile(worldX, worldY, type, "dark");
-                    }
+                if (Camera.insideScreen(tileWorldPosition, UtilView.tileSize)) {
+                    Position screenPos = Camera.worldToScreen(tileWorldPosition);
+                    BufferedImage image = tileMap.get(type).getImage(variant, getTileVariant(x, y));
                     g2d.drawImage(image, screenPos.getX(), screenPos.getY(), UtilView.tileSize, UtilView.tileSize, null);
                 }
+
             }
         }
         return miniMap;
@@ -105,11 +101,6 @@ public class TileManager {
             }
         }
         return tileVariant.toString();
-    }
-
-    public boolean insideScreen(int worldX, int worldY) {
-        // Make sure to return false so nothing is rendered outside the screen.
-        return true;
     }
 
     public void updateFowView(ArrayList<PlayerUnitView> unitViews) {

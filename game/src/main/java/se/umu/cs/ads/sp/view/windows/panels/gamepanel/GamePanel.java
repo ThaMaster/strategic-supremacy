@@ -267,6 +267,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         // Draw minimap
+        miniMap.addCameraBox();
         miniMap.draw(g2d);
 
         for (TextAnimation animation : textAnimations) {
@@ -304,7 +305,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             newUnit.setSelected(unit.isSelected());
             newUnit.isMyUnit = true;
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
-            Camera.setCameraWorldPosition(newUnit.getPosition());
+            Camera.setPosition(newUnit.getPosition());
         }
 
         for (Entity entity : entities.values()) {
@@ -412,7 +413,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setCameraWorldPosition(Position newCameraPosition) {
-        Camera.setCameraWorldPosition(newCameraPosition);
+        Camera.setPosition(newCameraPosition);
     }
 
     private void collectEvents() {

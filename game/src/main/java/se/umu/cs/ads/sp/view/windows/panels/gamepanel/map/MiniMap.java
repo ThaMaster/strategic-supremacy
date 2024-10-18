@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
+import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
@@ -49,6 +50,21 @@ public class MiniMap {
         Graphics2D mapGraphics = miniMap.createGraphics();
         mapGraphics.setColor(objectColor);
         mapGraphics.fillRect(minimapX, minimapY, (int) Math.ceil(pointSize * scaleX), (int) Math.ceil(pointSize * scaleY));
+        mapGraphics.dispose();
+    }
+
+    public void addCameraBox() {
+        int topLeftX = Camera.getPosition().getX() - UtilView.screenWidth / 2;
+        int topLeftY = Camera.getPosition().getY() - UtilView.screenHeight / 2;
+        int minimapX = (int) Math.floor(topLeftX * scaleX);
+        int minimapY = (int) Math.floor(topLeftY * scaleY);
+        // Convert the camera's width and height to minimap dimensions
+        int minimapWidth = (int) Math.ceil(UtilView.screenWidth * scaleX);
+        int minimapHeight = (int) Math.ceil(UtilView.screenHeight * scaleY);
+
+        Graphics2D mapGraphics = miniMap.createGraphics();
+        mapGraphics.setColor(Color.BLUE);
+        mapGraphics.drawRect(minimapX, minimapY, minimapWidth, minimapHeight);
         mapGraphics.dispose();
     }
 
