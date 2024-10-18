@@ -95,7 +95,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void mousePressed(MouseEvent e) {
 
-        // Convert the mouse screen coordinates to world coordinates.
         if (e.getButton() == MouseEvent.BUTTON1) {
             for (long key : gController.getSelectedUnits()) {
                 gameEntitiesView.get(key).setSelected(false);

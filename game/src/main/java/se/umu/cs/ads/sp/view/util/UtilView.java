@@ -8,7 +8,9 @@ public class UtilView {
     public static final int originalTileSize = 64;
     public static final int originalEntitySize = 32;
     public static final int originalObjectSize = 16;
+
     public static double scale = 1;
+
     public static int tileSize = (int)(originalTileSize * scale);
     public static int entitySize = (int)(originalEntitySize * scale);
     public static int objectSize = (int)(originalObjectSize * scale);
@@ -16,12 +18,16 @@ public class UtilView {
     // Should this be here or somewhere else?
     public static final int maxScreenCol = 10;
     public static final int maxScreenRow = 10;
-    public static final int screenWidth = tileSize * maxScreenCol;
-    public static final int screenHeight = tileSize * maxScreenRow;
+    public static int screenWidth = tileSize * maxScreenCol;
+    public static int screenHeight = tileSize * maxScreenRow;
 
     public static int screenX = screenWidth/2 - tileSize/2;
     public static int screenY = screenHeight/2 - tileSize/2;
 
+    public static void changeScreenSize(int newWidth, int newHeight) {
+        screenWidth = newWidth;
+        screenHeight = newHeight;
+    }
 
     public static void changeScale(double amount) {
         double newScale = scale + amount;

@@ -26,9 +26,10 @@ public class SettingsFrame extends JFrame {
         // Create a tabbed pane
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        this.generalPanel = new GeneralPanel();
-        this.controlPanel = new ControlPanel();
-        this.audioPanel = new AudioPanel(new SettingsMouseListener());
+        applyButton = new JButton("Apply");
+        this.generalPanel = new GeneralPanel(applyButton);
+        this.controlPanel = new ControlPanel(applyButton);
+        this.audioPanel = new AudioPanel(applyButton);
 
         // Add panels to the tabbed pane
         tabbedPane.addTab("General", generalPanel);
@@ -44,14 +45,12 @@ public class SettingsFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setSize(400, 600);
         this.setVisible(false);
-        this.addMouseListener(new SettingsMouseListener());
     }
 
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> showFrame(false));
-        applyButton = new JButton("Apply");
         applyButton.addActionListener(e -> {
             applyGeneralSettings();
             applyControlSettings();
@@ -83,16 +82,5 @@ public class SettingsFrame extends JFrame {
         float musicVolume = (audioPanel.musicMute()) ? 0.0f : audioPanel.getMusicVolume();
         float sfxVolume = (audioPanel.sfxMute()) ? 0.0f : audioPanel.getSFXVolume();
         SoundManager.getInstance().setVolume(globalVolume, musicVolume, sfxVolume);
-    }
-
-
-    private class SettingsMouseListener extends MouseAdapter {
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if (generalPanel.hasSettingsChanged() || controlPanel.hasSettingsChanged() || audioPanel.hasSettingsChanged()){
-                applyButton.setEnabled(true);
-            }
-        }
     }
 }

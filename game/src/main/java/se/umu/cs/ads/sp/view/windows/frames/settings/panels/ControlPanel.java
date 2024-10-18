@@ -4,13 +4,10 @@ import javax.swing.*;
 
 public class ControlPanel extends JPanel {
 
-    private boolean settingsChanged = false;
+    private JButton applyButton;
 
-    public ControlPanel() {
+    public ControlPanel(JButton applyButton) {
         this.add(new JLabel("CREATE CONTROL SETTINGS HERE!"));
-    }
-
-    public boolean hasSettingsChanged() {
-        return settingsChanged;
+        this.applyButton = applyButton;
     }
 }

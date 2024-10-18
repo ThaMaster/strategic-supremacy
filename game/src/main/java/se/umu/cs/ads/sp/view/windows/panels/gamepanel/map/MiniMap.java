@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.TileType;
 import se.umu.cs.ads.sp.view.util.Camera;
+import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 public class MiniMap {
 
     private BufferedImage miniMap;
+    private BufferedImage miniMapBorder;
     private final int miniMapWidth;
     private final int miniMapHeight;
     private final double scaleX;
@@ -19,9 +21,13 @@ public class MiniMap {
     private final int mapTileWidth;
     private final int mapTileHeight;
 
+    private int borderPadding = 36;
+    private int minimapOffset = 16;
+
     public MiniMap(int miniMapWidth, int miniMapHeight, int mapWidth, int mapHeight) {
         this.miniMapWidth = miniMapWidth;
         this.miniMapHeight = miniMapHeight;
+        miniMapBorder = ImageLoader.loadImage("/sprites/hud/minimapBorder.png");
         scaleX = (double) miniMapWidth / mapWidth;
         scaleY = (double) miniMapHeight / mapHeight;
         mapTileWidth = (int) Math.ceil(UtilView.tileSize * scaleX);
@@ -45,11 +51,14 @@ public class MiniMap {
     }
 
     public void addPoint(Position entityPosition, Color objectColor, int pointSize) {
-        int minimapX = (int) Math.floor(entityPosition.getX() * scaleX);
-        int minimapY = (int) Math.floor(entityPosition.getY() * scaleY);
+        int pointWidth = (int) Math.ceil(pointSize * scaleX);
+        int pointHeight = (int) Math.ceil(pointSize * scaleY);
+        int minimapX = (int) Math.floor(entityPosition.getX() * scaleX) - pointWidth / 2;
+        int minimapY = (int) Math.floor(entityPosition.getY() * scaleY) - pointHeight / 2;
+
         Graphics2D mapGraphics = miniMap.createGraphics();
         mapGraphics.setColor(objectColor);
-        mapGraphics.fillRect(minimapX, minimapY, (int) Math.ceil(pointSize * scaleX), (int) Math.ceil(pointSize * scaleY));
+        mapGraphics.fillRect(minimapX, minimapY, pointWidth, pointHeight);
         mapGraphics.dispose();
     }
 
@@ -70,7 +79,25 @@ public class MiniMap {
     }
 
     public void draw(Graphics2D g2d) {
-        g2d.drawImage(miniMap, UtilView.screenWidth - miniMap.getWidth(), 0, miniMapWidth, miniMapHeight, null);
+        // Calculate position for the minimap
+        int minimapX = UtilView.screenWidth - miniMapWidth - minimapOffset; // X position for the minimap
+        int minimapY = minimapOffset; // Y position for the minimap
+
+        // Calculate the dimensions of the border based on the minimap dimensions
+        int borderWidth = miniMapWidth + borderPadding; // Adjust border size as needed
+        int borderHeight = miniMapHeight + borderPadding; // Adjust border size as needed
+
+        // Calculate position for the border image
+        int borderX = minimapX - borderPadding / 2; // Center the border around the minimap
+        int borderY = minimapY - borderPadding / 2; // Center the border around the minimap
+
+        // Draw the minimap image
+        g2d.drawImage(miniMap, minimapX, minimapY, miniMapWidth, miniMapHeight, null); // Draw minimap
+
+        // Draw the border image
+        if (miniMapBorder != null) {
+            g2d.drawImage(miniMapBorder, borderX, borderY, borderWidth, borderHeight, null); // Draw border
+        }
     }
 
     public static BufferedImage createMinimapPreview(ArrayList<ArrayList<TileType>> map, int mapWidth, int mapHeight, int width, int height) {

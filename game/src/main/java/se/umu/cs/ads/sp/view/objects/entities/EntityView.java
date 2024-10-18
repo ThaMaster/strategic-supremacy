@@ -7,6 +7,7 @@ import se.umu.cs.ads.sp.view.objects.ObjectView;
 
 public abstract class EntityView extends ObjectView {
 
+    protected HealthBar healthBar;
     protected Position destination;
     protected EntityState state;
     protected int attackRange = 0;
@@ -19,6 +20,7 @@ public abstract class EntityView extends ObjectView {
     public EntityView(long id, Position pos) {
         super(id, pos);
         this.animator = new Animator();
+        this.healthBar = new HealthBar();
     }
 
     public void setSelected(boolean b) {
@@ -56,5 +58,8 @@ public abstract class EntityView extends ObjectView {
 
     public void setHasBeenHit(boolean bool) {
         this.hasBeenHit = bool;
+    }
+    public HealthBar getHealthBar() {
+        return healthBar;
     }
 }

@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.controller;
 
+import proto.PlayerUnit;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -34,6 +35,7 @@ public class GameController implements ActionListener {
     private User player;
 
     public GameController() {
+        UtilView.changeScreenSize(1600, 800);
         mainFrame = new MainFrame();
         setActionListeners();
         this.timer = new Timer(1000 / FPS, this);

@@ -1,12 +1,14 @@
 package se.umu.cs.ads.sp.view.objects.entities.units;
 
 import se.umu.cs.ads.sp.utils.AppSettings;
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
+import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
@@ -35,6 +37,7 @@ public class PlayerUnitView extends EntityView {
         }
 
         this.animator.draw(g2d, screenPos);
+        this.healthBar.draw(g2d, screenPos, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT/4);
     }
 
     @Override

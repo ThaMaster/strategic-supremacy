@@ -48,8 +48,11 @@ public class Animator {
         Position screenPos = new Position(
                 flipped ? frame.getWidth() + pos.getX() - (frame.getWidth() / 2) : pos.getX() - (frame.getWidth() / 2),
                 pos.getY() - (frame.getHeight() / 2));
+        int width = flipped ? -frame.getWidth() : frame.getWidth();
+        int height = frame.getHeight();
+
         if (currentAnimation != null && Camera.screenPosInsideScreen(screenPos, frame.getWidth(), frame.getHeight())) {
-            g2d.drawImage(frame, screenPos.getX(), screenPos.getY(), -frame.getWidth(), frame.getHeight(), null);
+            g2d.drawImage(frame, screenPos.getX(), screenPos.getY(), width, height, null);
         }
     }
 

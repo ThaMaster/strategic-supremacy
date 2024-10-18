@@ -6,46 +6,44 @@ import se.umu.cs.ads.sp.view.util.StyleConstants;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.MouseListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class AudioPanel extends JPanel {
 
+    private JButton applyButton;
     private JSlider globalVolumeSlider;
     private JSlider musicVolumeSlider;
     private JSlider sfxVolumeSlider;
-
-    private final MouseListener settingsListener;
 
     private boolean muteGlobal = false;
     private boolean muteMusic = false;
     private boolean muteSFX = false;
 
-    private boolean settingsChanged = false;
 
-    public AudioPanel(MouseListener listener) {
-        settingsListener = listener;
+    public AudioPanel(JButton applyButton) {
+        this.applyButton = applyButton;
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         globalVolumeSlider = new JSlider(0, 100, SoundManager.getInstance().getGlobalVolume());
-        globalVolumeSlider.addMouseListener(settingsListener);
+        globalVolumeSlider.addMouseListener(new SetChangedAdapter());
         musicVolumeSlider = new JSlider(0, 100, SoundManager.getInstance().getMusicVolume());
-        musicVolumeSlider.addMouseListener(settingsListener);
+        musicVolumeSlider.addMouseListener(new SetChangedAdapter());
         sfxVolumeSlider = new JSlider(0, 100, SoundManager.getInstance().getSFXVolume());
-        sfxVolumeSlider.addMouseListener(settingsListener);
-
+        sfxVolumeSlider.addMouseListener(new SetChangedAdapter());
         this.add(createVolumePanel("Global Volume", globalVolumeSlider, e -> {
             muteGlobal = ((JCheckBox) e.getSource()).isSelected();
             globalVolumeSlider.setEnabled(!muteGlobal);
-            settingsChanged = true;
+            applyButton.setEnabled(true);
         }));
         this.add(createVolumePanel("Music Volume", musicVolumeSlider, e -> {
             muteMusic = ((JCheckBox) e.getSource()).isSelected();
             musicVolumeSlider.setEnabled(!muteMusic);
-            settingsChanged = true;
+            applyButton.setEnabled(true);
         }));
         this.add(createVolumePanel("SFX Volume", sfxVolumeSlider, e -> {
             muteSFX = ((JCheckBox) e.getSource()).isSelected();
             sfxVolumeSlider.setEnabled(!muteSFX);
-            settingsChanged = true;
+            applyButton.setEnabled(true);
         }));
     }
 
@@ -61,7 +59,6 @@ public class AudioPanel extends JPanel {
 
         // Mute Checkbox
         JCheckBox muteCheckBox = new JCheckBox("Mute");
-        muteCheckBox.addMouseListener(settingsListener);
         muteCheckBox.addChangeListener(checkBoxListener);
 
         // Slider Panel
@@ -108,7 +105,10 @@ public class AudioPanel extends JPanel {
         return this.muteSFX;
     }
 
-    public boolean hasSettingsChanged() {
-        return settingsChanged;
+    private class SetChangedAdapter extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            applyButton.setEnabled(true);
+        }
     }
 }

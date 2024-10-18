@@ -242,4 +242,7 @@ public class MainFrame extends JFrame {
 
     //----------------------------------------
 
+    public HUDPanel getHudPanel() {
+        return hudPanel;
+    }
 }
