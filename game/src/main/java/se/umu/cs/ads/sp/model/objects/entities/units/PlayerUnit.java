@@ -9,9 +9,11 @@ import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
+import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.utils.Cooldown;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.utils.enums.EventType;
 
@@ -31,8 +33,10 @@ public class PlayerUnit extends Entity {
     private boolean inAttackRange = false;
     private boolean attacked = false;
     private boolean hit = false;
+    private boolean hasFlag;
+    private long myBaseId;
 
-    public PlayerUnit(String name, Position startPos, Map map) {
+    public PlayerUnit(String name, Position startPos, Map map, long baseId) {
         super(name, startPos, map);
         miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
         shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
@@ -44,6 +48,18 @@ public class PlayerUnit extends Entity {
         this.attackBuff = 0;
         this.attackRange = 150;
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
+    }
+
+    public void setBase(long baseId){
+        myBaseId = baseId;
+    }
+
+    public void setHasFlag(boolean hasFlag){
+        this.hasFlag = hasFlag;
+    }
+
+    public boolean hasFlag(){
+        return hasFlag;
     }
 
     public PlayerUnit(long id, String name, Position startPos, Map map) {
@@ -135,6 +151,12 @@ public class PlayerUnit extends Entity {
                     //Have reached destination, and I am next to a goldmine, start mining :)
                     goldMine = (GoldMine) coll.get(i);
                     startMining();
+                }
+                if (this.position.equals(getDestination()) && coll.get(i) instanceof Base base) {
+                    if(hasFlag && base.getId() == myBaseId){
+                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+40 points brother", EventType.FLAG_TO_BASE));
+                        hasFlag = false;
+                    }
                 }
             }
         }

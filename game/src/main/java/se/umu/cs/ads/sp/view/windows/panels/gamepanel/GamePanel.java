@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
+import se.umu.cs.ads.sp.model.objects.collectables.Flag;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -21,6 +22,7 @@ import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
 import se.umu.cs.ads.sp.view.objects.collectables.CollectableView;
+import se.umu.cs.ads.sp.view.objects.collectables.FlagView;
 import se.umu.cs.ads.sp.view.objects.collectables.GoldView;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.objects.entities.units.EnemyUnitView;
@@ -316,10 +318,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (Collectable collectable : collectables.values()) {
             if (collectable instanceof Chest) {
                 newCollectableView = new ChestView(collectable.getId(), collectable.getPosition());
-            } else if (collectable instanceof Gold) {
+            }
+            else if (collectable instanceof Gold) {
                 newCollectableView = new GoldView(collectable.getId(), collectable.getPosition());
                 newCollectableView.setCollisionBox(collectable.getCollisionBox());
             }
+            else if(collectable instanceof Flag){
+                newCollectableView = new FlagView(collectable.getId(), collectable.getPosition());
+                newCollectableView.setCollisionBox(collectable.getCollisionBox());
+            }
+
             if (newCollectableView != null) {
                 this.collectables.put(collectable.getId(), newCollectableView);
             }
@@ -442,6 +450,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 case TAKE_DMG:
                     SoundManager.getInstance().play(SoundFX.TAKE_DMG);
                     break;
+                case FLAG_TO_BASE:
+                    SoundManager.getInstance().play(SoundFX.FLAG_TO_BASE);
+                    addTextEvent(event, 15, EventColor.SUCCESS);
+                    break;
                 default:
                     //This is default case, it's a collectable we have stored
                     addCollectableEvent(event);
@@ -463,8 +475,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void addCollectableEvent(GameEvent event) {
+
         if (!this.collectables.containsKey(event.getId())) {
-            //Collected something that doesn't need an animation, forexample mining gold
+            //Collected something that doesn't need an animation, for example mining gold
             if (event.getType() == EventType.GOLD_PICK_UP) {
                 //Inc displayed gold?
             }
@@ -479,10 +492,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         CollectableView collectableView = this.collectables.get(event.getId());
         collectableView.pickup();
 
-        if (collectableView instanceof ChestView) {
+        if(collectableView instanceof ChestView) {
             SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
-        } else if (collectableView instanceof GoldView) {
+        }else if (collectableView instanceof GoldView) {
             SoundManager.getInstance().play(SoundFX.GOLD);
+            this.collectables.remove(event.getId());
+        }else if (collectableView instanceof FlagView){
+            SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
             this.collectables.remove(event.getId());
         }
         addTextEvent(event, 25, EventColor.SUCCESS);

@@ -24,6 +24,10 @@ public abstract class GameObject {
         map.setInhabitant(this, position);
     }
 
+    public void setCollisionBox(CollisionBox collisionBox){
+        this.collisionBox = collisionBox;
+    }
+
     public void destroy(Map map) {
         map.removeInhabitant(this, position);
     }

@@ -12,4 +12,6 @@ public class SoundFX {
     public static String ATTACK = "ATTACK";
     public static String DEATH = "DEATH";
     public static String TAKE_DMG = "TAKE_DMG";
+    public static String FLAG_PICK_UP = "FLAG_PICK_UP";
+    public static String FLAG_TO_BASE = "FLAG_TO_BASE";
 }

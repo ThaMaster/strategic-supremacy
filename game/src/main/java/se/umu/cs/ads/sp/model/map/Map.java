@@ -185,6 +185,20 @@ public class Map {
         return collectables;
     }
 
+    public Position getFlagPosition(){
+        Position flagPosition = new Position((cols / 2) * Constants.TILE_HEIGHT, (rows / 2) * Constants.TILE_WIDTH);
+        if(isWalkable(flagPosition)){
+            return flagPosition;
+        }
+        Position offsetPos;
+        do{
+            offsetPos = new Position(
+                    flagPosition.getX() + Utils.getRandomInt(-10,10),
+                    flagPosition.getY() + Utils.getRandomInt(-10,10));
+        }while(!isWalkable(offsetPos));
+        return offsetPos;
+    }
+
     // Get a random walkable tile
     private Position getRandomWalkableTile() {
         int row, col;

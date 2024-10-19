@@ -140,6 +140,9 @@ public class SoundManager {
             sounds.put(SoundFX.ATTACK, getClip("audio/sfx/attack.wav"));
             sounds.put(SoundFX.DEATH, getClip("audio/sfx/death.wav"));
             sounds.put(SoundFX.TAKE_DMG, getClip("audio/sfx/takeDmg.wav"));
+            sounds.put(SoundFX.FLAG_PICK_UP, getClip("audio/sfx/flagPickUp.wav"));
+            sounds.put(SoundFX.FLAG_TO_BASE, getClip("audio/sfx/flagToBase.wav"));
+
 
         } catch (NullPointerException e) {
             System.out.println("Could not load audio file");
