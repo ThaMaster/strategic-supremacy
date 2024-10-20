@@ -102,7 +102,7 @@ public class MainFrame extends JFrame {
         gamePanel = new GamePanel(tm);
         layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER);
         // Add palette layer that is the UI here!
-        hudPanel = new HUDPanel();
+        hudPanel = new HUDPanel(gamePanel);
         layeredPane.add(hudPanel, JLayeredPane.PALETTE_LAYER);
 
         // Add a MouseListener to the layeredPane to allow clicks to pass through non-interactive areas

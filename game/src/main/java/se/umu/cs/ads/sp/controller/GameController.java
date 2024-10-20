@@ -9,6 +9,7 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
+import se.umu.cs.ads.sp.utils.enums.UnitType;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
@@ -58,6 +59,10 @@ public class GameController implements ActionListener {
 
     public void startGame() {
         mainFrame.showGamePanel(tileManager);
+        ArrayList<UnitType> types = new ArrayList<>(
+                modelManager.getObjectHandler().getMyUnits().values().stream()
+                        .map(unit -> UnitType.fromLabel(unit.getEntityName())).toList());
+        mainFrame.getHudPanel().setUpgradeMenu(modelManager.getObjectHandler().getMyUnitIds(), types);
         mainFrame.getGamePanel().setGameController(this);
         mainFrame.getGamePanel().startGame();
         mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
@@ -349,5 +354,13 @@ public class GameController implements ActionListener {
         modelManager.getObjectHandler().removeEnemyUnits(unitIds);
         modelManager.getLobbyHandler().removePlayer(playerId);
         mainFrame.getGamePanel().removeEntities(unitIds);
+    }
+
+    public void buyUpgrade(long unitId, String type, int amount) {
+
+    }
+
+    public void toggleShopWindow() {
+        mainFrame.getHudPanel().toggleUpgradeMenu();
     }
 }

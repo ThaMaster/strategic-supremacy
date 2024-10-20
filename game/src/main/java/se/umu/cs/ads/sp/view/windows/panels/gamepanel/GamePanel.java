@@ -217,6 +217,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             case KeyEvent.VK_DOWN:
                 Camera.setYPosition(Camera.getPosition().getY() + 20);
                 break;
+            case KeyEvent.VK_B:
+                gController.toggleShopWindow();
             default:
                 break;
         }
@@ -310,6 +312,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             newUnit.setHealthBarValues(enemyUnit.getMaxHp(), enemyUnit.getCurrentHp());
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
         }
+
+
     }
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {

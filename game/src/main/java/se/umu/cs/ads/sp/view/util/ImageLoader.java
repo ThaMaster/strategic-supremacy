@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.view.util;
 
+import se.umu.cs.ads.sp.utils.enums.UnitType;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.imageio.ImageIO;
 
@@ -53,5 +56,13 @@ public class ImageLoader {
             images.add(ImageLoader.loadImage(folderPath + "/" + imageName + i + ".png"));
         }
         return images;
+    }
+
+    public static BufferedImage loadUnitIcon(UnitType unitType) {
+        String path = "";
+        switch(unitType) {
+            case GUNNER -> path = "/sprites/entities/units/basic/idle/idle1.png";
+        }
+        return Objects.requireNonNull(loadImage(path));
     }
 }
