@@ -160,12 +160,14 @@ public class ObjectHandler {
 
     public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        Collectable flag = new Flag(map.getFlagPosition(), map);
-        flag.setReward(new Reward(50, Reward.RewardType.POINT));
+
+        Flag flag = new Flag(map.getFlagPosition(), map);
+        flag.setReward(new Reward(1, Reward.RewardType.FLAG));
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
-        this.collectables = map.generateCollectables();
+        //collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
+
         for(Collectable collectable : collectables.values()){
             startGameRequest.addCollectable(
                     new CollectableDTO(collectable.getId(),
@@ -203,14 +205,6 @@ public class ObjectHandler {
                 basePositions.remove(0);
             }
         }
-
-
-        startGameRequest.addCollectable(
-                new CollectableDTO(Utils.generateId(),
-                        new Position(200, 200),
-                        DtoTypes.GOLD.label,
-                        new Reward(10, Reward.RewardType.GOLD))
-        );
         return startGameRequest;
     }
 
@@ -225,7 +219,6 @@ public class ObjectHandler {
                     }else{
                         spawnBase(map, env.position());
                     }
-
                     break;
                 case GOLDMINE:
                     spawnGoldMine(map, env.position());
@@ -235,7 +228,6 @@ public class ObjectHandler {
                     break;
             }
         }
-
         for (CollectableDTO collectable : request.collectables()) {
             DtoTypes type = DtoTypes.fromLabel(collectable.type());
             switch (type) {
@@ -245,6 +237,8 @@ public class ObjectHandler {
                 case CHEST:
                     spawnChest(map, collectable.position(), collectable.reward());
                     break;
+                case FLAG:
+                    spawnFlag(map, collectable.position());
                 default:
                     System.out.println("Unexpected type on collectable");
                     break;
@@ -290,6 +284,12 @@ public class ObjectHandler {
         Base base = new Base(position, map);
         addEnvironment(base);
         return base.getId();
+    }
+
+    private void spawnFlag(Map map, Position position){
+        Flag flag = new Flag(position, map);
+        flag.setReward(new Reward(1, Reward.RewardType.FLAG));
+        addCollectable(flag);
     }
 
     private void spawnGoldMine(Map map, Position position) {

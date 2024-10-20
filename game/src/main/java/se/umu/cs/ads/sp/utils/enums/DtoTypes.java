@@ -5,7 +5,11 @@ public enum DtoTypes {
     CHEST("CHEST"),
     BASE("BASE"),
     GOLDMINE("GOLDMINE"),
-    GOLD("GOLD");
+    GOLD("GOLD"),
+    FLAG("FLAG"),
+    INCREASED_DMG("INCREASED_DMG"),
+    POINT("POINT"),
+    MOVEMENT("MOVEMENT");
 
     public final String label;
 
@@ -20,7 +24,7 @@ public enum DtoTypes {
                 return typeEnum;
             }
         }
-        throw new IllegalArgumentException("No day with label " + label);
+        throw new IllegalArgumentException("No DTO with label " + label);
     }
 
 }

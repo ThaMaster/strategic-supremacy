@@ -317,6 +317,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
+        System.out.println("Setting collectables!");
         this.collectables.clear();
         CollectableView newCollectableView = null;
         for (Collectable collectable : collectables.values()) {
@@ -328,6 +329,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 newCollectableView.setCollisionBox(collectable.getCollisionBox());
             }
             else if(collectable instanceof Flag){
+                System.out.println("Got a flag view");
                 newCollectableView = new FlagView(collectable.getId(), collectable.getPosition());
                 newCollectableView.setCollisionBox(collectable.getCollisionBox());
             }

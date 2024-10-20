@@ -24,10 +24,11 @@ public class Reward {
     }
 
     public static class RewardType {
-        public static String GOLD = "Gold";
-        public static String MOVEMENT ="Movement";
-        public static String POINT = "Points";
-        public static String INCREASED_DMG = "IncreasedDmg";
+        public static String GOLD = "GOLD";
+        public static String MOVEMENT ="MOVEMENT";
+        public static String POINT = "POINT";
+        public static String FLAG = "FLAG";
+        public static String INCREASED_DMG = "INCREASED_DMG";
     }
 
     public static Reward getRandomReward(){
