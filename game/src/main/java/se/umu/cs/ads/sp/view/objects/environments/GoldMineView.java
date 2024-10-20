@@ -17,6 +17,7 @@ public class GoldMineView extends EnvironmentView {
         initAnimator();
         animator.changeAnimation("default");
         depleted = false;
+        this.animator.pause();
     }
 
     @Override
@@ -24,7 +25,7 @@ public class GoldMineView extends EnvironmentView {
         this.animator.addAnimation(
                 new Animation(
                         "default",
-                        ImageLoader.loadImages("/sprites/environment", "goldPile.png", 1),
+                        ImageLoader.loadImages("/sprites/environment/goldPile", "goldPile", 1),
                         7));
     }
 
@@ -32,7 +33,8 @@ public class GoldMineView extends EnvironmentView {
     public void draw(Graphics2D g2d) {
         if (!depleted) {
             Position screenPos = Camera.worldToScreen(position);
-            animator.draw(g2d, new Position(screenPos.getX() - Constants.ENTITY_WIDTH / 2, screenPos.getY() - Constants.ENTITY_HEIGHT / 2));
+            animator.draw(g2d, new Position(screenPos.getX() - Constants.ENTITY_WIDTH / 2,
+                    screenPos.getY() - Constants.ENTITY_HEIGHT / 2));
         }
     }
 

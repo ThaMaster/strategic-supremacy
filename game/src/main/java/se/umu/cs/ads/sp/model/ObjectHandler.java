@@ -165,7 +165,8 @@ public class ObjectHandler {
         flag.setReward(new Reward(1, Reward.RewardType.FLAG));
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
-        //collectables = map.generateCollectables();
+
+        collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
 
         for(Collectable collectable : collectables.values()){
@@ -178,13 +179,15 @@ public class ObjectHandler {
         for (User user : users) {
             long userId = user.id;
             Position basePos = basePositions.get(0);
-
+            Position goldMinePos = map.generateGoldMinePosition(basePos);
+            long goldMineId = spawnGoldMine(map, goldMinePos);
             //Spawning base
             startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.label, 0));
+
+            //Spawning goldmine
+            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoTypes.GOLDMINE.label, 0));
             long baseId = spawnBase(map, basePos);
 
-            //TODO
-            //Spawn goldMine
 
             //Spawning 3 entities
             for (int i = 0; i < 3; i++) {
@@ -292,9 +295,10 @@ public class ObjectHandler {
         addCollectable(flag);
     }
 
-    private void spawnGoldMine(Map map, Position position) {
+    private long spawnGoldMine(Map map, Position position) {
         GoldMine goldMine = new GoldMine(position, map, 100);
         addEnvironment(goldMine);
+        return goldMine.getId();
     }
 
     private void spawnGold(Map map, Position position) {

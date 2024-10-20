@@ -158,6 +158,17 @@ public class Map {
         return spawnPositions;
     }
 
+    public Position generateGoldMinePosition(Position basePosition){
+        Position minePosition = basePosition;
+
+        do{
+            minePosition = new Position(
+                    basePosition.getX() + Utils.getRandomInt(-Constants.TILE_HEIGHT,Constants.TILE_HEIGHT),
+                    basePosition.getY() + Utils.getRandomInt(-Constants.TILE_WIDTH,Constants.TILE_WIDTH));
+        }while(isWalkable(minePosition));
+        return minePosition;
+    }
+
     public HashMap<Long, Collectable> generateCollectables(){
         HashMap<Long, Collectable> collectables = new HashMap<>();
         for(int row = 0; row < map.size(); row++){
