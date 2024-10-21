@@ -5,8 +5,8 @@ import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 
 public class EnemyUnitView extends PlayerUnitView {
-    public EnemyUnitView(long id, String name, Position pos) {
-        super(id, name, pos);
+    public EnemyUnitView(long id, String unitType, Position pos) {
+        super(id, unitType, pos);
     }
 
     @Override

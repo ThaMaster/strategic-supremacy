@@ -24,7 +24,7 @@ public enum RewardType {
                 return typeEnum;
             }
         }
-        throw new IllegalArgumentException("ERROR: Unknown unit type " + label);
+        throw new IllegalArgumentException("ERROR: Unknown reward type " + label);
     }
 
     public static ArrayList<String> getUpgradeTypes() {

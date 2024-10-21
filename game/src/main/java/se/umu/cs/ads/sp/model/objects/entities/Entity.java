@@ -13,7 +13,7 @@ import se.umu.cs.ads.sp.utils.enums.EventType;
 
 public abstract class Entity extends GameObject {
 
-    protected String entityName;
+    protected String entityType;
     protected int maxHp;
     protected int baseHp;
     protected int currentHp;
@@ -29,9 +29,9 @@ public abstract class Entity extends GameObject {
 
     private long userId;
 
-    public Entity(String name, Position startPos, Map map) {
+    public Entity(String entityType, Position startPos, Map map) {
         super(startPos, map);
-        entityName = name;
+        this.entityType = entityType;
         position = startPos;
         state = EntityState.IDLE;
         baseSpeed = 2;
@@ -109,8 +109,8 @@ public abstract class Entity extends GameObject {
         this.state = EntityState.RUNNING;
     }
 
-    public String getEntityName() {
-        return entityName;
+    public String getEntityType() {
+        return entityType;
     }
 
     public void takeDamage(int damage) {

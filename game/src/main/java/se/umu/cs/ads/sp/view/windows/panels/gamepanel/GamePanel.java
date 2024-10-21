@@ -299,21 +299,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.gameEntitiesView.clear();
 
         for (PlayerUnit unit : myUnits.values()) {
-            PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getEntityName(), unit.getPosition());
+            PlayerUnitView newUnit = new PlayerUnitView(unit.getId(), unit.getEntityType(), unit.getPosition());
             newUnit.setSelected(unit.isSelected());
             newUnit.isMyUnit = true;
-            newUnit.setHealthBarValues(unit.getMaxHp(), unit.getCurrentHp());
+            newUnit.setStats(unit.getMaxHp(), unit.getCurrentHp(),
+                    unit.getBaseAttack() + unit.getAttackBuff(),
+                    unit.getBaseSpeed() + unit.getSpeedBuff());
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
             Camera.setPosition(newUnit.getPosition());
         }
 
         for (PlayerUnit enemyUnit : enemyUnits.values()) {
-            EnemyUnitView newUnit = new EnemyUnitView(enemyUnit.getId(), enemyUnit.getEntityName(), enemyUnit.getPosition());
+            EnemyUnitView newUnit = new EnemyUnitView(enemyUnit.getId(), enemyUnit.getEntityType(), enemyUnit.getPosition());
             newUnit.setHealthBarValues(enemyUnit.getMaxHp(), enemyUnit.getCurrentHp());
             this.gameEntitiesView.put(newUnit.getId(), newUnit);
         }
-
-
     }
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
@@ -378,7 +378,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 unitView.setInRange(modelUnit.isInAttackRange());
                 unitView.setHasAttacked(modelUnit.hasAttacked());
                 unitView.setHasBeenHit(modelUnit.hasBeenHit());
-                unitView.setHealthBarValues(entityModel.getMaxHp(), entityModel.getCurrentHp());
+                unitView.setStats(modelUnit.getMaxHp(), modelUnit.getCurrentHp(),
+                        modelUnit.getBaseAttack() + modelUnit.getAttackBuff(),
+                        modelUnit.getBaseSpeed() + modelUnit.getSpeedBuff());
                 unitView.setHasFlag(modelUnit.hasFlag());
                 unitView.update();
                 if (entity.isMyUnit) {
@@ -531,5 +533,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public GameController getController() {
         return this.gController;
+    }
+
+    public ArrayList<PlayerUnitView> getMyUnits(ArrayList<Long> myIds) {
+        ArrayList<PlayerUnitView> myUnitsView = new ArrayList<>();
+        for(Long id : myIds) {
+            myUnitsView.add((PlayerUnitView) gameEntitiesView.get(id));
+        }
+        return myUnitsView;
     }
 }

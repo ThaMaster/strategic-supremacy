@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 
 import se.umu.cs.ads.sp.utils.enums.UnitType;
+import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
@@ -162,8 +163,8 @@ public class HUDPanel extends JPanel implements KeyListener {
         }
     }
 
-    public void setUpgradeMenu(ArrayList<Long> unitIds, ArrayList<UnitType> types) {
-        upgradePanel.setUpgradeMenu(unitIds, types);
+    public void setUpgradeMenu(ArrayList<PlayerUnitView> unitIds) {
+        upgradePanel.setUpgradeMenu(unitIds);
     }
 
     @Override

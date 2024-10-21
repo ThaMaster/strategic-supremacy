@@ -248,7 +248,7 @@ public class ModelManager {
     public ArrayList<EntitySkeletonDTO> createMySkeletonList() {
         return new ArrayList<>(objectHandler.getMyUnits().values().stream()
                 .map(
-                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getEntityName(), playerUnit.getPosition())
+                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getEntityType(), playerUnit.getPosition())
                 ).toList());
     }
 

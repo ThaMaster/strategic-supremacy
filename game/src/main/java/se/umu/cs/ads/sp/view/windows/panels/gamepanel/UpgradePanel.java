@@ -1,7 +1,8 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 
-import se.umu.cs.ads.sp.utils.enums.RewardType;
 import se.umu.cs.ads.sp.utils.enums.UnitType;
+import se.umu.cs.ads.sp.utils.enums.UpgradeType;
+import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
@@ -57,9 +58,10 @@ public class UpgradePanel extends JPanel {
         return upgradeLabel;
     }
 
-    public void setUpgradeMenu(ArrayList<Long> unitIds, ArrayList<UnitType> types) {
+    public void setUpgradeMenu(ArrayList<PlayerUnitView> myUnits) {
         JPanel upgradeList = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         upgradeList.setOpaque(false);
         int rowOffset = 0;
 
@@ -67,8 +69,8 @@ public class UpgradePanel extends JPanel {
         topPanel.setOpaque(false);
         GridBagConstraints topGbc = new GridBagConstraints();
         // Add unit icons in the first row
-        for (int i = 0; i < types.size(); i++) {
-            ImageIcon unitIcon = new ImageIcon(ImageLoader.loadUnitIcon(types.get(i)));
+        for (int i = 0; i < myUnits.size(); i++) {
+            ImageIcon unitIcon = new ImageIcon(ImageLoader.loadUnitIcon(UnitType.fromLabel(myUnits.get(i).unitType)));
             JLabel unitImage = new JLabel(unitIcon);
             topGbc.gridx = i;
             topGbc.gridy = 0;
@@ -80,13 +82,13 @@ public class UpgradePanel extends JPanel {
         // Add the upgrade type panel to the main upgrade list
         gbc.gridx = 0; // Add all upgrade type panels in the first column
         gbc.gridy = rowOffset;
-        gbc.gridwidth = unitIds.size(); // Span the upgrade type panel across all unit columns
+        gbc.gridwidth = myUnits.size(); // Span the upgrade type panel across all unit columns
         gbc.insets = new Insets(25, 0, 5, 0); // Add space above and below the upgrade type panel
         upgradeList.add(topPanel, gbc);
         rowOffset++;
 
         // Create a panel for each upgrade type
-        for (String upgradeType : RewardType.getUpgradeTypes()) {
+        for (UpgradeType upgradeType : UpgradeType.values()) {
             // Create a panel for the upgrade type
             JPanel upgradeTypePanel = new JPanel(new GridBagLayout());
             upgradeTypePanel.setBorder(new LineBorder(Color.BLACK, 3, true));
@@ -98,17 +100,17 @@ public class UpgradePanel extends JPanel {
             // Add the upgrade type label to the upgrade type panel
             typeGbc.gridx = 0;
             typeGbc.gridy = 0;
-            typeGbc.gridwidth = unitIds.size();  // Span the label across all unit columns
-            JLabel upgradeLabel = new JLabel(upgradeType);
+            typeGbc.gridwidth = myUnits.size();  // Span the label across all unit columns
+            JLabel upgradeLabel = new JLabel(upgradeType.label);
             upgradeTypePanel.add(upgradeLabel, typeGbc);
 
             // Add upgrade rows for each unit in this type panel
-            for (int t = 0; t < unitIds.size(); t++) {
+            for (int t = 0; t < myUnits.size(); t++) {
                 typeGbc.gridx = t;
                 typeGbc.gridy = 1;  // Place upgrade rows below the label
                 typeGbc.gridwidth = 1;  // Reset grid width for the upgrade row
 
-                JPanel upgradeRow = createUpgradeRow(upgradeType, 100, 10, unitIds.get(t), 150);
+                JPanel upgradeRow = createUpgradeRow(upgradeType.label, myUnits.get(t).getStat(upgradeType.label), upgradeType.upgradeAmount, myUnits.get(t).getId(), upgradeType.initalCost);
                 upgradeRow.setOpaque(false);
                 upgradeTypePanel.add(upgradeRow, typeGbc);
             }
@@ -116,7 +118,7 @@ public class UpgradePanel extends JPanel {
             // Add the upgrade type panel to the main upgrade list
             gbc.gridx = 0; // Add all upgrade type panels in the first column
             gbc.gridy = rowOffset;
-            gbc.gridwidth = unitIds.size(); // Span the upgrade type panel across all unit columns
+            gbc.gridwidth = myUnits.size(); // Span the upgrade type panel across all unit columns
             gbc.insets = new Insets(5, 0, 5, 0); // Add space above and below the upgrade type panel
             upgradeList.add(upgradeTypePanel, gbc);
 

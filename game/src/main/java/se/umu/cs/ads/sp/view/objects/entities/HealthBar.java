@@ -18,6 +18,10 @@ public class HealthBar {
         healthBar = ImageLoader.loadImage("/sprites/hud/healthBar.png");  // Load the red health bar image
     }
 
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
     public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;
     }

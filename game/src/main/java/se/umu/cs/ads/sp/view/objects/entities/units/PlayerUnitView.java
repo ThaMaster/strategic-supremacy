@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
+import se.umu.cs.ads.sp.utils.enums.UpgradeType;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.util.Camera;
@@ -14,13 +15,16 @@ import java.awt.image.BufferedImage;
 
 public class PlayerUnitView extends EntityView {
 
-    public String unitName;
+    public String unitType;
     private boolean hasFlag = false;
     private BufferedImage collectedFlagImage;
 
-    public PlayerUnitView(long id, String name, Position pos) {
+    private int attackDamage = 0;
+    private int speed;
+
+    public PlayerUnitView(long id, String unitType, Position pos) {
         super(id, pos);
-        this.unitName = name;
+        this.unitType = unitType;
         initAnimator();
     }
 
@@ -141,5 +145,24 @@ public class PlayerUnitView extends EntityView {
 
     public void setHasFlag(boolean bool) {
         this.hasFlag = bool;
+    }
+
+    public void setStats(int maxHp, int currentHp, int attackDamage, int speed) {
+        setHealthBarValues(maxHp, currentHp);
+        this.attackDamage = attackDamage;
+        this.speed = speed;
+    }
+
+    public int getStat(String stat) {
+        UpgradeType type = UpgradeType.fromLabel(stat);
+        int value;
+        switch (type) {
+            case MAX_HP -> value = healthBar.getMaxHealth();
+            case ATTACK_DMG -> value = attackDamage;
+            case MOVEMENT_SPEED -> value = speed;
+            default -> value = -1;
+        }
+
+        return value;
     }
 }

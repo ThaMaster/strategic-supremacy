@@ -9,7 +9,7 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
-import se.umu.cs.ads.sp.utils.enums.UnitType;
+import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.MiniMap;
@@ -65,17 +65,17 @@ public class GameController implements ActionListener {
 
     private void initializeView() {
         mainFrame.showGamePanel(tileManager);
-
-        ArrayList<UnitType> types = new ArrayList<>(
-                modelManager.getObjectHandler().getMyUnits().values().stream()
-                        .map(unit -> UnitType.fromLabel(unit.getEntityName())).toList());
-        mainFrame.getHudPanel().setUpgradeMenu(modelManager.getObjectHandler().getMyUnitIds(), types);
         mainFrame.getGamePanel().setGameController(this);
         mainFrame.getGamePanel().startGame();
         mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
                 modelManager.getObjectHandler().getEnemyUnits());
         mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
         mainFrame.getGamePanel().setEnvironments(modelManager.getObjectHandler().getEnvironments());
+
+        ArrayList<PlayerUnitView> myViews = mainFrame.getGamePanel()
+                .getMyUnits(modelManager.getObjectHandler().getMyUnitIds());
+
+        mainFrame.getHudPanel().setUpgradeMenu(myViews);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class GameController implements ActionListener {
 
         ArrayList<String> unitNames = new ArrayList<>();
         for (PlayerUnit unit : selectedUnits) {
-            unitNames.add(unit.getEntityName());
+            unitNames.add(unit.getEntityType());
         }
         mainFrame.getHudPanel().updateSelectedUnit(unitNames);
     }

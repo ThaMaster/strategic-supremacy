@@ -5,7 +5,6 @@ import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.dto.*;
-import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.*;
@@ -200,10 +199,10 @@ public class ObjectHandler {
             Position goldMinePos = map.generateGoldMinePosition(basePos);
             long goldMineId = spawnGoldMine(map, goldMinePos);
             //Spawning base
-            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoTypes.BASE.label, 0));
+            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoType.BASE.label, 0));
 
             //Spawning goldmine
-            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoTypes.GOLDMINE.label, 0));
+            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoType.GOLDMINE.label, 0));
             long baseId = spawnBase(map, basePos);
 
 
@@ -233,7 +232,7 @@ public class ObjectHandler {
     public void populateWorld(StartGameRequestDTO request, Map map) {
         long baseId = 1L;
         for (EnvironmentDTO env : request.environments()) {
-            DtoTypes type = DtoTypes.fromLabel(env.type());
+            DtoType type = DtoType.fromLabel(env.type());
             switch (type) {
                 case BASE:
                     if(env.userId() == user.id){
@@ -251,7 +250,7 @@ public class ObjectHandler {
             }
         }
         for (CollectableDTO collectable : request.collectables()) {
-            DtoTypes type = DtoTypes.fromLabel(collectable.type());
+            DtoType type = DtoType.fromLabel(collectable.type());
             switch (type) {
                 case GOLD:
                     spawnGold(map, collectable.position());
@@ -278,7 +277,7 @@ public class ObjectHandler {
     public ArrayList<EntitySkeletonDTO> getAllEntitySkeletons(){
         ArrayList<EntitySkeletonDTO> skeletons = getMyUnitsToEntitySkeletons();
         for(PlayerUnit unit : enemyUnits.values()){
-            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getId(), unit.getEntityName(), unit.getPosition());
+            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getId(), unit.getEntityType(), unit.getPosition());
             skeletons.add(skeletonDTO);
         }
         return skeletons;
@@ -295,7 +294,7 @@ public class ObjectHandler {
     public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons(){
         ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
         for(PlayerUnit unit : myUnits.values()){
-            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), user.id, unit.getEntityName(), unit.getPosition());
+            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), user.id, unit.getEntityType(), unit.getPosition());
             skeletons.add(skeletonDTO);
         }
         return skeletons;

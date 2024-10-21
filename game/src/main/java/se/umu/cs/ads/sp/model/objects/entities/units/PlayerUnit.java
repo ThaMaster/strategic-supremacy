@@ -124,7 +124,7 @@ public class PlayerUnit extends Entity {
                     return;
                 } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
-                    goldMine.harvestGold(1);
+                    goldMine.harvestGold(20);
                     coin.setReward(new Reward(1, RewardType.GOLD));
                     this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
@@ -226,5 +226,9 @@ public class PlayerUnit extends Entity {
 
     public int getAttackBuff() {
         return attackBuff;
+    }
+
+    public int getBaseAttack() {
+        return baseAttack;
     }
 }

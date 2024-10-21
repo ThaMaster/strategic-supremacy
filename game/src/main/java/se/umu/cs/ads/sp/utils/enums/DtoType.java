@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.utils.enums;
 
-public enum DtoTypes {
+public enum DtoType {
 
     CHEST("CHEST"),
     BASE("BASE"),
@@ -13,13 +13,13 @@ public enum DtoTypes {
 
     public final String label;
 
-    DtoTypes(String label) {
+    DtoType(String label) {
         this.label = label;
     }
 
 
-    public static DtoTypes fromLabel(String label) {
-        for (DtoTypes typeEnum : DtoTypes.values()) {
+    public static DtoType fromLabel(String label) {
+        for (DtoType typeEnum : DtoType.values()) {
             if (typeEnum.label.equalsIgnoreCase(label)) {
                 return typeEnum;
             }
