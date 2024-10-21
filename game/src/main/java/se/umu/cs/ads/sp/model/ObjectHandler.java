@@ -39,9 +39,15 @@ public class ObjectHandler {
         this.user = user;
     }
 
-    public void update() {
+    public void update(Map map) {
         for (PlayerUnit entity : myUnits.values()) {
             entity.update();
+
+            if (entity.getState() == EntityState.DEAD && entity.hasFlag()) {
+                spawnFlag(map, entity.getPosition());
+                entity.setHasFlag(false);
+            }
+
             checkCollectables(entity);
         }
 
@@ -113,6 +119,11 @@ public class ObjectHandler {
 
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
+
+            if (playerUnit.getState() != EntityState.DEAD) {
+                continue;
+            }
+
             if (collected instanceof Chest) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
             }
@@ -159,20 +170,15 @@ public class ObjectHandler {
     }
 
     public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
-        System.out.println("1");
-
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        System.out.println("2");
 
         Flag flag = new Flag(map.getFlagPosition(), map);
         flag.setReward(new Reward(1, Reward.RewardType.FLAG));
-        System.out.println("3");
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
 
         collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
-        System.out.println("4");
 
         for(Collectable collectable : collectables.values()){
             startGameRequest.addCollectable(
@@ -181,7 +187,6 @@ public class ObjectHandler {
                             collectable.getReward().getType(),
                             collectable.getReward()));
         }
-        System.out.println("5");
 
         for (User user : users) {
             long userId = user.id;

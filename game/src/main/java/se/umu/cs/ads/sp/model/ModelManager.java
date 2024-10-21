@@ -58,7 +58,7 @@ public class ModelManager {
     public void update() {
         // Update all entities in game, including my units.
 
-        objectHandler.update();
+        objectHandler.update(map);
         fow.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
 
     }
