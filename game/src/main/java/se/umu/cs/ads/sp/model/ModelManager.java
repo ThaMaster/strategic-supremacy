@@ -10,14 +10,11 @@ import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.EventColor;
-import se.umu.cs.ads.sp.view.objects.environments.GoldMineView;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 
@@ -27,13 +24,12 @@ import java.util.TimerTask;
 
 public class ModelManager {
 
-    private int currentGold;
+    private int currentGold = 180;
     private int currentPoints;
     private final Map map;
     private ObjectHandler objectHandler;
 
     private FowModel fow;
-    private GameEvents gameEvents;
 
     private final ComHandler comHandler;
     private final User player;
@@ -45,7 +41,6 @@ public class ModelManager {
 
     public ModelManager(GameController controller, User player) {
         map = new Map();
-        gameEvents = GameEvents.getInstance();
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler(player);
@@ -239,7 +234,7 @@ public class ModelManager {
                     unit.getDestination(),
                     unit.getMaxHp(),
                     unit.getCurrentHp(),
-                    unit.getSpeed()));
+                    unit.getBaseSpeed()));
         }
         return new PlayerUnitUpdateRequestDTO(unitUpdates, player.id);
     }
@@ -273,13 +268,12 @@ public class ModelManager {
                     break;
                 case DEATH:
                     PlayerUnit unit;
-                    if(objectHandler.getMyUnitIds().contains(event.getId())){
+                    if (objectHandler.getMyUnitIds().contains(event.getId())) {
                         unit = objectHandler.getMyUnits().get(event.getId());
-                    }
-                    else{
+                    } else {
                         unit = objectHandler.getEnemyUnits().get(event.getId());
                     }
-                    if(unit.hasFlag()){
+                    if (unit.hasFlag()) {
                         long id = objectHandler.spawnFlag(map, unit.getPosition());
                         unit.setHasFlag(false);
                         controller.spawnFlag(id, unit.getPosition());
@@ -296,13 +290,10 @@ public class ModelManager {
                     break;
                 case POINT_PICK_UP:
                     int point = Reward.parseQuantity(event.getEvent());
-                    System.out.println("Collected points -> " + point);
                     this.currentPoints += point;
-
                     break;
                 case GOLD_PICK_UP:
                     int gold = Reward.parseQuantity(event.getEvent());
-                    System.out.println("PICKED UP COINS :D -> " + gold);
                     this.currentGold += gold;
                     break;
                 default:
@@ -310,5 +301,17 @@ public class ModelManager {
                     break;
             }
         }
+    }
+
+    public int getCurrentGold() {
+        return currentGold;
+    }
+
+    public void setCurrentGold(int newGold) {
+        this.currentGold = newGold;
+    }
+
+    public int getCurrentPoints() {
+        return currentPoints;
     }
 }

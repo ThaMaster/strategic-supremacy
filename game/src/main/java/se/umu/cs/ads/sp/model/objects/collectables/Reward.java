@@ -1,21 +1,23 @@
 package se.umu.cs.ads.sp.model.objects.collectables;
 
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.RewardType;
 
 public class Reward {
     private int quantity;
-    private String type;
+    private RewardType type;
 
-    public Reward(int quantity, String type) {
+    public Reward(int quantity, RewardType type) {
         this.quantity = quantity;
         this.type = type;
     }
 
     @Override
-    public String toString(){
-        return "+"+quantity+" " +type;
+    public String toString() {
+        return "+" + quantity + " " + type;
     }
-    public int getQuantity(){
+
+    public int getQuantity() {
         return quantity;
     }
 
@@ -30,25 +32,16 @@ public class Reward {
         return input.replaceAll("\\+\\d+\\s*", "").trim();
     }
 
-    public String getType(){
+    public RewardType getType() {
         return type;
     }
 
-    public static class RewardType {
-        public static String GOLD = "GOLD";
-        public static String MOVEMENT ="MOVEMENT";
-        public static String POINT = "POINT";
-        public static String FLAG = "FLAG";
-        public static String INCREASED_DMG = "INCREASED_DMG";
-    }
-
-    public static Reward getRandomReward(){
-        int randomNum = Utils.getRandomInt(0,5);
+    public static Reward getRandomReward() {
+        int randomNum = Utils.getRandomInt(0, 4);
         return switch (randomNum) {
-            case 0 -> new Reward(Utils.getRandomInt(1, 5), RewardType.MOVEMENT);
-            case 1 -> new Reward(Utils.getRandomInt(1, 5), RewardType.POINT);
-            case 2 -> new Reward(Utils.getRandomInt(5, 20), RewardType.GOLD);
-            case 3 -> new Reward(Utils.getRandomInt(1, 5), RewardType.INCREASED_DMG);
+            case 0 -> new Reward(Utils.getRandomInt(1, 5), RewardType.POINT);
+            case 1 -> new Reward(Utils.getRandomInt(1, 5), RewardType.MOVEMENT_SPEED);
+            case 2 -> new Reward(Utils.getRandomInt(1, 5), RewardType.ATTACK_DMG);
             default -> new Reward(Utils.getRandomInt(10, 20), RewardType.GOLD);
         };
 

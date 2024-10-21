@@ -17,7 +17,9 @@ public abstract class Entity extends GameObject {
     protected int maxHp;
     protected int baseHp;
     protected int currentHp;
-    protected int speed;
+
+    protected int baseSpeed;
+    protected int speedBuff;
     protected Cooldown hitCooldown;
     protected CollisionBox attackBox;
     protected EntityState state;
@@ -29,21 +31,24 @@ public abstract class Entity extends GameObject {
 
     public Entity(String name, Position startPos, Map map) {
         super(startPos, map);
-        this.entityName = name;
-        this.position = startPos;
-        this.state = EntityState.IDLE;
-        this.speed = 2;
+        entityName = name;
+        position = startPos;
+        state = EntityState.IDLE;
+        baseSpeed = 2;
+        speedBuff = 0;
         this.baseHp = 100;
+        this.maxHp = baseHp;
+        this.currentHp = maxHp;
         this.map = map;
         // Place the hitbox around the entity rather than
-        this.collisionBox = new CollisionBox(position, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
+        collisionBox = new CollisionBox(position, Constants.ENTITY_WIDTH, Constants.ENTITY_HEIGHT);
     }
 
-    public void setUserId(long id){
+    public void setUserId(long id) {
         userId = id;
     }
 
-    public long getUserid(){
+    public long getUserid() {
         return userId;
     }
 
@@ -52,10 +57,10 @@ public abstract class Entity extends GameObject {
     public void move() {
         // Check if the speed is greater than the distance left
         map.removeInhabitant(this, position);
-        if (Position.distance(this.position, destination) <= speed) {
-            this.position = destination;
-            this.collisionBox.setLocation(destination);
-            this.state = EntityState.IDLE;
+        if (Position.distance(this.position, destination) <= (baseSpeed + speedBuff)) {
+            position = destination;
+            collisionBox.setLocation(destination);
+            state = EntityState.IDLE;
             map.setInhabitant(this, position);
             return;
         }
@@ -65,20 +70,20 @@ public abstract class Entity extends GameObject {
         int deltaY = position.getY() - destination.getY();
 
         // Calculate the new coordinates
-        int newX = (Math.abs(deltaX) <= speed) ? destination.getX() : position.getX() - Integer.signum(deltaX) * speed;
-        int newY = (Math.abs(deltaY) <= speed) ? destination.getY() : position.getY() - Integer.signum(deltaY) * speed;
+        int newX = (Math.abs(deltaX) <= (baseSpeed + speedBuff)) ? destination.getX() : position.getX() - Integer.signum(deltaX) * (baseSpeed + speedBuff);
+        int newY = (Math.abs(deltaY) <= (baseSpeed + speedBuff)) ? destination.getY() : position.getY() - Integer.signum(deltaY) * (baseSpeed + speedBuff);
 
         // Check for collisions
         int row = newY / Constants.TILE_WIDTH;
         int col = newX / Constants.TILE_HEIGHT;
         if (map.getModelMap().get(row).get(col).hasCollision()) {
-            this.state = EntityState.IDLE;
+            state = EntityState.IDLE;
             map.setInhabitant(this, position);
             return;
         }
 
-        this.position = new Position(newX, newY);
-        this.collisionBox.setLocation(position);
+        position = new Position(newX, newY);
+        collisionBox.setLocation(position);
     }
 
     public boolean isSelected() {
@@ -87,20 +92,12 @@ public abstract class Entity extends GameObject {
 
     public void setSelected(boolean select) {
         if (state != EntityState.DEAD) {
-            this.selected = select;
+            selected = select;
         }
     }
 
     public EntityState getState() {
-        return this.state;
-    }
-
-    public int getSpeed() {
-        return this.speed;
-    }
-
-    public void setSpeed(int newSpeed) {
-        this.speed = newSpeed;
+        return state;
     }
 
     public Position getDestination() {
@@ -110,18 +107,6 @@ public abstract class Entity extends GameObject {
     public void setDestination(Position newDestination) {
         this.destination = newDestination;
         this.state = EntityState.RUNNING;
-    }
-
-    public void setMaxHp(int hp) {
-        this.maxHp = hp;
-    }
-
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    public int getCurrentHp() {
-        return this.currentHp;
     }
 
     public String getEntityName() {
@@ -146,5 +131,37 @@ public abstract class Entity extends GameObject {
         this.position = newPos;
         this.collisionBox.setLocation(newPos);
         map.setInhabitant(this, position);
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int hp) {
+        this.maxHp = hp;
+    }
+
+    public int getCurrentHp() {
+        return this.currentHp;
+    }
+
+    public void setCurrentHp(int newHp) {
+        currentHp = newHp;
+    }
+
+    public int getBaseHp() {
+        return baseHp;
+    }
+
+    public int getBaseSpeed() {
+        return baseSpeed;
+    }
+
+    public int getSpeedBuff() {
+        return speedBuff;
+    }
+
+    public void setSpeedBuff(int newSpeedBuff) {
+        speedBuff = newSpeedBuff;
     }
 }

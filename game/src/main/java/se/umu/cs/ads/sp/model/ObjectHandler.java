@@ -16,10 +16,7 @@ import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.DtoTypes;
-import se.umu.cs.ads.sp.utils.enums.EntityState;
-import se.umu.cs.ads.sp.utils.enums.EventType;
-import se.umu.cs.ads.sp.utils.enums.UnitType;
+import se.umu.cs.ads.sp.utils.enums.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -130,16 +127,17 @@ public class ObjectHandler {
 
             if (collected instanceof Chest chest) {
                 System.out.println("Picked up chest!");
-                if(collected.getReward().getType().equals(Reward.RewardType.GOLD)){
+                if(collected.getReward().getType().equals(RewardType.GOLD)){
                     System.out.println("isa gold");
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
-                }else if(collected.getReward().getType().equals(Reward.RewardType.POINT)){
+                }else if(collected.getReward().getType().equals(RewardType.POINT)){
                     System.out.println("isa point");
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP));
                 }else{
                     //Chest contains a BUFF, parse it
                     System.out.println("ISA BUFF");
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP));
+                    upgradeUnit(playerUnit.getId(), Reward.parseReward(collected.getReward().toString()), Reward.parseQuantity(collected.getReward().toString()));
                     System.out.println("BUFF -> "+Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
                 }
             }
@@ -181,7 +179,7 @@ public class ObjectHandler {
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
         Flag flag = new Flag(map.getFlagPosition(), map);
-        flag.setReward(new Reward(1, Reward.RewardType.FLAG));
+        flag.setReward(new Reward(1, RewardType.FLAG));
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
 
@@ -192,7 +190,7 @@ public class ObjectHandler {
             startGameRequest.addCollectable(
                     new CollectableDTO(collectable.getId(),
                             collectable.getPosition(),
-                            collectable.getReward().getType(),
+                            collectable.getReward().getType().label,
                             collectable.getReward()));
         }
 
@@ -312,7 +310,7 @@ public class ObjectHandler {
 
     public long spawnFlag(Map map, Position position){
         Flag flag = new Flag(position, map);
-        flag.setReward(new Reward(1, Reward.RewardType.FLAG));
+        flag.setReward(new Reward(1, RewardType.FLAG));
         addCollectable(flag);
         return flag.getId();
     }
@@ -325,7 +323,7 @@ public class ObjectHandler {
 
     private void spawnGold(Map map, Position position) {
         Gold coin = new Gold(position, map);
-        coin.setReward(new Reward(10, Reward.RewardType.GOLD));
+        coin.setReward(new Reward(10, RewardType.GOLD));
         addCollectable(coin);
     }
 
@@ -362,7 +360,7 @@ public class ObjectHandler {
             enemyUnit.setPosition(update.position());
             enemyUnit.setCurrentHp(update.currentHp());
             enemyUnit.setMaxHp(update.maxHp());
-            enemyUnit.setSpeed(update.speed());
+            enemyUnit.setSpeedBuff(update.speed());
         }
     }
 
@@ -379,4 +377,15 @@ public class ObjectHandler {
     public void addEnvironment(Environment environment) {
         environments.put(environment.getId(), environment);
     }
+
+    public void upgradeUnit(long unitId, String type, int amount) {
+        PlayerUnit myUnit = myUnits.get(unitId);
+        RewardType upgrade = RewardType.fromLabel(type);
+        switch(upgrade) {
+            case MAX_HP -> myUnit.setMaxHp(myUnit.getMaxHp() + amount);
+            case ATTACK_DMG -> myUnit.setAttackBuff(myUnit.getAttackBuff() + amount);
+            case MOVEMENT_SPEED -> myUnit.setSpeedBuff(myUnit.getSpeedBuff() + amount);
+            default -> System.out.println("ERROR: Unknown upgrade type - " + type);
+        }
+        }
 }

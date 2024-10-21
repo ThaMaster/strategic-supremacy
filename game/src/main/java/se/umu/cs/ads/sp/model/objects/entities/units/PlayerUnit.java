@@ -5,7 +5,6 @@ import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
@@ -17,6 +16,7 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.EntityState;
 import se.umu.cs.ads.sp.utils.enums.EventType;
+import se.umu.cs.ads.sp.utils.enums.RewardType;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -27,15 +27,18 @@ public class PlayerUnit extends Entity {
     private Cooldown miningCooldown;
     private Cooldown shootCooldown;
     private GoldMine goldMine;
+    private long myBaseId;
+
+    // Attack variables
     private PlayerUnit targetedUnit;
-    private final int attack;
-    protected int attackRange;
+    private final int baseAttack;
     private int attackBuff;
+    protected int attackRange;
     private boolean inAttackRange = false;
     private boolean attacked = false;
     private boolean hit = false;
+
     private boolean hasFlag;
-    private long myBaseId;
 
     public PlayerUnit(String name, Position startPos, Map map, long baseId) {
         super(name, startPos, map);
@@ -45,23 +48,21 @@ public class PlayerUnit extends Entity {
         this.baseHp = 100;
         this.maxHp = baseHp;
         this.currentHp = maxHp;
-        this.attack = 10;
+        this.baseAttack = 10;
         this.attackBuff = 0;
         this.attackRange = 150;
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
-    public void setBase(long baseId){
+    public void setBase(long baseId) {
         myBaseId = baseId;
     }
 
-    public void setHasFlag(boolean hasFlag){
-
-        System.out.println("SET TO + " + hasFlag);
+    public void setHasFlag(boolean hasFlag) {
         this.hasFlag = hasFlag;
     }
 
-    public boolean hasFlag(){
+    public boolean hasFlag() {
         return hasFlag;
     }
 
@@ -73,7 +74,7 @@ public class PlayerUnit extends Entity {
         this.baseHp = 100;
         this.maxHp = baseHp;
         this.currentHp = maxHp;
-        this.attack = 10;
+        this.baseAttack = 10;
         this.attackBuff = 0;
         this.attackRange = 150;
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
@@ -124,7 +125,7 @@ public class PlayerUnit extends Entity {
                 } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
                     goldMine.harvestGold(1);
-                    coin.setReward(new Reward(1, Reward.RewardType.GOLD));
+                    coin.setReward(new Reward(1, RewardType.GOLD));
                     this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
@@ -146,7 +147,7 @@ public class PlayerUnit extends Entity {
                 if (coll.get(i) instanceof Collectable collectable) {
                     if (this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())) {
 
-                        if(collectable.hasBeenCollected()){
+                        if (collectable.hasBeenCollected()) {
                             continue;
                         }
 
@@ -161,7 +162,7 @@ public class PlayerUnit extends Entity {
                     startMining();
                 }
                 if (this.position.equals(getDestination()) && coll.get(i) instanceof Base base) {
-                    if(hasFlag && base.getId() == myBaseId){
+                    if (hasFlag && base.getId() == myBaseId) {
                         GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+10 Points", EventType.FLAG_TO_BASE));
                         hasFlag = false;
                     }
@@ -189,25 +190,21 @@ public class PlayerUnit extends Entity {
         return this.collected;
     }
 
-    public void setAttackBuff(int newBuff) {
-        this.attackBuff = newBuff;
-    }
-
     public boolean isInAttackRange() {
-        return this.inAttackRange;
+        return inAttackRange;
     }
 
     public void attack() {
         GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit attacking", EventType.ATTACK));
-        targetedUnit.takeDamage(attack + attackBuff);
+        targetedUnit.takeDamage(baseAttack + attackBuff);
     }
 
     private void startMining() {
-        if (this.state == EntityState.MINING) {
+        if (state == EntityState.MINING) {
             return;
         }
-        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit mining", EventType.MINING));
-        this.state = EntityState.MINING;
+        GameEvents.getInstance().addEvent(new GameEvent(id, "Unit mining", EventType.MINING));
+        state = EntityState.MINING;
         miningCooldown.start();
     }
 
@@ -223,9 +220,11 @@ public class PlayerUnit extends Entity {
         return hit;
     }
 
-    public void setCurrentHp(int currentHp) {
-        this.currentHp = currentHp;
+    public void setAttackBuff(int newAttackBuff) {
+        attackBuff = newAttackBuff;
     }
 
-
+    public int getAttackBuff() {
+        return attackBuff;
+    }
 }

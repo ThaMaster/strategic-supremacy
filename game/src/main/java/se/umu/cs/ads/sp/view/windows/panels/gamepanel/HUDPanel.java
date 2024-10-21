@@ -9,12 +9,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class HUDPanel extends JPanel {
+public class HUDPanel extends JPanel implements KeyListener {
 
     private JLabel timerLabel;
     private JLabel selectedUnitLabel;
@@ -46,19 +48,18 @@ public class HUDPanel extends JPanel {
      */
     private void initHUDComponents() {
         // Player stats section (top left corner)
-        this.timerLabel = new JLabel("01:00");
-        this.moneyLabel = new JLabel("Money: $0");
-        this.scoreLabel = new JLabel("Score: 0");
-        this.selectedUnitLabel = new JLabel("");
+        timerLabel = new JLabel("01:00");
+        moneyLabel = new JLabel("Money: $0");
+        scoreLabel = new JLabel("Score: 0");
+        selectedUnitLabel = new JLabel("");
 
         ContainerPanel timerPanel = createHUDContainerLabel(timerLabel, UtilView.screenWidth / 2 - 65, 20, 100, 40);
-        ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 20, 120, 40);
-        ContainerPanel scorePanel = createHUDContainerLabel(scoreLabel, 20, 60, 120, 40);
+        ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 20, 170, 50);
+        ContainerPanel scorePanel = createHUDContainerLabel(scoreLabel, 20, 70, 170, 50);
         ContainerPanel selectedUnitPanel = createHUDContainerLabel(selectedUnitLabel, 20, UtilView.screenHeight - 100, 310, 100);
 
         openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80, 70, 50);
-        upgradePanel = new UpgradePanel(500, 500);
-        upgradePanel.setBounds(UtilView.screenWidth / 2 - 250, UtilView.screenHeight / 2 - 250, 500, 500);
+        upgradePanel = new UpgradePanel(gamePanel, 850, 550);
 
         // Add components to HUDPanel
         this.add(timerPanel);
@@ -72,23 +73,12 @@ public class HUDPanel extends JPanel {
     private ContainerPanel createHUDContainerLabel(JLabel label, int x, int y, int width, int height) {
         ContainerPanel cPanel = new ContainerPanel("wood", width, height);
         cPanel.setBounds(x, y, width, height);
-        label.setForeground(Color.RED); // White text for HUD
+        label.setForeground(Color.BLACK); // White text for HUD
         label.setFont(StyleConstants.HUD_TEXT); // Customize font and size
-        label.setHorizontalAlignment(JLabel.CENTER);
         label.setVerticalAlignment(JLabel.CENTER);
+        label.setHorizontalAlignment(JLabel.CENTER);
         cPanel.add(label, BorderLayout.CENTER);
         return cPanel;
-    }
-
-    /**
-     * Helper method to create HUD labels with consistent style and position.
-     */
-    private JLabel createHUDLabel(String text, int x, int y, int width, int height) {
-        JLabel label = new JLabel(text);
-        label.setForeground(Color.RED); // White text for HUD
-        label.setFont(StyleConstants.HUD_TEXT); // Customize font and size
-        label.setBounds(x, y, width, height); // Set position and size
-        return label;
     }
 
     private JButton createHUDShopButton(int x, int y, int width, int height) {
@@ -117,20 +107,11 @@ public class HUDPanel extends JPanel {
         return button;
     }
 
-    /**
-     * Update the player's money display on the HUD.
-     *
-     * @param money The new money value.
-     */
     public void updateMoney(int money) {
         moneyLabel.setText("Money: $" + money);
+        upgradePanel.updateMoney(money);
     }
 
-    /**
-     * Update the player's score display on the HUD.
-     *
-     * @param score The new score value.
-     */
     public void updateScore(int score) {
         scoreLabel.setText("Score: " + score);
     }
@@ -183,5 +164,22 @@ public class HUDPanel extends JPanel {
 
     public void setUpgradeMenu(ArrayList<Long> unitIds, ArrayList<UnitType> types) {
         upgradePanel.setUpgradeMenu(unitIds, types);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_B) {
+            toggleUpgradeMenu();
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }

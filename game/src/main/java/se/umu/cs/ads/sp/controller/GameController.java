@@ -59,12 +59,11 @@ public class GameController implements ActionListener {
         timer.start();
     }
 
-    public void spawnFlag(long id, Position flagPos){
+    public void spawnFlag(long id, Position flagPos) {
         mainFrame.getGamePanel().spawnFlag(id, flagPos);
     }
 
-    private void initializeView()
-    {
+    private void initializeView() {
         mainFrame.showGamePanel(tileManager);
 
         ArrayList<UnitType> types = new ArrayList<>(
@@ -96,6 +95,7 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().updateEntityViews(getAllUnits());
         mainFrame.getGamePanel().updateCollectables();
         mainFrame.getGamePanel().updateEnvironments();
+        updateHudInfo();
         // Check where to move the camera.
         if (cameraPanningDirection != Direction.NONE) {
             switch (cameraPanningDirection) {
@@ -363,8 +363,14 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().removeEntities(unitIds);
     }
 
-    public void buyUpgrade(long unitId, String type, int amount) {
+    private void updateHudInfo() {
+        mainFrame.getHudPanel().updateMoney(modelManager.getCurrentGold());
+        mainFrame.getHudPanel().updateScore(modelManager.getCurrentPoints());
+    }
 
+    public void buyUpgrade(long unitId, String type, int amount, int cost) {
+        modelManager.setCurrentGold(modelManager.getCurrentGold() - cost);
+        modelManager.getObjectHandler().upgradeUnit(unitId, type, amount);
     }
 
     public void toggleShopWindow() {

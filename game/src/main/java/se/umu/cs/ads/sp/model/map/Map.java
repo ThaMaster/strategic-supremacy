@@ -9,6 +9,7 @@ import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.RewardType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -187,7 +188,7 @@ public class Map {
                 // 10 % chance of generating a coin
                 else if (getRandomSuccess(10)) {
                     Gold coin = new Gold(pos, this);
-                    coin.setReward(new Reward(10, Reward.RewardType.GOLD));
+                    coin.setReward(new Reward(10, RewardType.GOLD));
                     collectables.put(coin.getId(), coin);
                 }
             }

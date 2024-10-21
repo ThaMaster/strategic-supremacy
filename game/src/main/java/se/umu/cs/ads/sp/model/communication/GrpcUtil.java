@@ -8,6 +8,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.utils.enums.RewardType;
 
 import java.util.ArrayList;
 
@@ -112,7 +113,7 @@ public class GrpcUtil {
     }
 
     public static Reward fromGrpcReward(proto.Reward reward) {
-        return new Reward(reward.getQuantity(), reward.getReward());
+        return new Reward(reward.getQuantity(), RewardType.fromLabel(reward.getReward()));
     }
 
     public static CollectableDTO fromGrpcCollectable(proto.Collectable collectable) {
