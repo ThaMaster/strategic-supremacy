@@ -38,10 +38,6 @@ public abstract class EntityView extends ObjectView {
         this.state = newState;
     }
 
-    public EntityState getEntityState() {
-        return this.state;
-    }
-
     public void update() {
         this.animator.update();
     }
@@ -55,7 +51,6 @@ public abstract class EntityView extends ObjectView {
     public void setHasAttacked(boolean bool) {
         this.attacked = bool;
     }
-
     public void setHasBeenHit(boolean bool) {
         this.hasBeenHit = bool;
     }

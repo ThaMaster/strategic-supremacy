@@ -14,6 +14,7 @@ public abstract class Collectable extends GameObject {
     }
 
     public void pickUp(Map map){
+        hasBeenCollected = true;
         this.destroy(map);
     }
 
@@ -23,5 +24,9 @@ public abstract class Collectable extends GameObject {
 
     public Reward getReward(){
         return this.reward;
+    }
+
+    public boolean hasBeenCollected() {
+        return hasBeenCollected;
     }
 }

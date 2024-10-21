@@ -67,4 +67,8 @@ public class Animator {
     public void pause() {
         this.paused = true;
     }
+
+    public boolean isFlipped() {
+        return flipped;
+    }
 }

@@ -76,7 +76,7 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
                 modelManager.getObjectHandler().getEnemyUnits());
         mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
-        mainFrame.getGamePanel().setEnvironemnts(modelManager.getObjectHandler().getEnvironments());
+        mainFrame.getGamePanel().setEnvironments(modelManager.getObjectHandler().getEnvironments());
     }
 
     @Override

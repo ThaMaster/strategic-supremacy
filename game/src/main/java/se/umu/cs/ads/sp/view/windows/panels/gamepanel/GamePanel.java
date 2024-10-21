@@ -317,19 +317,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
-        System.out.println("Setting collectables!");
         this.collectables.clear();
         CollectableView newCollectableView = null;
         for (Collectable collectable : collectables.values()) {
             if (collectable instanceof Chest) {
                 newCollectableView = new ChestView(collectable.getId(), collectable.getPosition());
-            }
-            else if (collectable instanceof Gold) {
+            } else if (collectable instanceof Gold) {
                 newCollectableView = new GoldView(collectable.getId(), collectable.getPosition());
                 newCollectableView.setCollisionBox(collectable.getCollisionBox());
-            }
-            else if(collectable instanceof Flag){
-                System.out.println("Got a flag view");
+            } else if (collectable instanceof Flag) {
                 newCollectableView = new FlagView(collectable.getId(), collectable.getPosition());
                 newCollectableView.setCollisionBox(collectable.getCollisionBox());
             }
@@ -340,7 +336,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void setEnvironemnts(HashMap<Long, Environment> environments) {
+    public void setEnvironments(HashMap<Long, Environment> environments) {
         this.environments.clear();
         EnvironmentView newEnvironmentView = null;
         for (Environment environment : environments.values()) {
@@ -372,19 +368,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (Entity entityModel : entities) {
             EntityView entity = this.gameEntitiesView.get(entityModel.getId());
             if (entityModel instanceof PlayerUnit modelUnit) {
-                entity.setEntityState(modelUnit.getState());
-                entity.setPosition(modelUnit.getPosition());
-                entity.setDestination(modelUnit.getDestination());
-                entity.setSelected(modelUnit.isSelected());
-                entity.setAttackRange(modelUnit.getAttackRange());
-                entity.setCollisionBox(modelUnit.getCollisionBox());
-                entity.setInRange(modelUnit.isInAttackRange());
-                entity.setHasAttacked(modelUnit.hasAttacked());
-                entity.setHasBeenHit(modelUnit.hasBeenHit());
-                entity.setHealthBarValues(entityModel.getMaxHp(), entityModel.getCurrentHp());
-                entity.update();
+                PlayerUnitView unitView = (PlayerUnitView) entity;
+                unitView.setEntityState(modelUnit.getState());
+                unitView.setPosition(modelUnit.getPosition());
+                unitView.setDestination(modelUnit.getDestination());
+                unitView.setSelected(modelUnit.isSelected());
+                unitView.setAttackRange(modelUnit.getAttackRange());
+                unitView.setCollisionBox(modelUnit.getCollisionBox());
+                unitView.setInRange(modelUnit.isInAttackRange());
+                unitView.setHasAttacked(modelUnit.hasAttacked());
+                unitView.setHasBeenHit(modelUnit.hasBeenHit());
+                unitView.setHealthBarValues(entityModel.getMaxHp(), entityModel.getCurrentHp());
+                unitView.setHasFlag(modelUnit.hasFlag());
+                unitView.update();
                 if (entity.isMyUnit) {
-                    myUnits.add((PlayerUnitView) entity);
+                    myUnits.add(unitView);
                 }
             }
         }
@@ -480,7 +478,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.repaint();
     }
 
-    public void spawnFlag(long id, Position flagPos){
+    public void spawnFlag(long id, Position flagPos) {
         this.collectables.put(id, new FlagView(id, flagPos));
     }
 
@@ -502,13 +500,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         CollectableView collectableView = this.collectables.get(event.getId());
         collectableView.pickup();
 
-        if(collectableView instanceof ChestView) {
+        if (collectableView instanceof ChestView) {
             SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
-        }else if (collectableView instanceof GoldView) {
+        } else if (collectableView instanceof GoldView) {
             SoundManager.getInstance().play(SoundFX.GOLD);
             System.out.println("Picked up collectable with id -> " + collectableView.getId());
             this.collectables.remove(event.getId());
-        }else if (collectableView instanceof FlagView){
+        } else if (collectableView instanceof FlagView) {
             SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
             this.collectables.remove(event.getId());
         }

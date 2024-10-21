@@ -10,10 +10,13 @@ import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class PlayerUnitView extends EntityView {
 
-    public String unitName = "";
+    public String unitName;
+    private boolean hasFlag = false;
+    private BufferedImage collectedFlagImage;
 
     public PlayerUnitView(long id, String name, Position pos) {
         super(id, pos);
@@ -26,6 +29,15 @@ public class PlayerUnitView extends EntityView {
         g2d.setColor(Color.RED);
 
         Position screenPos = Camera.worldToScreen(position);
+
+        if (hasFlag) {
+            Position flagPos = new Position(
+                    animator.isFlipped() ? collectedFlagImage.getWidth() + screenPos.getX() - (collectedFlagImage.getWidth() / 2) : screenPos.getX() - (collectedFlagImage.getWidth() / 2),
+                    screenPos.getY() - (collectedFlagImage.getHeight() / 2) - 10);
+            int width = animator.isFlipped() ? -collectedFlagImage.getWidth() : collectedFlagImage.getWidth();
+            int height = collectedFlagImage.getHeight();
+            g2d.drawImage(collectedFlagImage, flagPos.getX(), flagPos.getY(), width, height, null);
+        }
 
         if (selected) {
             Position hpBarPosition = new Position(screenPos.getX(), screenPos.getY() - (int) (Constants.ENTITY_HEIGHT * 0.75));
@@ -52,6 +64,7 @@ public class PlayerUnitView extends EntityView {
 
     @Override
     protected void initAnimator() {
+        collectedFlagImage = ImageLoader.loadImage("/sprites/collectables/flag/flagCollected.png");
         this.animator.addAnimation(
                 new Animation(
                         "idle",
@@ -124,5 +137,9 @@ public class PlayerUnitView extends EntityView {
                 break;
         }
         this.state = newState;
+    }
+
+    public void setHasFlag(boolean bool) {
+        this.hasFlag = bool;
     }
 }

@@ -56,6 +56,8 @@ public class PlayerUnit extends Entity {
     }
 
     public void setHasFlag(boolean hasFlag){
+
+        System.out.println("SET TO + " + hasFlag);
         this.hasFlag = hasFlag;
     }
 
@@ -144,7 +146,7 @@ public class PlayerUnit extends Entity {
                 if (coll.get(i) instanceof Collectable collectable) {
                     if (this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())) {
 
-                        if(collectable instanceof Chest chest && chest.isOpen()){
+                        if(collectable.hasBeenCollected()){
                             continue;
                         }
 
