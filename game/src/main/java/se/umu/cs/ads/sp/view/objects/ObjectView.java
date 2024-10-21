@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.view.objects;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.animation.Animator;
 import se.umu.cs.ads.sp.view.util.Camera;
@@ -17,7 +18,7 @@ public abstract class ObjectView {
 
 
     public ObjectView(long id, Position pos) {
-        this.collisionBox = new CollisionBox(pos, 0, 0);
+        this.collisionBox = new CollisionBox(pos, Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
         this.id = id;
         position = pos;
         animator = new Animator();

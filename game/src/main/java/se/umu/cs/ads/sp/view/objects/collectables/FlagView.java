@@ -21,7 +21,6 @@ public class FlagView extends CollectableView {
     @Override
     public void pickup() {
         this.hasBeenPickedUp = true;
-        animator.start();
     }
 
     @Override
@@ -40,6 +39,6 @@ public class FlagView extends CollectableView {
             drawCollisionBox(g2d);
         }
         Position screenPos = Camera.worldToScreen(position);
-        this.animator.draw(g2d, new Position(screenPos.getX() - Constants.ENTITY_WIDTH / 2, screenPos.getY() - Constants.ENTITY_HEIGHT / 2));
+        this.animator.draw(g2d, new Position(screenPos.getX() + 20, screenPos.getY() - 20));
     }
 }

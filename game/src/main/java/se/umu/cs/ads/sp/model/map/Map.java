@@ -158,35 +158,34 @@ public class Map {
         return spawnPositions;
     }
 
-    public Position generateGoldMinePosition(Position basePosition){
-        Position minePosition = basePosition;
-
-        do{
+    public Position generateGoldMinePosition(Position basePosition) {
+        Position minePosition;
+        do {
             minePosition = new Position(
-                    basePosition.getX() + Utils.getRandomInt(-Constants.TILE_HEIGHT,Constants.TILE_HEIGHT),
-                    basePosition.getY() + Utils.getRandomInt(-Constants.TILE_WIDTH,Constants.TILE_WIDTH));
-        }while(isWalkable(minePosition));
+                    basePosition.getX() + Utils.getRandomInt(-Constants.TILE_HEIGHT, Constants.TILE_HEIGHT),
+                    basePosition.getY() + Utils.getRandomInt(-Constants.TILE_WIDTH, Constants.TILE_WIDTH));
+        } while (!isWalkable(minePosition));
         return minePosition;
     }
 
-    public HashMap<Long, Collectable> generateCollectables(){
+    public HashMap<Long, Collectable> generateCollectables() {
         HashMap<Long, Collectable> collectables = new HashMap<>();
-        for(int row = 0; row < map.size(); row++){
-            for(int col = 0; col < map.get(row).size(); col++){
-                if(!inBounds(row, col) || getModelMap().get(row).get(col).hasCollision()){
+        for (int row = 0; row < map.size(); row++) {
+            for (int col = 0; col < map.get(row).size(); col++) {
+                if (!inBounds(row, col) || getModelMap().get(row).get(col).hasCollision()) {
                     continue;
                 }
 
-                Position pos = new Position(col*Constants.TILE_HEIGHT, row * Constants.TILE_WIDTH);
+                Position pos = new Position(col * Constants.TILE_HEIGHT, row * Constants.TILE_WIDTH);
 
                 // 2 % chance of generating a chest
-                if(getRandomSuccess(2)){
+                if (getRandomSuccess(2)) {
                     Chest chest = new Chest(pos, this);
                     chest.setReward(Reward.getRandomReward());
                     collectables.put(chest.getId(), chest);
                 }
                 // 10 % chance of generating a coin
-                else if(getRandomSuccess(10)){
+                else if (getRandomSuccess(10)) {
                     Gold coin = new Gold(pos, this);
                     coin.setReward(new Reward(10, Reward.RewardType.GOLD));
                     collectables.put(coin.getId(), coin);
@@ -196,17 +195,18 @@ public class Map {
         return collectables;
     }
 
-    public Position getFlagPosition(){
+    public Position getFlagPosition() {
         Position flagPosition = new Position((cols / 2) * Constants.TILE_HEIGHT, (rows / 2) * Constants.TILE_WIDTH);
-        if(isWalkable(flagPosition)){
+        if (isWalkable(flagPosition)) {
             return flagPosition;
         }
         Position offsetPos;
-        do{
+        do {
+            System.out.println("bruh");
             offsetPos = new Position(
-                    flagPosition.getX() + Utils.getRandomInt(-10,10),
-                    flagPosition.getY() + Utils.getRandomInt(-10,10));
-        }while(!isWalkable(offsetPos));
+                    flagPosition.getX() + Utils.getRandomInt(-10, 10),
+                    flagPosition.getY() + Utils.getRandomInt(-10, 10));
+        } while (!isWalkable(offsetPos));
         return offsetPos;
     }
 

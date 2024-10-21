@@ -64,4 +64,9 @@ public class CollisionBox {
     public int getHeight() {
         return (int)collisionBox.getHeight();
     }
+
+    @Override
+    public String toString() {
+        return "(x: " + collisionBox.x + " y: " + collisionBox.y + " w:" + width + " h:" + height + ")";
+    }
 }

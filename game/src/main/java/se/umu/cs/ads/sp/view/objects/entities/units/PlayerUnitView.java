@@ -23,6 +23,8 @@ public class PlayerUnitView extends EntityView {
 
     @Override
     public void draw(Graphics2D g2d) {
+        g2d.setColor(Color.RED);
+
         Position screenPos = Camera.worldToScreen(position);
 
         if (selected) {
@@ -39,8 +41,10 @@ public class PlayerUnitView extends EntityView {
         }
 
         if (AppSettings.DEBUG) {
+            if (selected) {
+                g2d.setColor(Color.GREEN);
+            }
             drawCollisionBox(g2d);
-            g2d.setColor(Color.RED);
             g2d.drawOval(screenPos.getX() - attackRange, screenPos.getY() - attackRange, attackRange * 2, attackRange * 2);
         }
         this.animator.draw(g2d, screenPos);

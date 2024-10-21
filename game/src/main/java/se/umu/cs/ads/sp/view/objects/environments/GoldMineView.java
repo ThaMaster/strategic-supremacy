@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.environments;
 
+import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.view.animation.Animation;
@@ -33,8 +34,10 @@ public class GoldMineView extends EnvironmentView {
     public void draw(Graphics2D g2d) {
         if (!depleted) {
             Position screenPos = Camera.worldToScreen(position);
-            animator.draw(g2d, new Position(screenPos.getX() - Constants.ENTITY_WIDTH / 2,
-                    screenPos.getY() - Constants.ENTITY_HEIGHT / 2));
+            animator.draw(g2d, new Position(screenPos.getX(), screenPos.getY()));
+            if (AppSettings.DEBUG) {
+                drawCollisionBox(g2d);
+            }
         }
     }
 

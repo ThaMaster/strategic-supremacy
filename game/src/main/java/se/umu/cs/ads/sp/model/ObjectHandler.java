@@ -159,15 +159,20 @@ public class ObjectHandler {
     }
 
     public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
+        System.out.println("1");
+
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        System.out.println("2");
 
         Flag flag = new Flag(map.getFlagPosition(), map);
         flag.setReward(new Reward(1, Reward.RewardType.FLAG));
+        System.out.println("3");
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
 
         collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
+        System.out.println("4");
 
         for(Collectable collectable : collectables.values()){
             startGameRequest.addCollectable(
@@ -176,6 +181,8 @@ public class ObjectHandler {
                             collectable.getReward().getType(),
                             collectable.getReward()));
         }
+        System.out.println("5");
+
         for (User user : users) {
             long userId = user.id;
             Position basePos = basePositions.get(0);
@@ -208,6 +215,7 @@ public class ObjectHandler {
                 basePositions.remove(0);
             }
         }
+
         return startGameRequest;
     }
 
