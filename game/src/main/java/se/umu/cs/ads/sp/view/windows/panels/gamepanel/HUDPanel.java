@@ -117,6 +117,15 @@ public class HUDPanel extends JPanel implements KeyListener {
         scoreLabel.setText("Score: " + score);
     }
 
+    public void updateTimer(int minutes, int seconds) {
+        if(minutes == 0 && seconds < 30) {
+            timerLabel.setForeground(Color.RED.darker().darker());
+        } else {
+            timerLabel.setForeground(Color.BLACK);
+        }
+        timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+    }
+
     public void updateSelectedUnit(ArrayList<String> unitNames) {
         StringBuilder nameBuilder = new StringBuilder();
 

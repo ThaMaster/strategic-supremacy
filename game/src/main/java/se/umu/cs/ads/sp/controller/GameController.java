@@ -26,7 +26,11 @@ public class GameController implements ActionListener {
 
     private final int FPS = 60;
 
-    private Timer timer;
+    private Timer updateTimer;
+
+    private Timer gameTimer;
+    private int remainingTime = 2 * 60 + 30;
+
     private MainFrame mainFrame;
 
     private ModelManager modelManager;
@@ -39,14 +43,30 @@ public class GameController implements ActionListener {
         UtilView.changeScreenSize(1600, 800);
         mainFrame = new MainFrame();
         setActionListeners();
-        this.timer = new Timer(1000 / FPS, this);
+        this.updateTimer = new Timer(1000 / FPS, this);
+        this.gameTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (remainingTime > 0) {
+                    remainingTime--;
+                    updateHudTimer();
+                } else {
+                    gameTimer.stop();
+                    updateTimer.stop();
+                    modelManager.leaveOngoingGame();
+                    mainFrame.switchPanel("Browse");
+                    fetchLobbies();
+                }
+            }
+        });
     }
 
     //We got a message/request to start the game
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
         initializeView();
-        this.timer.start();
+        updateTimer.start();
+        gameTimer.start();
     }
 
     public ModelManager getModelManager() {
@@ -56,7 +76,8 @@ public class GameController implements ActionListener {
     //We have started the game
     public void startGame() {
         initializeView();
-        timer.start();
+        updateTimer.start();
+        gameTimer.start();
     }
 
     public void spawnFlag(long id, Position flagPos) {
@@ -269,7 +290,7 @@ public class GameController implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            timer.stop();
+            updateTimer.stop();
             modelManager.leaveOngoingGame();
             mainFrame.getQuitFrame().showFrame(false);
             mainFrame.switchPanel("Browse");
@@ -361,6 +382,10 @@ public class GameController implements ActionListener {
         modelManager.getObjectHandler().removeEnemyUnits(unitIds);
         modelManager.getLobbyHandler().removePlayer(playerId);
         mainFrame.getGamePanel().removeEntities(unitIds);
+    }
+
+    private void updateHudTimer() {
+        mainFrame.getHudPanel().updateTimer(remainingTime / 60, remainingTime % 60);
     }
 
     private void updateHudInfo() {

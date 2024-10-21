@@ -116,7 +116,7 @@ public class ObjectHandler {
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
 
-            if(!myUnits.containsKey(playerUnit.getId())){
+            if (!myUnits.containsKey(playerUnit.getId())) {
                 pickedUpCollectableIds.add(collected.getId());
                 continue;
             }
@@ -125,25 +125,19 @@ public class ObjectHandler {
             }
 
             if (collected instanceof Chest chest) {
-                System.out.println("Picked up chest!");
-                if(collected.getReward().getType().equals(RewardType.GOLD)){
-                    System.out.println("isa gold");
+                if (collected.getReward().getType().equals(RewardType.GOLD)) {
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
-                }else if(collected.getReward().getType().equals(RewardType.POINT)){
-                    System.out.println("isa point");
+                } else if (collected.getReward().getType().equals(RewardType.POINT)) {
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP));
-                }else{
+                } else {
                     //Chest contains a BUFF, parse it
-                    System.out.println("ISA BUFF");
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP));
                     upgradeUnit(playerUnit.getId(), Reward.parseReward(collected.getReward().toString()), Reward.parseQuantity(collected.getReward().toString()));
-                    System.out.println("BUFF -> "+Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
+                    System.out.println("BUFF -> " + Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
                 }
-            }
-            else if (collected instanceof Gold) {
+            } else if (collected instanceof Gold) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
-            }
-            else if(collected instanceof Flag){
+            } else if (collected instanceof Flag) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(),
                         "Flag picked up, hurry up and get it to the base",
                         EventType.FLAG_PICK_UP));
@@ -185,7 +179,7 @@ public class ObjectHandler {
         collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
 
-        for(Collectable collectable : collectables.values()){
+        for (Collectable collectable : collectables.values()) {
             startGameRequest.addCollectable(
                     new CollectableDTO(collectable.getId(),
                             collectable.getPosition(),
@@ -235,9 +229,9 @@ public class ObjectHandler {
             DtoType type = DtoType.fromLabel(env.type());
             switch (type) {
                 case BASE:
-                    if(env.userId() == user.id){
+                    if (env.userId() == user.id) {
                         baseId = spawnBase(map, env.position());
-                    }else{
+                    } else {
                         spawnBase(map, env.position());
                     }
                     break;
@@ -270,30 +264,31 @@ public class ObjectHandler {
             spawnUnit(map, unit.id(), unit.unitType(), unit.position(), unit.userId(), baseId);
         }
     }
-    public ArrayList<Long> getCollectedIds(){
+
+    public ArrayList<Long> getCollectedIds() {
         return pickedUpCollectableIds;
     }
 
-    public ArrayList<EntitySkeletonDTO> getAllEntitySkeletons(){
+    public ArrayList<EntitySkeletonDTO> getAllEntitySkeletons() {
         ArrayList<EntitySkeletonDTO> skeletons = getMyUnitsToEntitySkeletons();
-        for(PlayerUnit unit : enemyUnits.values()){
+        for (PlayerUnit unit : enemyUnits.values()) {
             EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getId(), unit.getEntityType(), unit.getPosition());
             skeletons.add(skeletonDTO);
         }
         return skeletons;
     }
 
-    public void updateUnitPositions(ArrayList<EntitySkeletonDTO> skeletons){
-        for(EntitySkeletonDTO unit : skeletons){
-            if(enemyUnits.containsKey(unit.id())){
+    public void updateUnitPositions(ArrayList<EntitySkeletonDTO> skeletons) {
+        for (EntitySkeletonDTO unit : skeletons) {
+            if (enemyUnits.containsKey(unit.id())) {
                 enemyUnits.get(unit.id()).setPosition(unit.position());
             }
         }
     }
 
-    public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons(){
+    public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons() {
         ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
-        for(PlayerUnit unit : myUnits.values()){
+        for (PlayerUnit unit : myUnits.values()) {
             EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), user.id, unit.getEntityType(), unit.getPosition());
             skeletons.add(skeletonDTO);
         }
@@ -307,7 +302,7 @@ public class ObjectHandler {
         return base.getId();
     }
 
-    public long spawnFlag(Map map, Position position){
+    public long spawnFlag(Map map, Position position) {
         Flag flag = new Flag(position, map);
         flag.setReward(new Reward(1, RewardType.FLAG));
         addCollectable(flag);
@@ -380,11 +375,12 @@ public class ObjectHandler {
     public void upgradeUnit(long unitId, String type, int amount) {
         PlayerUnit myUnit = myUnits.get(unitId);
         RewardType upgrade = RewardType.fromLabel(type);
-        switch(upgrade) {
+        switch (upgrade) {
             case MAX_HP -> myUnit.setMaxHp(myUnit.getMaxHp() + amount);
             case ATTACK_DMG -> myUnit.setAttackBuff(myUnit.getAttackBuff() + amount);
             case MOVEMENT_SPEED -> myUnit.setSpeedBuff(myUnit.getSpeedBuff() + amount);
             default -> System.out.println("ERROR: Unknown upgrade type - " + type);
         }
-        }
+    }
+
 }

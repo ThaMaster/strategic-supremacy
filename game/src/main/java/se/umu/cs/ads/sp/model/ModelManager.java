@@ -157,6 +157,8 @@ public class ModelManager {
                 comHandler.sendStartGameRequest(req, user);
             }
         }
+
+        System.out.println("nr units: " + objectHandler.getMyUnits().values().size());
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
@@ -217,8 +219,8 @@ public class ModelManager {
         System.out.println("[Client] Leaving ongoing game...");
 
         comHandler.removePlayerUnits();
+        objectHandler.clearSelectedUnitIds();
         objectHandler.getMyUnits().clear();
-        objectHandler.getSelectedUnits().clear();
         objectHandler.getEnvironments().clear();
         objectHandler.getCollectables().clear();
         lobbyHandler.leaveLobby();
