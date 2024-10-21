@@ -118,11 +118,11 @@ public abstract class Entity extends GameObject {
         this.currentHp -= damage;
         hitCooldown.start();
         if (currentHp <= 0) {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH, id));
             this.state = EntityState.DEAD;
             this.destroy(map);
         } else {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG, id));
         }
     }
 

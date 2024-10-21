@@ -4,8 +4,6 @@ public enum EventType {
     //General game event
     NEW_ROUND,
     LOGG,
-
-    COLLECT,
     GOLD_PICK_UP,
     BUFF_PICK_UP,
     FLAG_PICK_UP,
@@ -13,6 +11,8 @@ public enum EventType {
     MINING,
     FLAG_TO_BASE,
     POINT_PICK_UP,
+
+    ENEMY_PICK_UP,
 
     //Game actions
     TAKE_DMG,

@@ -47,5 +47,6 @@ public class EnemyUnitView extends PlayerUnitView {
                         7);
         attackAnimation.setOneShot(true);
         this.animator.addAnimation(attackAnimation);
+        this.animator.changeAnimation("idle");
     }
 }

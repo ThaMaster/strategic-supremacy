@@ -44,10 +44,6 @@ public class Animator {
 
     public void draw(Graphics2D g2d, Position pos) {
         // Draw the current frame of animation
-        if(currentAnimation == null || currentAnimation.getCurrentFrame() == null) {
-            System.out.println("TODO View-Animator (row 48), currentFrame is null?");
-            return;
-        }
         BufferedImage frame = currentAnimation.getCurrentFrame();
         Position screenPos = new Position(
                 flipped ? frame.getWidth() + pos.getX() - (frame.getWidth() / 2) : pos.getX() - (frame.getWidth() / 2),

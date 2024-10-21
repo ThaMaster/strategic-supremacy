@@ -119,7 +119,7 @@ public class PlayerUnit extends Entity {
                 break;
             case MINING:
                 if (!this.goldMine.hasResourceLeft()) {
-                    GameEvents.getInstance().addEvent(new GameEvent(goldMine.getId(), "depleted", EventType.MINE_DEPLETED));
+                    GameEvents.getInstance().addEvent(new GameEvent(goldMine.getId(), "depleted", EventType.MINE_DEPLETED, id));
                     this.state = EntityState.IDLE;
                     return;
                 } else if (miningCooldown.hasElapsed()) {
@@ -129,7 +129,7 @@ public class PlayerUnit extends Entity {
                     this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
-                    GameEvents.getInstance().addEvent(new GameEvent(coin.getId(), coin.getReward().toString(), EventType.GOLD_PICK_UP));
+                    GameEvents.getInstance().addEvent(new GameEvent(coin.getId(), coin.getReward().toString(), EventType.GOLD_PICK_UP, id));
                 }
                 break;
             case DEAD:
@@ -163,7 +163,7 @@ public class PlayerUnit extends Entity {
                 }
                 if (this.position.equals(getDestination()) && coll.get(i) instanceof Base base) {
                     if (hasFlag && base.getId() == myBaseId) {
-                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+10 Points", EventType.FLAG_TO_BASE));
+                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+10 Points", EventType.FLAG_TO_BASE, id));
                         hasFlag = false;
                     }
                 }
@@ -195,7 +195,7 @@ public class PlayerUnit extends Entity {
     }
 
     public void attack() {
-        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit attacking", EventType.ATTACK));
+        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit attacking", EventType.ATTACK, id));
         targetedUnit.takeDamage(baseAttack + attackBuff);
     }
 
@@ -203,7 +203,7 @@ public class PlayerUnit extends Entity {
         if (state == EntityState.MINING) {
             return;
         }
-        GameEvents.getInstance().addEvent(new GameEvent(id, "Unit mining", EventType.MINING));
+        GameEvents.getInstance().addEvent(new GameEvent(id, "Unit mining", EventType.MINING, id));
         state = EntityState.MINING;
         miningCooldown.start();
     }

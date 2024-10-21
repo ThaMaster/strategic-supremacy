@@ -105,6 +105,7 @@ public class PlayerUnitView extends EntityView {
                         7);
         attackAnimation.setOneShot(true);
         this.animator.addAnimation(attackAnimation);
+        this.animator.changeAnimation("idle");
     }
 
     @Override
@@ -138,6 +139,7 @@ public class PlayerUnitView extends EntityView {
                 this.animator.changeAnimation("dead");
                 break;
             default:
+                this.animator.changeAnimation("idle");
                 break;
         }
         this.state = newState;

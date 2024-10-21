@@ -116,31 +116,27 @@ public class ObjectHandler {
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
 
-            if (!myUnits.containsKey(playerUnit.getId())) {
-                pickedUpCollectableIds.add(collected.getId());
-                continue;
-            }
             if (playerUnit.getState() == EntityState.DEAD) {
                 continue;
             }
 
             if (collected instanceof Chest chest) {
                 if (collected.getReward().getType().equals(RewardType.GOLD)) {
-                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
                 } else if (collected.getReward().getType().equals(RewardType.POINT)) {
-                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP));
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP, playerUnit.getId()));
                 } else {
                     //Chest contains a BUFF, parse it
-                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP));
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP, playerUnit.getId()));
                     upgradeUnit(playerUnit.getId(), Reward.parseReward(collected.getReward().toString()), Reward.parseQuantity(collected.getReward().toString()));
                     System.out.println("BUFF -> " + Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
                 }
             } else if (collected instanceof Gold) {
-                GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+                GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
             } else if (collected instanceof Flag) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(),
                         "Flag picked up, hurry up and get it to the base",
-                        EventType.FLAG_PICK_UP));
+                        EventType.FLAG_PICK_UP, playerUnit.getId()));
                 playerUnit.setHasFlag(true);
             }
             pickedUpCollectableIds.add(collected.getId());
@@ -278,10 +274,40 @@ public class ObjectHandler {
         return skeletons;
     }
 
+    public ArrayList<EnvironmentDTO> getAllEnvironmentsDTO() {
+        ArrayList<EnvironmentDTO> environmentDtos = new ArrayList<>();
+        for(Environment env : this.environments.values()){
+            if(env instanceof GoldMine goldmine){
+                environmentDtos.add(new EnvironmentDTO(env.getId(), -1, env.getPosition(), DtoType.BASE.label, goldmine.getRemainingResource()));
+            }
+        }
+        return environmentDtos;
+    }
+
     public void updateUnitPositions(ArrayList<EntitySkeletonDTO> skeletons) {
         for (EntitySkeletonDTO unit : skeletons) {
             if (enemyUnits.containsKey(unit.id())) {
                 enemyUnits.get(unit.id()).setPosition(unit.position());
+            }
+        }
+    }
+
+    public void removeCollectables(Map map, ArrayList<Long> collectableIds){
+        for(Long collectableId : collectableIds){
+            this.collectables.get(collectableId).destroy(map);
+            this.collectables.remove(collectableId);
+        }
+    }
+
+    public void updateEnvironments(ArrayList<EnvironmentDTO> envDtos){
+        for(EnvironmentDTO env : envDtos){
+            if(this.environments.containsKey(env.id())){
+                if(DtoType.fromLabel(env.type()) == DtoType.GOLDMINE){
+                    GoldMine mine = (GoldMine)this.environments.get(env.id());
+                    if(mine.getRemainingResource() > env.remainingResource()){
+                        mine.setResource(env.remainingResource());
+                    }
+                }
             }
         }
     }
@@ -373,12 +399,18 @@ public class ObjectHandler {
     }
 
     public void upgradeUnit(long unitId, String type, int amount) {
-        PlayerUnit myUnit = myUnits.get(unitId);
+        PlayerUnit unit;
+
+        if(myUnits.containsKey(unitId)){
+            unit = myUnits.get(unitId);
+        }else{
+            unit = enemyUnits.get(unitId);
+        }
         RewardType upgrade = RewardType.fromLabel(type);
         switch (upgrade) {
-            case MAX_HP -> myUnit.setMaxHp(myUnit.getMaxHp() + amount);
-            case ATTACK_DMG -> myUnit.setAttackBuff(myUnit.getAttackBuff() + amount);
-            case MOVEMENT_SPEED -> myUnit.setSpeedBuff(myUnit.getSpeedBuff() + amount);
+            case MAX_HP -> unit.setMaxHp(unit.getMaxHp() + amount);
+            case ATTACK_DMG -> unit.setAttackBuff(unit.getAttackBuff() + amount);
+            case MOVEMENT_SPEED -> unit.setSpeedBuff(unit.getSpeedBuff() + amount);
             default -> System.out.println("ERROR: Unknown upgrade type - " + type);
         }
     }

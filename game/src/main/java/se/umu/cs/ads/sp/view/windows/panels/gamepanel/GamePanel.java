@@ -432,9 +432,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
         for (GameEvent event : events) {
             switch (event.getType()) {
-                case COLLECT:
-                    addTextEvent(event, 15, EventColor.SUCCESS);
-                    break;
                 case NEW_ROUND:
                     addTextEvent(event, 15, EventColor.ALERT);
                     break;

@@ -29,7 +29,6 @@ public class GameController implements ActionListener {
     private Timer updateTimer;
 
     private Timer gameTimer;
-    private int remainingTime = 2 * 60 + 30;
 
     private MainFrame mainFrame;
 
@@ -44,18 +43,14 @@ public class GameController implements ActionListener {
         mainFrame = new MainFrame();
         setActionListeners();
         this.updateTimer = new Timer(1000 / FPS, this);
-        this.gameTimer = new Timer(1000, new ActionListener() {
+        this.gameTimer = new Timer(700, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (remainingTime > 0) {
-                    remainingTime--;
-                    updateHudTimer();
-                } else {
-                    gameTimer.stop();
-                    updateTimer.stop();
-                    modelManager.leaveOngoingGame();
-                    mainFrame.switchPanel("Browse");
-                    fetchLobbies();
+                long remainingTime = modelManager.getRoundRemainingTime();
+                if(remainingTime <= 0){
+                    //Todo next round stuff
+                }else{
+                    updateHudTimer((int)remainingTime);
                 }
             }
         });
@@ -384,7 +379,7 @@ public class GameController implements ActionListener {
         mainFrame.getGamePanel().removeEntities(unitIds);
     }
 
-    private void updateHudTimer() {
+    public void updateHudTimer(int remainingTime) {
         mainFrame.getHudPanel().updateTimer(remainingTime / 60, remainingTime % 60);
     }
 

@@ -19,4 +19,12 @@ public class GoldMine extends Environment {
         return goldReserve >= 0;
     }
 
+    public int getRemainingResource(){
+        return goldReserve;
+    }
+
+    public void setResource(int amount){
+        this.goldReserve = amount;
+    }
+
 }

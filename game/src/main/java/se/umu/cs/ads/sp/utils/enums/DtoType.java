@@ -9,7 +9,8 @@ public enum DtoType {
     FLAG("FLAG"),
     INCREASED_DMG("INCREASED_DMG"),
     POINT("POINT"),
-    MOVEMENT("MOVEMENT");
+    ATTACK_DMG("ATTACK_DMG"),
+    MOVEMENT("MOVEMENT_SPEED");
 
     public final String label;
 

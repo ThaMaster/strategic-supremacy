@@ -7,6 +7,7 @@ import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
+import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -15,8 +16,6 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
-import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -36,8 +35,11 @@ public class ModelManager {
     private final LobbyHandler lobbyHandler;
     private boolean started = false;
     private Timer l3Timer;
+    private long currentScoreHolderId;
 
     private GameController controller;
+    private Timer gameTimer;
+    private long remainingTime = 2 * 60 + 30;
 
     public ModelManager(GameController controller, User player) {
         map = new Map();
@@ -75,7 +77,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
+            //comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
             return true;
         }
 
@@ -88,7 +90,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
+            //comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
             return true;
         }
         return false;
@@ -160,9 +162,12 @@ public class ModelManager {
 
         System.out.println("nr units: " + objectHandler.getMyUnits().values().size());
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+
         started = true;
         l3Timer = new Timer();
-        //startL3Timer(Constants.L3_UPDATE_TIME);
+        startL3Timer(Constants.L3_UPDATE_TIME);
+        startRoundTimer();
     }
 
     private void startL3Timer(long updateTime) {
@@ -183,26 +188,34 @@ public class ModelManager {
         L3UpdateDTO dto;
         ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
         if (fromLeader) {
-            //Get the current state of the world
             entities = objectHandler.getAllEntitySkeletons();
         } else {
-            //Only send my units to leader
             entities = objectHandler.getMyUnitsToEntitySkeletons();
-
         }
         ArrayList<Long> collectedIds = objectHandler.getCollectedIds();
         return new L3UpdateDTO(entities,
                 objectHandler.getCollectedIds(),
-                10L, //Todo send remaining time
-                1L, //Todo send current leader
-                new ArrayList<>(), //Todo sent environment
+                remainingTime,
+                currentScoreHolderId,
+                objectHandler.getAllEnvironmentsDTO(), //Todo send environment
                 Constants.LOW_SEVERITY
         );
     }
 
     public void receiveL3Update(L3UpdateDTO update) {
-        //Todo
+
+        //Todo do not update units or stuff if the author of the message is within l2 or l1
         objectHandler.updateUnitPositions(update.entities());
+        objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.updateEnvironments(update.environments());
+        if(!iAmLeader()){
+            this.remainingTime = update.remainingTime();
+        }
+        this.currentScoreHolderId = update.currentScoreLeader();
+    }
+
+    private boolean iAmLeader(){
+        return lobbyHandler.getLobby().leader.id == player.id;
     }
 
     // A request has come in to start the game
@@ -212,7 +225,8 @@ public class ModelManager {
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
-        //startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
     }
 
     public void leaveOngoingGame() {
@@ -243,7 +257,6 @@ public class ModelManager {
 
     public ArrayList<Long> getPlayersToUpdate() {
         // This function will maybe check which users are in L1, L2, L3?
-
         return new ArrayList<>(lobbyHandler.getLobby().users.stream().map(user -> user.id).toList());
     }
 
@@ -262,9 +275,8 @@ public class ModelManager {
         ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
         for (GameEvent event : events) {
             switch (event.getType()) {
-                case COLLECT:
-                    break;
                 case NEW_ROUND:
+                    //Create logiko
                     break;
                 case LOGG:
                     break;
@@ -282,27 +294,52 @@ public class ModelManager {
                     }
                     break;
                 case ATTACK:
-                    SoundManager.getInstance().play(SoundFX.ATTACK);
                     break;
                 case TAKE_DMG:
-                    SoundManager.getInstance().play(SoundFX.TAKE_DMG);
                     break;
                 case FLAG_TO_BASE:
-                    this.currentPoints += 10;
+                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                        this.currentPoints += 10;
+                    }
                     break;
                 case POINT_PICK_UP:
-                    int point = Reward.parseQuantity(event.getEvent());
-                    this.currentPoints += point;
+                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                        int point = Reward.parseQuantity(event.getEvent());
+                        this.currentPoints += point;
+                    }
                     break;
                 case GOLD_PICK_UP:
-                    int gold = Reward.parseQuantity(event.getEvent());
-                    this.currentGold += gold;
+                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                        int gold = Reward.parseQuantity(event.getEvent());
+                        this.currentGold += gold;
+                    }
                     break;
                 default:
-                    //This is default case, it's a collectable we have stored
                     break;
             }
         }
+    }
+
+    public long getRoundRemainingTime(){
+        return remainingTime;
+    }
+
+    private void startRoundTimer(){
+        this.gameTimer = new Timer();
+        this.gameTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (remainingTime > 0) {
+                    remainingTime--;
+                } else {
+                    gameTimer.cancel();
+                }
+            }
+        }, 0, 1000);
+    }
+
+    private boolean eventCreatedByMyUnit(long eventId){
+        return objectHandler.getMyUnitIds().contains(eventId);
     }
 
     public int getCurrentGold() {
