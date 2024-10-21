@@ -13,10 +13,21 @@ public class Reward {
 
     @Override
     public String toString(){
-        return "+"+quantity+" "+type;
+        return "+"+quantity+" " +type;
     }
     public int getQuantity(){
         return quantity;
+    }
+
+    public static int parseQuantity(String input) {
+        // The regex will match a '+' followed by digits.
+        String numberPart = input.replaceAll("[^\\d]", "");
+        return Integer.parseInt(numberPart);
+    }
+
+    public static String parseReward(String input) {
+        // The regex will remove the number part, leaving just the name.
+        return input.replaceAll("\\+\\d+\\s*", "").trim();
     }
 
     public String getType(){

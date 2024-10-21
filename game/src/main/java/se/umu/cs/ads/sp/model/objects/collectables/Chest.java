@@ -7,7 +7,6 @@ import se.umu.cs.ads.sp.utils.Position;
 public class Chest extends Collectable {
 
     private boolean open = false;
-
     public Chest(Position pos, Map map) {
         super(pos, map);
     }
@@ -15,5 +14,9 @@ public class Chest extends Collectable {
     @Override
     public void pickUp(Map map) {
         open = true;
+    }
+
+    public boolean isOpen() {
+        return open;
     }
 }

@@ -506,6 +506,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
         }else if (collectableView instanceof GoldView) {
             SoundManager.getInstance().play(SoundFX.GOLD);
+            System.out.println("Picked up collectable with id -> " + collectableView.getId());
             this.collectables.remove(event.getId());
         }else if (collectableView instanceof FlagView){
             SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);

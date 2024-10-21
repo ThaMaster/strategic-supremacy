@@ -294,6 +294,17 @@ public class ModelManager {
                 case FLAG_TO_BASE:
                     this.currentPoints += 10;
                     break;
+                case POINT_PICK_UP:
+                    int point = Reward.parseQuantity(event.getEvent());
+                    System.out.println("Collected points -> " + point);
+                    this.currentPoints += point;
+
+                    break;
+                case GOLD_PICK_UP:
+                    int gold = Reward.parseQuantity(event.getEvent());
+                    System.out.println("PICKED UP COINS :D -> " + gold);
+                    this.currentGold += gold;
+                    break;
                 default:
                     //This is default case, it's a collectable we have stored
                     break;

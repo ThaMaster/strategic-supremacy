@@ -120,12 +120,28 @@ public class ObjectHandler {
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
 
+            if(!myUnits.containsKey(playerUnit.getId())){
+                pickedUpCollectableIds.add(collected.getId());
+                continue;
+            }
             if (playerUnit.getState() == EntityState.DEAD) {
                 continue;
             }
 
-            if (collected instanceof Chest) {
-                GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+            if (collected instanceof Chest chest) {
+                System.out.println("Picked up chest!");
+                if(collected.getReward().getType().equals(Reward.RewardType.GOLD)){
+                    System.out.println("isa gold");
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
+                }else if(collected.getReward().getType().equals(Reward.RewardType.POINT)){
+                    System.out.println("isa point");
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP));
+                }else{
+                    //Chest contains a BUFF, parse it
+                    System.out.println("ISA BUFF");
+                    GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP));
+                    System.out.println("BUFF -> "+Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
+                }
             }
             else if (collected instanceof Gold) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP));
