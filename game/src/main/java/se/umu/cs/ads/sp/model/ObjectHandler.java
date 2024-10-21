@@ -120,7 +120,7 @@ public class ObjectHandler {
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
 
-            if (playerUnit.getState() != EntityState.DEAD) {
+            if (playerUnit.getState() == EntityState.DEAD) {
                 continue;
             }
 
@@ -143,14 +143,6 @@ public class ObjectHandler {
 
     public void addCollectable(Collectable collectable) {
         collectables.put(collectable.getId(), collectable);
-    }
-
-    public void addMyUnit(PlayerUnit unit) {
-        this.myUnits.put(unit.getId(), unit);
-    }
-
-    public void addEnemyUnit(PlayerUnit unit) {
-        this.enemyUnits.put(unit.getId(), unit);
     }
 
     public HashMap<Long, PlayerUnit> getEnemyUnits() {
@@ -302,10 +294,11 @@ public class ObjectHandler {
         return base.getId();
     }
 
-    private void spawnFlag(Map map, Position position){
+    public long spawnFlag(Map map, Position position){
         Flag flag = new Flag(position, map);
         flag.setReward(new Reward(1, Reward.RewardType.FLAG));
         addCollectable(flag);
+        return flag.getId();
     }
 
     private long spawnGoldMine(Map map, Position position) {

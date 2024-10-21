@@ -42,14 +42,10 @@ public class GameController implements ActionListener {
         this.timer = new Timer(1000 / FPS, this);
     }
 
+    //We got a message/request to start the game
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
-        mainFrame.showGamePanel(tileManager);
-        mainFrame.getGamePanel().setGameController(this);
-        mainFrame.getGamePanel().startGame();
-        mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
-                modelManager.getObjectHandler().getEnemyUnits());
-        mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
+        initializeView();
         this.timer.start();
     }
 
@@ -57,8 +53,20 @@ public class GameController implements ActionListener {
         return this.modelManager;
     }
 
+    //We have started the game
     public void startGame() {
+        initializeView();
+        timer.start();
+    }
+
+    public void spawnFlag(long id, Position flagPos){
+        mainFrame.getGamePanel().spawnFlag(id, flagPos);
+    }
+
+    private void initializeView()
+    {
         mainFrame.showGamePanel(tileManager);
+
         ArrayList<UnitType> types = new ArrayList<>(
                 modelManager.getObjectHandler().getMyUnits().values().stream()
                         .map(unit -> UnitType.fromLabel(unit.getEntityName())).toList());
@@ -69,7 +77,6 @@ public class GameController implements ActionListener {
                 modelManager.getObjectHandler().getEnemyUnits());
         mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
         mainFrame.getGamePanel().setEnvironemnts(modelManager.getObjectHandler().getEnvironments());
-        timer.start();
     }
 
     @Override

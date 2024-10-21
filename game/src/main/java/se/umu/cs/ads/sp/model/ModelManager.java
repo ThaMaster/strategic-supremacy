@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.model;
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
@@ -15,6 +16,10 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.EventColor;
+import se.umu.cs.ads.sp.view.objects.environments.GoldMineView;
+import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
+import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -36,6 +41,8 @@ public class ModelManager {
     private boolean started = false;
     private Timer l3Timer;
 
+    private GameController controller;
+
     public ModelManager(GameController controller, User player) {
         map = new Map();
         gameEvents = GameEvents.getInstance();
@@ -45,6 +52,7 @@ public class ModelManager {
         comHandler = new ComHandler(player.port, controller, this);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::leaveOngoingGame));
+        this.controller = controller;
     }
 
     public User getPlayer() {
@@ -57,10 +65,9 @@ public class ModelManager {
 
     public void update() {
         // Update all entities in game, including my units.
-
         objectHandler.update(map);
         fow.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
-
+        collectEvents();
     }
 
     public ObjectHandler getObjectHandler() {
@@ -73,7 +80,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            //comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
             return true;
         }
 
@@ -86,7 +93,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            //comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
+            comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
             return true;
         }
         return false;
@@ -139,12 +146,6 @@ public class ModelManager {
                 !objectHandler.getMyUnits().containsValue(unit);
     }
 
-    private void spawnGold(Position position) {
-        Gold coin = new Gold(position, map);
-        coin.setReward(new Reward(10, Reward.RewardType.GOLD));
-        objectHandler.addCollectable(coin);
-    }
-
     public void loadMap(String mapName) {
         map.loadMap("maps/" + mapName + ".txt");
     }
@@ -164,7 +165,7 @@ public class ModelManager {
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
-        startL3Timer(Constants.L3_UPDATE_TIME);
+        //startL3Timer(Constants.L3_UPDATE_TIME);
     }
 
     private void startL3Timer(long updateTime) {
@@ -214,7 +215,7 @@ public class ModelManager {
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
-        startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        //startL3Timer(Constants.L3_UPDATE_TIME / 2);
     }
 
     public void leaveOngoingGame() {
@@ -258,5 +259,45 @@ public class ModelManager {
 
     public boolean hasGameStarted() {
         return started;
+    }
+
+    private void collectEvents() {
+        ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
+        for (GameEvent event : events) {
+            switch (event.getType()) {
+                case COLLECT:
+                    break;
+                case NEW_ROUND:
+                    break;
+                case LOGG:
+                    break;
+                case DEATH:
+                    PlayerUnit unit;
+                    if(objectHandler.getMyUnitIds().contains(event.getId())){
+                        unit = objectHandler.getMyUnits().get(event.getId());
+                    }
+                    else{
+                        unit = objectHandler.getEnemyUnits().get(event.getId());
+                    }
+                    if(unit.hasFlag()){
+                        long id = objectHandler.spawnFlag(map, unit.getPosition());
+                        unit.setHasFlag(false);
+                        controller.spawnFlag(id, unit.getPosition());
+                    }
+                    break;
+                case ATTACK:
+                    SoundManager.getInstance().play(SoundFX.ATTACK);
+                    break;
+                case TAKE_DMG:
+                    SoundManager.getInstance().play(SoundFX.TAKE_DMG);
+                    break;
+                case FLAG_TO_BASE:
+                    this.currentPoints += 10;
+                    break;
+                default:
+                    //This is default case, it's a collectable we have stored
+                    break;
+            }
+        }
     }
 }

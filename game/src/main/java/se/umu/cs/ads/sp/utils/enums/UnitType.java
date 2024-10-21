@@ -5,8 +5,7 @@ public enum UnitType {
     GUNNER("GUNNER"),
     // Maybe more units later?
     BRAWLER("BRAWLER"),
-    ARCHER("ARCHER"),
-    GOLD("GOLD");
+    ARCHER("ARCHER");
 
     public final String label;
 

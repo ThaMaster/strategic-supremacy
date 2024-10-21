@@ -154,7 +154,7 @@ public class PlayerUnit extends Entity {
                 }
                 if (this.position.equals(getDestination()) && coll.get(i) instanceof Base base) {
                     if(hasFlag && base.getId() == myBaseId){
-                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+40 points brother", EventType.FLAG_TO_BASE));
+                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+10 Points", EventType.FLAG_TO_BASE));
                         hasFlag = false;
                     }
                 }
@@ -215,26 +215,9 @@ public class PlayerUnit extends Entity {
         return hit;
     }
 
-    public void setPosition(Position newPos) {
-        this.position = newPos;
-    }
-
     public void setCurrentHp(int currentHp) {
         this.currentHp = currentHp;
     }
 
-    public void takeDamage(int damage) {
-        this.state = EntityState.TAKING_DAMAGE;
-        this.currentHp -= damage;
-        hitCooldown.start();
-        if (currentHp <= 0) {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
-            this.state = EntityState.DEAD;
-            if (hasFlag) {
-            }
-            this.destroy(map);
-        } else {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));
-        }
-    }
+
 }

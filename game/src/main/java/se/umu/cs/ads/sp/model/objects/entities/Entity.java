@@ -51,6 +51,7 @@ public abstract class Entity extends GameObject {
 
     public void move() {
         // Check if the speed is greater than the distance left
+        map.removeInhabitant(this, position);
         if (Position.distance(this.position, destination) <= speed) {
             this.position = destination;
             this.collisionBox.setLocation(destination);
@@ -125,5 +126,25 @@ public abstract class Entity extends GameObject {
 
     public String getEntityName() {
         return entityName;
+    }
+
+    public void takeDamage(int damage) {
+        this.state = EntityState.TAKING_DAMAGE;
+        this.currentHp -= damage;
+        hitCooldown.start();
+        if (currentHp <= 0) {
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH));
+            this.state = EntityState.DEAD;
+            this.destroy(map);
+        } else {
+            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG));
+        }
+    }
+
+    public void setPosition(Position newPos) {
+        map.removeInhabitant(this, position);
+        this.position = newPos;
+        this.collisionBox.setLocation(newPos);
+        map.setInhabitant(this, position);
     }
 }

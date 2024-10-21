@@ -480,6 +480,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.repaint();
     }
 
+    public void spawnFlag(long id, Position flagPos){
+        this.collectables.put(id, new FlagView(id, flagPos));
+    }
+
     public void addCollectableEvent(GameEvent event) {
 
         if (!this.collectables.containsKey(event.getId())) {
