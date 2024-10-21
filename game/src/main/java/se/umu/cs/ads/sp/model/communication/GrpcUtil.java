@@ -55,7 +55,7 @@ public class GrpcUtil {
     public static proto.Reward toGrpcReward(Reward reward) {
         return proto.Reward.newBuilder()
                 .setQuantity(reward.getQuantity())
-                .setReward(reward.toString())
+                .setReward(reward.getType().label)
                 .build();
     }
 
