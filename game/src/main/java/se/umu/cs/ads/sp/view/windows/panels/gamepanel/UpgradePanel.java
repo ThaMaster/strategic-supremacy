@@ -19,19 +19,17 @@ import java.util.Objects;
 
 public class UpgradePanel extends JPanel {
 
+    private final ArrayList<JButton> buyButtons = new ArrayList<>();
+    private final GamePanel gamePanel;
+    private final int panelWidth;
+    private final int panelHeight;
+
     private BufferedImage panelImage;
     private ImageIcon defaultIcon;
     private ImageIcon pressedIcon;
     private ImageIcon disabledIcon;
-
-    private final ArrayList<JButton> buyButtons = new ArrayList<>();
-
+    
     private int money = 0; // Initial money, you can modify this externally
-
-    private GamePanel gamePanel;
-
-    private final int panelWidth;
-    private final int panelHeight;
 
     public UpgradePanel(GamePanel gp, int width, int height) {
         this.setLayout(null); // No layout manager, manually setting bounds
@@ -43,14 +41,14 @@ public class UpgradePanel extends JPanel {
         panelHeight = height;
         gamePanel = gp;
 
-        this.add(createTitle("UNIT UPGRADES"));
+        this.add(createTitle());
 
         this.setVisible(false);
         this.setBounds(UtilView.screenWidth / 2 - width / 2, UtilView.screenHeight / 2 - height / 2, width, height);
     }
 
-    private JLabel createTitle(String title) {
-        JLabel upgradeLabel = new JLabel(title);
+    private JLabel createTitle() {
+        JLabel upgradeLabel = new JLabel("UNIT UPGRADES");
         upgradeLabel.setFont(new Font("Monospaced", Font.BOLD, 35));
         upgradeLabel.setForeground(Color.BLACK);
         upgradeLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -141,7 +139,7 @@ public class UpgradePanel extends JPanel {
         gbc.weightx = 1; // Allow components to grow horizontally
 
         // Upgrade amount label (number of upgrades)
-        JLabel currentLevelLabel = new JLabel("Level: " + 0);
+        JLabel currentLevelLabel = new JLabel("Level: 1");
         gbc.gridx = 0; // First column
         gbc.gridy = 0; // First row
         gbc.weightx = 0; // Don't allow the number label to grow
@@ -212,7 +210,7 @@ public class UpgradePanel extends JPanel {
         gbc.insets = new Insets(0, 15, 0, 15); // Add padding around components
         upgradeRowPanel.add(pricePanel, gbc);
 
-        buyButton.addActionListener(new BuyButtonListener(initialPrice, currentStat, upgradeAmount,
+        buyButton.addActionListener(new BuyButtonListener(currentStat,
                 currentStatLabel, upgradedStatLabel, currentLevelLabel, currentPriceLabel, upgradeName, unitId));
 
         // Initial button state check
@@ -296,6 +294,23 @@ public class UpgradePanel extends JPanel {
         }
     }
 
+    public void updateStat(long unitId, String upgradeName) {
+        // Refresh the upgrade buttons to reflect the new money amount
+        for (JButton button : buyButtons) {
+            // Retrieve the current price stored in the button's action listener
+            ActionListener[] listeners = button.getActionListeners();
+            if (listeners.length > 0 && listeners[0] != null) {
+                ActionListener listener = listeners[0];
+                // Assuming listener is an inner class that has access to `currentPrice`
+                if (listener instanceof BuyButtonListener buyListener &&
+                        buyListener.getUpgradeName().equals(upgradeName) &&
+                        buyListener.getUnitId() == unitId) {
+                    buyListener.updateStat();
+                }
+            }
+        }
+    }
+
     // Define a custom ActionListener to store the current price
     private class BuyButtonListener implements ActionListener {
         private final int initialPrice;
@@ -303,10 +318,10 @@ public class UpgradePanel extends JPanel {
         private int currentStat;
         private final JLabel currentStatLabel;
 
-        private int upgradeAmount;
+        private final int upgradeAmount;
         private final JLabel upgradedStatLabel;
 
-        private int currentLevel = 1;
+        private int currentLevel;
         private final JLabel currentLevelLabel;
 
         private int currentPrice;
@@ -315,18 +330,20 @@ public class UpgradePanel extends JPanel {
         private final String upgradeName;
         private final long unitId;
 
-        public BuyButtonListener(int initialPrice, int currentStat, int upgradeAmount,
-                                 JLabel currentStatLabel, JLabel upgradedStatLabel, JLabel currentLevelLabel,
-                                 JLabel currentPriceLabel, String upgradeName, long unitId) {
-            this.currentPrice = initialPrice;
+        public BuyButtonListener(int currentStat, JLabel currentStatLabel, JLabel upgradedStatLabel,
+                                 JLabel currentLevelLabel, JLabel currentPriceLabel, String upgradeName,
+                                 long unitId) {
+            UpgradeType type = UpgradeType.fromLabel(upgradeName);
+            this.currentPrice = type.initalCost;
             this.currentPriceLabel = currentPriceLabel;
-            this.initialPrice = initialPrice;
+            this.initialPrice = type.initalCost;
+            this.currentLevel = 1;
             this.currentLevelLabel = currentLevelLabel;
             this.upgradeName = upgradeName;
             this.unitId = unitId;
             this.currentStat = currentStat;
             this.currentStatLabel = currentStatLabel;
-            this.upgradeAmount = upgradeAmount;
+            this.upgradeAmount = type.upgradeAmount;
             this.upgradedStatLabel = upgradedStatLabel;
         }
 
@@ -336,6 +353,27 @@ public class UpgradePanel extends JPanel {
 
         public int getCurrentPrice() {
             return currentPrice;
+        }
+
+        public String getUpgradeName() {
+            return upgradeName;
+        }
+
+        public long getUnitId() {
+            return unitId;
+        }
+
+        // The player gets upgrade without buying!
+        public void updateStat() {
+            currentLevel++;
+            currentLevelLabel.setText("Level: " + currentLevel);
+
+            currentStat += upgradeAmount;
+            currentStatLabel.setText(String.valueOf(currentStat));
+            upgradedStatLabel.setText(String.valueOf(currentStat + upgradeAmount));
+
+            currentPrice += (int) (initialPrice * 0.25); // Increase price for next upgrade
+            currentPriceLabel.setText("$" + currentPrice); // Update price label
         }
 
         @Override

@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 
-import se.umu.cs.ads.sp.utils.enums.UnitType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
@@ -10,14 +9,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class HUDPanel extends JPanel implements KeyListener {
+public class HUDPanel extends JPanel {
 
     private JLabel timerLabel;
     private JLabel selectedUnitLabel;
@@ -118,7 +115,7 @@ public class HUDPanel extends JPanel implements KeyListener {
     }
 
     public void updateTimer(int minutes, int seconds) {
-        if(minutes == 0 && seconds < 30) {
+        if (minutes == 0 && seconds < 30) {
             timerLabel.setForeground(Color.RED.darker().darker());
         } else {
             timerLabel.setForeground(Color.BLACK);
@@ -176,20 +173,7 @@ public class HUDPanel extends JPanel implements KeyListener {
         upgradePanel.setUpgradeMenu(unitIds);
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_B) {
-            toggleUpgradeMenu();
-        }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
+    public void updateStat(long unitId, String upgradeName) {
+        upgradePanel.updateStat(unitId, upgradeName);
     }
 }

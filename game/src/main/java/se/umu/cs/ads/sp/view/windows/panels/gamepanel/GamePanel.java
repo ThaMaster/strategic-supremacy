@@ -3,10 +3,7 @@ package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
-import se.umu.cs.ads.sp.model.objects.collectables.Chest;
-import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
-import se.umu.cs.ads.sp.model.objects.collectables.Flag;
-import se.umu.cs.ads.sp.model.objects.collectables.Gold;
+import se.umu.cs.ads.sp.model.objects.collectables.*;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
@@ -502,6 +499,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         if (collectableView instanceof ChestView) {
             SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
+            gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
         } else if (collectableView instanceof GoldView) {
             SoundManager.getInstance().play(SoundFX.GOLD);
             this.collectables.remove(event.getId());
@@ -535,7 +533,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public ArrayList<PlayerUnitView> getMyUnits(ArrayList<Long> myIds) {
         ArrayList<PlayerUnitView> myUnitsView = new ArrayList<>();
-        for(Long id : myIds) {
+        for (Long id : myIds) {
             myUnitsView.add((PlayerUnitView) gameEntitiesView.get(id));
         }
         return myUnitsView;

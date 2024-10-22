@@ -393,6 +393,10 @@ public class GameController implements ActionListener {
         modelManager.getObjectHandler().upgradeUnit(unitId, type, amount);
     }
 
+    public void updateStat(long unitId, String upgradeName) {
+        mainFrame.getHudPanel().updateStat(unitId, upgradeName);
+    }
+
     public void toggleShopWindow() {
         mainFrame.getHudPanel().toggleUpgradeMenu();
     }

@@ -129,7 +129,6 @@ public class ObjectHandler {
                     //Chest contains a BUFF, parse it
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP, playerUnit.getId()));
                     upgradeUnit(playerUnit.getId(), Reward.parseReward(collected.getReward().toString()), Reward.parseQuantity(collected.getReward().toString()));
-                    System.out.println("BUFF -> " + Reward.parseReward(collected.getReward().toString()) + " Quantity -> " + Reward.parseQuantity(collected.getReward().toString()));
                 }
             } else if (collected instanceof Gold) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
