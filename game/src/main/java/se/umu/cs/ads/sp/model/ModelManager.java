@@ -163,12 +163,12 @@ public class ModelManager {
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
         started = true;
-        l3Timer = new Timer();
         startL3Timer(Constants.L3_UPDATE_TIME);
         startRoundTimer();
     }
 
     private void startL3Timer(long updateTime) {
+        l3Timer = new Timer();
         l3Timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -187,7 +187,7 @@ public class ModelManager {
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
-        ArrayList<EntitySkeletonDTO> entities;
+        ArrayList<UsersEntitiesDTO> entities;
         int msgCount = lobbyHandler.getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
@@ -195,6 +195,7 @@ public class ModelManager {
         } else {
             entities = objectHandler.getMyUnitsToEntitySkeletons();
         }
+
         return new L3UpdateDTO(
                 msgCount,
                 entities,
@@ -206,7 +207,10 @@ public class ModelManager {
         );
     }
 
-    public L2UpdateDTO
+    // TODO: Implement below method
+    public L2UpdateDTO constructL2Message() {
+        return new L2UpdateDTO();
+    }
 
     public L1UpdateDTO constructL1Message(long targetId) {
         ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
@@ -228,13 +232,11 @@ public class ModelManager {
         //Todo do not update units or stuff if the author of the message is within l2 or l1
         if (!iAmLeader()) {
             lobbyHandler.updateMsgCount(update.msgCount());
+            this.remainingTime = update.remainingTime();
         }
         objectHandler.updateUnitPositions(update.entities());
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
-        if (!iAmLeader()) {
-            this.remainingTime = update.remainingTime();
-        }
         this.currentScoreHolderId = update.currentScoreLeader();
     }
 
@@ -252,8 +254,13 @@ public class ModelManager {
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
 
-        l3Timer.cancel();
-        gameTimer.cancel();
+        if (l3Timer != null) {
+            l3Timer.cancel();
+        }
+
+        if (gameTimer != null) {
+            gameTimer.cancel();
+        }
 
         comHandler.removePlayerUnits();
         objectHandler.clearSelectedUnitIds();
@@ -263,11 +270,12 @@ public class ModelManager {
         lobbyHandler.leaveLobby();
     }
 
-    public ArrayList<EntitySkeletonDTO> createMySkeletonList() {
-        return new ArrayList<>(objectHandler.getMyUnits().values().stream()
+    public UsersEntitiesDTO createMySkeletonList() {
+        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>(objectHandler.getMyUnits().values().stream()
                 .map(
-                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), player.id, playerUnit.getEntityType(), playerUnit.getPosition())
+                        playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), playerUnit.getEntityType(), playerUnit.getPosition())
                 ).toList());
+        return new UsersEntitiesDTO(player.id, skeletons);
     }
 
     public boolean hasGameStarted() {

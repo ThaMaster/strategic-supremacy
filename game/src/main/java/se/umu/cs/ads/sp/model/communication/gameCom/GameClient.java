@@ -12,12 +12,11 @@ import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
-import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.UsersEntitiesDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class GameClient {
@@ -43,8 +42,8 @@ public class GameClient {
     }
 
     @Override
-    public String toString(){
-        return ip+":"+port;
+    public String toString() {
+        return ip + ":" + port;
     }
 
     public void destroy() {
@@ -77,7 +76,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void sendL3Message(L3UpdateDTO msg){
+    public void sendL3Message(L3UpdateDTO msg) {
         System.out.println("[Client] Sending L3 update");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -85,11 +84,12 @@ public class GameClient {
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
-            public void onSuccess(@Nullable Empty result) {}
+            public void onSuccess(@Nullable Empty result) {
+            }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("\t Failed to send L3 Update to client " + ip+":"+port);
+                System.out.println("\t Failed to send L3 Update to client " + ip + ":" + port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
@@ -136,7 +136,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void removePlayerUnits(ArrayList<EntitySkeletonDTO> entitySkeletons) {
+    public void removePlayerUnits(UsersEntitiesDTO entitySkeletons) {
         System.out.println("[Client] Trying to leave ongoing game...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)

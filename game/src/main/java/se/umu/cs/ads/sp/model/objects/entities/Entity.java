@@ -48,7 +48,7 @@ public abstract class Entity extends GameObject {
         userId = id;
     }
 
-    public long getUserid() {
+    public long getUserId() {
         return userId;
     }
 

@@ -4,7 +4,6 @@ import se.umu.cs.ads.sp.utils.Position;
 
 public record EntitySkeletonDTO(
         long id,
-        long userId,
         String unitType,
         Position position
 ) {

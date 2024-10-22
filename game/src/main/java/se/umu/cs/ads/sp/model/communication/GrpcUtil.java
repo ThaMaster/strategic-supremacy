@@ -33,7 +33,6 @@ public class GrpcUtil {
     public static proto.EntitySkeleton toGrpcEntitySkeleton(EntitySkeletonDTO skeleton) {
         return proto.EntitySkeleton.newBuilder()
                 .setId(skeleton.id())
-                .setUserId(skeleton.userId())
                 .setUnitType(skeleton.unitType())
                 .setPosition(toGrpcPosition(skeleton.position().getX(), skeleton.position().getY()))
                 .build();
@@ -68,7 +67,10 @@ public class GrpcUtil {
     public static proto.StartGameRequest toGrpcStartGameReq(StartGameRequestDTO req) {
         proto.StartGameRequest.Builder builder = proto.StartGameRequest.newBuilder();
 
-        builder.setEntities(toGrpcEntitySkeletons(req.entitySkeletons()));
+
+        for (UsersEntitiesDTO skeletons : req.entitySkeletons()) {
+            builder.addEntities(toGrpcEntitySkeletons(skeletons));
+        }
 
         for (EnvironmentDTO environment : req.environments()) {
             builder.addEnvironments(toGrpcEnvironment(environment));
@@ -81,9 +83,10 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static proto.EntitySkeletons toGrpcEntitySkeletons(ArrayList<EntitySkeletonDTO> entitySkeletons) {
+    public static proto.EntitySkeletons toGrpcEntitySkeletons(UsersEntitiesDTO entitySkeletons) {
         proto.EntitySkeletons.Builder builder = proto.EntitySkeletons.newBuilder();
-        for (EntitySkeletonDTO skeleton : entitySkeletons) {
+        builder.setUserId(entitySkeletons.userId());
+        for (EntitySkeletonDTO skeleton : entitySkeletons.entities()) {
             builder.addSkeletons(toGrpcEntitySkeleton(skeleton));
         }
         return builder.build();
@@ -92,17 +95,16 @@ public class GrpcUtil {
     public static EntitySkeletonDTO fromGrpcSkeleton(proto.EntitySkeleton skeletons) {
         return new EntitySkeletonDTO(
                 skeletons.getId(),
-                skeletons.getUserId(),
                 skeletons.getUnitType(),
                 fromGrpcPosition(skeletons.getPosition()));
     }
 
-    public static ArrayList<EntitySkeletonDTO> fromGrpcEntitySkeletons(proto.EntitySkeletons grpcSkeletons) {
+    public static UsersEntitiesDTO fromGrpcEntitySkeletons(proto.EntitySkeletons grpcSkeletons) {
         ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
         for (int i = 0; i < grpcSkeletons.getSkeletonsCount(); i++) {
             skeletons.add(fromGrpcSkeleton(grpcSkeletons.getSkeletons(i)));
         }
-        return skeletons;
+        return new UsersEntitiesDTO(grpcSkeletons.getUserId(), skeletons);
     }
 
     public static EnvironmentDTO fromGrpcEnv(proto.Environment env) {
@@ -121,7 +123,11 @@ public class GrpcUtil {
     }
 
     public static StartGameRequestDTO fromGrpcStartGameReq(proto.StartGameRequest req) {
-        StartGameRequestDTO data = new StartGameRequestDTO(fromGrpcEntitySkeletons(req.getEntities()), new ArrayList<>(), new ArrayList<>());
+        StartGameRequestDTO data = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+        for (proto.EntitySkeletons skeletons : req.getEntitiesList()) {
+            data.addSkeleton(fromGrpcEntitySkeletons(skeletons));
+        }
 
         for (proto.Environment env : req.getEnvironmentsList()) {
             data.addEnvironment(fromGrpcEnv(env));
@@ -149,41 +155,46 @@ public class GrpcUtil {
     }
 
 
-    public static proto.L3Message toGrpcL3Message(L3UpdateDTO message){
+    public static proto.L3Message toGrpcL3Message(L3UpdateDTO message) {
         proto.L3Message.Builder builder = proto.L3Message.newBuilder();
 
         builder.setMessageCount(message.msgCount());
-        for(long pickedUpCollectables : message.pickedUpCollectables()){
+        for (long pickedUpCollectables : message.pickedUpCollectables()) {
             builder.addPickedUpCollectables(pickedUpCollectables);
         }
-        for(EnvironmentDTO env : message.environments()){
+        for (EnvironmentDTO env : message.environments()) {
             builder.addEnvironments(toGrpcEnvironment(env));
         }
 
-        builder.setEntities(toGrpcEntitySkeletons(message.entities()))
-                .setRemainingTime(message.remainingTime())
+        for (UsersEntitiesDTO skeletons : message.entities()) {
+            builder.addEntities(toGrpcEntitySkeletons(skeletons));
+        }
+
+        builder.setRemainingTime(message.remainingTime())
                 .setCurrentScoreLeader(message.currentScoreLeader())
                 .setSeverity(message.msgSeverity());
 
         return builder.build();
     }
 
-    public static L3UpdateDTO fromGrpcL3Message(proto.L3Message message){
-        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+    public static L3UpdateDTO fromGrpcL3Message(proto.L3Message message) {
+        ArrayList<UsersEntitiesDTO> skeletons = new ArrayList<>();
         ArrayList<EnvironmentDTO> environments = new ArrayList<>();
         ArrayList<Long> pickedUp = new ArrayList<>();
 
-        entities = fromGrpcEntitySkeletons(message.getEntities());
-        for(int i = 0; i < message.getEnvironmentsCount(); i++){
+        for (int i = 0; i < message.getEntitiesCount(); i++) {
+            skeletons.add(fromGrpcEntitySkeletons(message.getEntities(i)));
+        }
+        for (int i = 0; i < message.getEnvironmentsCount(); i++) {
             environments.add(fromGrpcEnv(message.getEnvironments(i)));
         }
-        for(int i = 0; i < message.getPickedUpCollectablesCount(); i++){
+        for (int i = 0; i < message.getPickedUpCollectablesCount(); i++) {
             pickedUp.add(message.getPickedUpCollectables(i));
         }
 
         return new L3UpdateDTO(
                 message.getMessageCount(),
-                entities,
+                skeletons,
                 pickedUp,
                 message.getRemainingTime(),
                 message.getCurrentScoreLeader(),

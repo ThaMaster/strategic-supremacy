@@ -195,6 +195,34 @@ public class ComHandler {
     }
 
     public void updateLayers(ArrayList<Long> newL3Clients, ArrayList<Long> newL2Clients, ArrayList<Long> newL1Clients) {
+        for (Long id : newL3Clients) {
+            if (l2Clients.containsKey(id)) {
+                l3Clients.put(id, l2Clients.get(id));
+                l2Clients.remove(id);
+            } else if (l1Clients.containsKey(id)) {
+                l3Clients.put(id, l1Clients.get(id));
+                l1Clients.remove(id);
+            }
+        }
 
+        for (Long id : newL2Clients) {
+            if (l3Clients.containsKey(id)) {
+                l2Clients.put(id, l3Clients.get(id));
+                l3Clients.remove(id);
+            } else if (l1Clients.containsKey(id)) {
+                l2Clients.put(id, l1Clients.get(id));
+                l1Clients.remove(id);
+            }
+        }
+
+        for (Long id : newL1Clients) {
+            if (l3Clients.containsKey(id)) {
+                l1Clients.put(id, l3Clients.get(id));
+                l3Clients.remove(id);
+            } else if (l2Clients.containsKey(id)) {
+                l1Clients.put(id, l2Clients.get(id));
+                l2Clients.remove(id);
+            }
+        }
     }
 }

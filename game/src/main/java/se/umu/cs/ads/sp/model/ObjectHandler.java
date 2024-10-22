@@ -197,20 +197,20 @@ public class ObjectHandler {
             startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoType.GOLDMINE.label, 0));
 
 
-            //Spawning 3 entities
+            // Spawning 3 entities
+            ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 Position offsetPosition;
-
                 do {
                     offsetPosition = new Position((basePos.getX() + Utils.getRandomInt(-30, 30)),
                             (basePos.getY() + Utils.getRandomInt(-30, 30)));
                 } while (!modelManager.isWalkable(offsetPosition));
 
-                EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), userId, UnitType.GUNNER.label, offsetPosition);
+                EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), UnitType.GUNNER.label, offsetPosition);
                 spawnUnit(map, entitySkeletonDTO.id(), entitySkeletonDTO.unitType(), offsetPosition, userId, baseId);
-
-                startGameRequest.entitySkeletons().add(entitySkeletonDTO);
+                skeletons.add(entitySkeletonDTO);
             }
+            startGameRequest.entitySkeletons().add(new UsersEntitiesDTO(userId, skeletons));
 
             if (!basePositions.isEmpty()) {
                 basePositions.remove(0);
@@ -257,8 +257,10 @@ public class ObjectHandler {
             }
         }
 
-        for (EntitySkeletonDTO unit : request.entitySkeletons()) {
-            spawnUnit(map, unit.id(), unit.unitType(), unit.position(), unit.userId(), baseId);
+        for (UsersEntitiesDTO skeletons : request.entitySkeletons()) {
+            for (EntitySkeletonDTO skeleton : skeletons.entities()) {
+                spawnUnit(map, skeleton.id(), skeleton.unitType(), skeleton.position(), skeletons.userId(), baseId);
+            }
         }
     }
 
@@ -266,29 +268,44 @@ public class ObjectHandler {
         return pickedUpCollectableIds;
     }
 
-    public ArrayList<EntitySkeletonDTO> getAllEntitySkeletons() {
-        ArrayList<EntitySkeletonDTO> skeletons = getMyUnitsToEntitySkeletons();
-        for (PlayerUnit unit : enemyUnits.values()) {
-            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getId(), unit.getEntityType(), unit.getPosition());
-            skeletons.add(skeletonDTO);
+    public ArrayList<UsersEntitiesDTO> getAllEntitySkeletons() {
+        HashMap<Long, UsersEntitiesDTO> skeletons = new HashMap<>();
+        ArrayList<PlayerUnit> allUnits = new ArrayList<>();
+        allUnits.addAll(myUnits.values());
+        allUnits.addAll(enemyUnits.values());
+        for (PlayerUnit unit : allUnits) {
+            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition());
+            if (skeletons.containsKey(unit.getUserId())) {
+                skeletons.get(unit.getUserId()).addSkeleton(skeletonDTO);
+            } else {
+                skeletons.put(unit.getUserId(), new UsersEntitiesDTO(unit.getUserId(), new ArrayList<>()));
+                skeletons.get(unit.getUserId()).addSkeleton(skeletonDTO);
+            }
         }
-        return skeletons;
+        return new ArrayList<>(skeletons.values());
     }
 
     public ArrayList<EnvironmentDTO> getAllEnvironmentsDTO() {
-        ArrayList<EnvironmentDTO> environmentDtos = new ArrayList<>();
+        ArrayList<EnvironmentDTO> environmentDTOs = new ArrayList<>();
         for (Environment env : this.environments.values()) {
             if (env instanceof GoldMine goldmine) {
-                environmentDtos.add(new EnvironmentDTO(env.getId(), -1, env.getPosition(), DtoType.BASE.label, goldmine.getRemainingResource()));
+                environmentDTOs.add(new EnvironmentDTO(
+                        env.getId(),
+                        -1,
+                        env.getPosition(),
+                        DtoType.BASE.label,
+                        goldmine.getRemainingResource()));
             }
         }
-        return environmentDtos;
+        return environmentDTOs;
     }
 
-    public void updateUnitPositions(ArrayList<EntitySkeletonDTO> skeletons) {
-        for (EntitySkeletonDTO unit : skeletons) {
-            if (enemyUnits.containsKey(unit.id())) {
-                enemyUnits.get(unit.id()).setPosition(unit.position());
+    public void updateUnitPositions(ArrayList<UsersEntitiesDTO> skeletons) {
+        for (UsersEntitiesDTO units : skeletons) {
+            for (EntitySkeletonDTO unit : units.entities()) {
+                if (enemyUnits.containsKey(unit.id())) {
+                    enemyUnits.get(unit.id()).setPosition(unit.position());
+                }
             }
         }
     }
@@ -315,13 +332,14 @@ public class ObjectHandler {
         }
     }
 
-    public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons() {
-        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
+    public ArrayList<UsersEntitiesDTO> getMyUnitsToEntitySkeletons() {
+        UsersEntitiesDTO skeletons = new UsersEntitiesDTO(user.id, new ArrayList<>());
         for (PlayerUnit unit : myUnits.values()) {
-            EntitySkeletonDTO skeletonDTO = new EntitySkeletonDTO(unit.getId(), user.id, unit.getEntityType(), unit.getPosition());
-            skeletons.add(skeletonDTO);
+            skeletons.addSkeleton(new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition()));
         }
-        return skeletons;
+        ArrayList<UsersEntitiesDTO> mySkeletons = new ArrayList<>();
+        mySkeletons.add(skeletons);
+        return mySkeletons;
     }
 
     //Return the base ID

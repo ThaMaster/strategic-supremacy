@@ -97,7 +97,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             for (long key : gController.getSelectedUnits()) {
-                System.out.println("Selected id: " + key);
                 gameEntitiesView.get(key).setSelected(false);
             }
             startDragPoint = e.getPoint();
@@ -435,7 +434,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void setGameController(GameController gc) {
-        System.out.println("Setting gController");
         this.gController = gc;
     }
 

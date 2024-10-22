@@ -29,13 +29,13 @@ message PlayerUnits {
 
 message EntitySkeleton {
   int64 id = 1;
-  int64 userId = 2;
-  string unitType = 3;
-  Position position = 4;
+  string unitType = 2;
+  Position position = 3;
 }
 
 message EntitySkeletons {
-  repeated EntitySkeleton skeletons = 1;
+  int64 userId = 1;
+  repeated EntitySkeleton skeletons = 2;
 }
 
 message Reward {
@@ -59,14 +59,14 @@ message Environment {
 }
 
 message StartGameRequest {
-  EntitySkeletons entities = 1;
+  repeated EntitySkeletons entities = 1;
   repeated Collectable collectables = 2;
   repeated Environment environments = 3;
 }
 
 message L3Message {
   int32 messageCount = 1;
-  EntitySkeletons entities = 2;
+  repeated EntitySkeletons entities = 2;
   repeated int64 pickedUpCollectables = 3;
   int64 remainingTime = 4;
   int64 currentScoreLeader = 5;
@@ -96,7 +96,7 @@ message candidateLeaderRequest {
 }
 
 message candidateLeaderResponse {
-  int32 acknoweldgement = 1;
+  int32 acknowledgement = 1;
 }
 
 service GameService {

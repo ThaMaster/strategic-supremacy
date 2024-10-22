@@ -8,6 +8,7 @@ import proto.*;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
+import se.umu.cs.ads.sp.model.communication.dto.UsersEntitiesDTO;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,31 +39,31 @@ public class GameServer {
 
         @Override
         public void startGame(StartGameRequest request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received start game request...");
             comHandler.startGame(GrpcUtil.fromGrpcStartGameReq(request));
-            System.out.println("[Server] Received start game request.");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
 
         @Override
         public void updateLobby(DetailedLobbyInfo request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Updating the lobby...");
             comHandler.updateLobby(GrpcUtil.fromGrpcLobby(request));
-            System.out.println("[Server] Updating the lobby.");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
 
         @Override
         public void updatePlayerUnit(PlayerUnits request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Updating enemy units...");
             comHandler.updateEnemyUnits(GrpcUtil.fromGrpcUpdatePlayerUnits(request));
-            System.out.println("[Server] Updating enemy units.");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
 
         @Override
         public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L3 update");
+            System.out.println("[Server] Received L3 update...");
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
             comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
@@ -70,11 +71,11 @@ public class GameServer {
 
         @Override
         public void removePlayerUnits(EntitySkeletons request, StreamObserver<Empty> responseObserver) {
-            ArrayList<EntitySkeletonDTO> skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
-            long userId = skeletons.get(0).userId();
-            comHandler.removePlayer(userId, new ArrayList<>(skeletons.stream().map(EntitySkeletonDTO::id).toList()));
-            System.out.println("[Server] Got request to remove " + skeletons.size() + " units from player with id: " + userId);
+            UsersEntitiesDTO skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
+            long userId = skeletons.userId();
+            System.out.println("[Server] Got request to remove " + skeletons.entities().size() + " units from player with id: " + userId);
 
+            comHandler.removePlayer(userId, new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::id).toList()));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
