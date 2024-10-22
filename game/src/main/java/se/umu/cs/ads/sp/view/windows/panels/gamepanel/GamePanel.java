@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
+import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.*;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -15,7 +16,6 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
-import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
@@ -269,7 +269,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             animation.update();
         }
 
-        if(AppSettings.DEBUG) {
+        if (AppSettings.DEBUG) {
             Rectangle l1BB = gController.getL1BoundingBox();
             Rectangle l2BB = gController.getL2BoundingBox();
             if (l1BB == null || l2BB == null) {
@@ -334,21 +334,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void setCollectables(HashMap<Long, Collectable> collectables) {
         this.collectables.clear();
-        CollectableView newCollectableView = null;
         for (Collectable collectable : collectables.values()) {
-            if (collectable instanceof Chest) {
-                newCollectableView = new ChestView(collectable.getId(), collectable.getPosition());
-            } else if (collectable instanceof Gold) {
-                newCollectableView = new GoldView(collectable.getId(), collectable.getPosition());
-                newCollectableView.setCollisionBox(collectable.getCollisionBox());
-            } else if (collectable instanceof Flag) {
-                newCollectableView = new FlagView(collectable.getId(), collectable.getPosition());
-                newCollectableView.setCollisionBox(collectable.getCollisionBox());
-            }
+            addCollectable(collectable);
+        }
+    }
 
-            if (newCollectableView != null) {
-                this.collectables.put(collectable.getId(), newCollectableView);
-            }
+    public void addCollectable(Collectable collectableModel) {
+        CollectableView newCollectableView = null;
+        if (collectableModel instanceof Chest chest) {
+            newCollectableView = new ChestView(chest.getId(), chest.getPosition());
+        } else if (collectableModel instanceof Gold gold) {
+            newCollectableView = new GoldView(gold.getId(), gold.getPosition());
+            newCollectableView.setCollisionBox(gold.getCollisionBox());
+        } else if (collectableModel instanceof Flag flag) {
+            newCollectableView = new FlagView(flag.getId(), flag.getPosition());
+            newCollectableView.setCollisionBox(flag.getCollisionBox());
+        }
+
+        if (newCollectableView != null) {
+            this.collectables.put(newCollectableView.getId(), newCollectableView);
         }
     }
 
@@ -367,7 +371,29 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void updateCollectables() {
+    public void updateCollectables(ArrayList<Collectable> collectableModels) {
+
+        // If the view is missing keys to objects in model, add them.
+        ArrayList<Collectable> collectablesToAdd = new ArrayList<>(collectableModels.stream()
+                .filter(collectableModel -> !collectables.containsKey(collectableModel.getId())).toList());
+
+        // If the view contains keys to objects missing in model, they are to be removed.
+        ArrayList<Long> collectablesToRemove = new ArrayList<>(
+                collectables.values().stream()
+                        .map(ObjectView::getId)
+                        .filter(id -> !collectableModels.stream().map(GameObject::getId).toList().contains(id))
+                        .toList()
+        );
+
+        for (Collectable collectable : collectablesToAdd) {
+            addCollectable(collectable);
+        }
+
+        for (Long id : collectablesToRemove) {
+            System.out.println("Removing id: " + id);
+            collectables.remove(id);
+        }
+
         for (CollectableView collectable : collectables.values()) {
             collectable.update();
         }
@@ -493,37 +519,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.repaint();
     }
 
-    public void spawnFlag(long id, Position flagPos) {
-        this.collectables.put(id, new FlagView(id, flagPos));
-    }
-
     public void addCollectableEvent(GameEvent event) {
 
-        if (!this.collectables.containsKey(event.getId())) {
-            //Collected something that doesn't need an animation, for example mining gold
-            if (event.getType() == EventType.GOLD_PICK_UP) {
-                //Inc displayed gold?
+        if (collectables.containsKey(event.getId())) {
+            CollectableView collectableView = collectables.get(event.getId());
+            if (collectableView instanceof ChestView chest) {
+                SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
+                gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
+                collectables.get(event.getId());
+                chest.pickup();
             }
-            addTextEvent(event, 25, EventColor.SUCCESS);
-            return;
-        }
-
-        if (this.collectables.get(event.getId()).hasBeenCollected()) {
-            return;
-        }
-
-        CollectableView collectableView = this.collectables.get(event.getId());
-        collectableView.pickup();
-
-        if (collectableView instanceof ChestView) {
-            SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
-            gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
-        } else if (collectableView instanceof GoldView) {
-            SoundManager.getInstance().play(SoundFX.GOLD);
-            this.collectables.remove(event.getId());
-        } else if (collectableView instanceof FlagView) {
-            SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
-            this.collectables.remove(event.getId());
+        } else {
+            switch (event.getType()) {
+                case GOLD_PICK_UP -> SoundManager.getInstance().play(SoundFX.GOLD);
+                case FLAG_PICK_UP -> SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
+            }
         }
         addTextEvent(event, 25, EventColor.SUCCESS);
     }

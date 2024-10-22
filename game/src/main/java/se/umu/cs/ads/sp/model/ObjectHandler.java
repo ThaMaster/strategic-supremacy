@@ -132,11 +132,13 @@ public class ObjectHandler {
                 }
             } else if (collected instanceof Gold) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
+                this.collectables.remove(collected.getId());
             } else if (collected instanceof Flag) {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(),
                         "Flag picked up, hurry up and get it to the base",
                         EventType.FLAG_PICK_UP, playerUnit.getId()));
                 playerUnit.setHasFlag(true);
+                this.collectables.remove(collected.getId());
             }
             pickedUpCollectableIds.add(collected.getId());
         }
@@ -157,6 +159,10 @@ public class ObjectHandler {
 
     public HashMap<Long, Collectable> getCollectables() {
         return collectables;
+    }
+
+    public ArrayList<Collectable> getCollectablesArray() {
+        return new ArrayList<>(collectables.values());
     }
 
     public HashMap<Long, Environment> getEnvironments() {

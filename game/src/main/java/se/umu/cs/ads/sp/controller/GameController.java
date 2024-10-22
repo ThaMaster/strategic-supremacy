@@ -75,10 +75,6 @@ public class GameController implements ActionListener {
         gameTimer.start();
     }
 
-    public void spawnFlag(long id, Position flagPos) {
-        mainFrame.getGamePanel().spawnFlag(id, flagPos);
-    }
-
     private void initializeView() {
         mainFrame.showGamePanel(tileManager);
         mainFrame.getGamePanel().setGameController(this);
@@ -109,7 +105,7 @@ public class GameController implements ActionListener {
     private void update() {
         modelManager.update();
         mainFrame.getGamePanel().updateEntityViews(getAllUnits());
-        mainFrame.getGamePanel().updateCollectables();
+        mainFrame.getGamePanel().updateCollectables(modelManager.getObjectHandler().getCollectablesArray());
         mainFrame.getGamePanel().updateEnvironments();
         updateHudInfo();
         // Check where to move the camera.

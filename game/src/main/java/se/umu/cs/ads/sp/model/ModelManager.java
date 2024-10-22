@@ -24,7 +24,6 @@ import java.util.TimerTask;
 public class ModelManager {
 
     private final Map map;
-    private final GameController controller;
     private final ObjectHandler objectHandler;
     private final LobbyHandler lobbyHandler;
     private final ComHandler comHandler;
@@ -51,7 +50,6 @@ public class ModelManager {
         comHandler = new ComHandler(player.port, controller, this);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::leaveOngoingGame));
-        this.controller = controller;
     }
 
     public User getPlayer() {
@@ -284,7 +282,6 @@ public class ModelManager {
                     if (unit.hasFlag()) {
                         long id = objectHandler.spawnFlag(map, unit.getPosition());
                         unit.setHasFlag(false);
-                        controller.spawnFlag(id, unit.getPosition());
                     }
                     break;
                 case ATTACK:
