@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L2UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
@@ -38,6 +39,7 @@ public class ComHandler {
     }
 
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
+        // Make all async calls here
         if (fromLeader) {
             for (GameClient client : l3Clients.values()) {
                 // Send l3 update to everyone
@@ -57,12 +59,24 @@ public class ComHandler {
         modelManager.receiveL3Update(message);
     }
 
-    public void sendL1Update(L1UpdateDTO message) {
-        if(l1Clients.isEmpty()) {
+    public void sendL2Update(L2UpdateDTO message) {
+        if (l2Clients.isEmpty()) {
             return;
         }
-        System.out.println("L1 client size: " + l1Clients.size());
+        for (GameClient client : l2Clients.values()) {
+            // Send l2 update only to those in the zone
+            client.sendL2Message(message);
+        }
+    }
 
+    public void handleReceiveL2Msg(L2UpdateDTO message) {
+        modelManager.receiveL2Update(message);
+    }
+
+    public void sendL1Update(L1UpdateDTO message) {
+        if (l1Clients.isEmpty()) {
+            return;
+        }
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
             client.sendL1Message(message);
@@ -132,28 +146,21 @@ public class ComHandler {
     }
 
     private void sendUpdatedLobby(Lobby lobby) {
-        Context newContext = Context.current().fork();
-        Context origContext = newContext.attach();
-        try {
-            // Make all async calls here
-            for (User user : lobby.users) {
-                //No need to send the update to ourselves
-                if (user.id == modelManager.getPlayer().id) {
-                    continue;
-                }
-                GameClient client;
-                if (!l3Clients.containsKey(user.id)) {
-                    client = new GameClient();
-                    client.create(user.ip, user.port);
-                    l3Clients.put(user.id, client);
-                } else {
-                    client = l3Clients.get(user.id);
-                }
-                client.updateLobby(lobby, user);
+        // Make all async calls here
+        for (User user : lobby.users) {
+            //No need to send the update to ourselves
+            if (user.id == modelManager.getPlayer().id) {
+                continue;
             }
-        } finally {
-            // Return to old context
-            newContext.detach(origContext);
+            GameClient client;
+            if (!l3Clients.containsKey(user.id)) {
+                client = new GameClient();
+                client.create(user.ip, user.port);
+                l3Clients.put(user.id, client);
+            } else {
+                client = l3Clients.get(user.id);
+            }
+            client.updateLobby(lobby, user);
         }
     }
 
@@ -178,18 +185,15 @@ public class ComHandler {
     }
 
     private void removeGameClient(long userId) {
-        GameClient client;
         if (l1Clients.containsKey(userId)) {
-            client = l1Clients.get(userId);
+            l1Clients.get(userId).destroy();
             l1Clients.remove(userId);
         } else if (l2Clients.containsKey(userId)) {
-            client = l2Clients.get(userId);
+            l2Clients.get(userId).destroy();
             l2Clients.remove(userId);
-        } else {
-            client = l3Clients.get(userId);
         }
 
-        client.shutdown();
+        l3Clients.get(userId).destroy();
         l3Clients.remove(userId);
     }
 
@@ -201,14 +205,15 @@ public class ComHandler {
     }
 
     public void voteReceived() {
-
     }
 
     public void moveUserToL3(Long userId) {
         if (l2Clients.containsKey(userId)) {
-//            l2Clients.remove(userId);
+            l2Clients.get(userId).destroy();
+            l2Clients.remove(userId);
             System.out.println("[Client] MOVE " + userId + " to L3 from L2");
         } else if (l1Clients.containsKey(userId)) {
+            l1Clients.get(userId).destroy();
             l1Clients.remove(userId);
             System.out.println("[Client] MOVE " + userId + " to L3 from L1");
         }
@@ -219,14 +224,21 @@ public class ComHandler {
             return;
         }
 
+        GameClient newClient;
         if (l1Clients.containsKey(userId)) {
-//            l2Clients.put(userId, l1Clients.get(userId));
-//            l1Clients.remove(userId);
+            // Check if the client is in L1
+            newClient = l1Clients.get(userId);
+            l1Clients.remove(userId);
             System.out.println("[Client] MOVE " + userId + " to L2 from L1");
         } else {
-//            l2Clients.put(userId, l3Clients.get(userId));
+            // If in L3, need to create a new client since context causes problem
+            GameClient l3Client = l3Clients.get(userId);
+            newClient = new GameClient();
+            newClient.create(l3Client.getIp(), l3Client.getPort());
             System.out.println("[Client] MOVE " + userId + " TO L2 from L3");
         }
+
+        l2Clients.put(userId, newClient);
     }
 
     public void moveUserToL1(Long userId) {
@@ -234,14 +246,28 @@ public class ComHandler {
             return;
         }
 
+        GameClient newClient;
         if (l2Clients.containsKey(userId)) {
-//          l1Clients.put(userId, l2Clients.get(userId));
-//          l2Clients.remove(userId);
+            // Check if the client is in L2
+            newClient = l2Clients.get(userId);
+            l2Clients.remove(userId);
             System.out.println("[Client] MOVE " + userId + " TO L1 from L2");
         } else {
-            l1Clients.put(userId, l3Clients.get(userId));
+            // If in L3, need to create a new client since context causes problem
+            GameClient l3Client = l3Clients.get(userId);
+            newClient = new GameClient();
+            newClient.create(l3Client.getIp(), l3Client.getPort());
             System.out.println("[Client] MOVE " + userId + " TO L1 from L3");
-
         }
+
+        l1Clients.put(userId, newClient);
+    }
+
+    public int getNrL1Clients() {
+        return l1Clients.size();
+    }
+
+    public int getNrL2Clients() {
+        return l2Clients.size();
     }
 }

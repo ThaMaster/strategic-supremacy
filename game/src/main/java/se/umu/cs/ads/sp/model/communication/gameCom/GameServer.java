@@ -54,17 +54,25 @@ public class GameServer {
         }
 
         @Override
-        public void l1Update(L1Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L1 update...");
-            comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
+        public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received L3 update...");
+            comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
 
         @Override
-        public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L3 update...");
-            comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
+        public void l2Update(L2Message request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received L2 update...");
+            comHandler.handleReceiveL2Msg(GrpcUtil.fromGrpcL2Message(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
+        public void l1Update(L1Message request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received L1 update...");
+            comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }

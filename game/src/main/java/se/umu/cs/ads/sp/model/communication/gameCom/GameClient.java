@@ -12,10 +12,7 @@ import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
-import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
-import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
+import se.umu.cs.ads.sp.model.communication.dto.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,10 +23,17 @@ public class GameClient {
 
     private String ip;
     private int port;
-    private String username;
 
     public GameClient() {
         super();
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public void create(String ip, int port) {
@@ -89,7 +93,25 @@ public class GameClient {
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("\t Failed to send L3 Update to client " + ip + ":" + port);
+                System.out.println("\t Failed to send L3 update to client " + ip + ":" + port);
+                System.out.println("\t" + t.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void sendL2Message(L2UpdateDTO msg) {
+        System.out.println("[Client] Sending L2 update...");
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .l2Update(GrpcUtil.toGrpcL2Message(msg));
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("\t Failed to send L2 update to client " + ip + ":" + port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());
@@ -108,7 +130,7 @@ public class GameClient {
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("\t Failed to send L1 Update to client " + ip + ":" + port);
+                System.out.println("\t Failed to send L1 update to client " + ip + ":" + port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());

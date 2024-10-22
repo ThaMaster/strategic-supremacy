@@ -153,6 +153,62 @@ public class GrpcUtil {
                 .build();
     }
 
+    public static Lobby fromGrpcLobby(proto.DetailedLobbyInfo request) {
+        Lobby lobby = new Lobby(
+                request.getId(),
+                request.getLobbyName(),
+                fromGrpcUser(request.getLeader()),
+                request.getUsersCount(),
+                request.getMaxPlayers(),
+                request.getSelectedMap());
+
+        ArrayList<User> users = new ArrayList<>();
+        for (proto.User user : request.getUsersList()) {
+            users.add(fromGrpcUser(user));
+        }
+
+        lobby.setUsers(users);
+        return lobby;
+    }
+
+    public static proto.DetailedLobbyInfo toGrpcLobby(Lobby lobby) {
+        proto.DetailedLobbyInfo.Builder builder = proto.DetailedLobbyInfo.newBuilder()
+                .setId(lobby.id)
+                .setLeader(toGrpcUser(lobby.leader))
+                .setSelectedMap(lobby.selectedMap)
+                .setMaxPlayers(lobby.maxPlayers)
+                .setLobbyName(lobby.name);
+        for (User user : lobby.users) {
+            builder.addUsers(toGrpcUser(user));
+        }
+        return builder.build();
+    }
+
+    public static proto.PlayerUnit toGrpcPlayerUnit(UnitDTO unit) {
+        return proto.PlayerUnit.newBuilder()
+                .setUnitId(unit.unitId())
+                .setTargetUnitId(unit.targetUnitId())
+                .setPosition(toGrpcPosition(unit.position()))
+                .setDestination(toGrpcPosition(unit.destination()))
+                .setMaxHp(unit.maxHp())
+                .setCurrentHp(unit.currentHp())
+                .setSpeedBuff(unit.speedBuff())
+                .setAttackBuff(unit.attackBuff())
+                .build();
+    }
+
+    public static UnitDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
+        return new UnitDTO(
+                unit.getUnitId(),
+                unit.getTargetUnitId(),
+                unit.getUnitType(),
+                fromGrpcPosition(unit.getPosition()),
+                fromGrpcPosition(unit.getDestination()),
+                unit.getMaxHp(),
+                unit.getCurrentHp(),
+                unit.getSpeedBuff(),
+                unit.getAttackBuff());
+    }
 
     public static proto.L3Message toGrpcL3Message(L3UpdateDTO message) {
         proto.L3Message.Builder builder = proto.L3Message.newBuilder();
@@ -202,76 +258,66 @@ public class GrpcUtil {
         );
     }
 
-    public static Lobby fromGrpcLobby(proto.DetailedLobbyInfo request) {
-        Lobby lobby = new Lobby(
-                request.getId(),
-                request.getLobbyName(),
-                fromGrpcUser(request.getLeader()),
-                request.getUsersCount(),
-                request.getMaxPlayers(),
-                request.getSelectedMap());
+    public static proto.L2Message toGrpcL2Message(L2UpdateDTO message) {
+        proto.L2Message.Builder builder = proto.L2Message.newBuilder();
 
-        ArrayList<User> users = new ArrayList<>();
-        for (proto.User user : request.getUsersList()) {
-            users.add(fromGrpcUser(user));
+        for (long pickedUpCollectables : message.pickedUpCollectables()) {
+            builder.addPickedUpCollectables(pickedUpCollectables);
+        }
+        for (EnvironmentDTO env : message.environments()) {
+            builder.addEnvironments(toGrpcEnvironment(env));
         }
 
-        lobby.setUsers(users);
-        return lobby;
-    }
-
-    public static proto.DetailedLobbyInfo toGrpcLobby(Lobby lobby) {
-        proto.DetailedLobbyInfo.Builder builder = proto.DetailedLobbyInfo.newBuilder()
-                .setId(lobby.id)
-                .setLeader(toGrpcUser(lobby.leader))
-                .setSelectedMap(lobby.selectedMap)
-                .setMaxPlayers(lobby.maxPlayers)
-                .setLobbyName(lobby.name);
-        for (User user : lobby.users) {
-            builder.addUsers(toGrpcUser(user));
+        for (EntitySkeletonDTO skeletons : message.entities()) {
+            builder.addEntities(toGrpcEntitySkeleton(skeletons));
         }
+
+        builder.setUserId(message.userId())
+                .setSeverity(message.msgSeverity());
         return builder.build();
     }
 
-    public static proto.PlayerUnit toGrpcPlayerUnit(EntityDTO unit) {
-        return proto.PlayerUnit.newBuilder()
-                .setUnitId(unit.unitId())
-                .setTargetUnitId(unit.targetUnitId())
-                .setPosition(toGrpcPosition(unit.position()))
-                .setDestination(toGrpcPosition(unit.destination()))
-                .setMaxHp(unit.maxHp())
-                .setCurrentHp(unit.currentHp())
-                .setSpeedBuff(unit.speedBuff())
-                .setAttackBuff(unit.attackBuff())
-                .build();
+    public static L2UpdateDTO fromGrpcL2Message(proto.L2Message message) {
+        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
+        ArrayList<EnvironmentDTO> environments = new ArrayList<>();
+        ArrayList<Long> pickedUp = new ArrayList<>();
+
+        for (int i = 0; i < message.getEntitiesCount(); i++) {
+            skeletons.add(fromGrpcSkeleton(message.getEntities(i)));
+        }
+
+        for (int i = 0; i < message.getEnvironmentsCount(); i++) {
+            environments.add(fromGrpcEnv(message.getEnvironments(i)));
+        }
+
+        for (int i = 0; i < message.getPickedUpCollectablesCount(); i++) {
+            pickedUp.add(message.getPickedUpCollectables(i));
+        }
+
+        return new L2UpdateDTO(
+                message.getUserId(),
+                skeletons,
+                pickedUp,
+                environments,
+                message.getSeverity()
+        );
     }
 
-    public static EntityDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
-        return new EntityDTO(
-                unit.getUnitId(),
-                unit.getTargetUnitId(),
-                fromGrpcPosition(unit.getPosition()),
-                fromGrpcPosition(unit.getDestination()),
-                unit.getMaxHp(),
-                unit.getCurrentHp(),
-                unit.getSpeedBuff(),
-                unit.getAttackBuff());
-    }
-
-    public static proto.L1Message toGrpcL1Message(L1UpdateDTO playerUnitUpdateRequest) {
+    public static proto.L1Message toGrpcL1Message(L1UpdateDTO message) {
         proto.L1Message.Builder builder = proto.L1Message.newBuilder()
-                .setUserId(playerUnitUpdateRequest.playerId());
-        for (EntityDTO unit : playerUnitUpdateRequest.unitUpdates()) {
+                .setUserId(message.userId())
+                .setSeverity(message.msgSeverity());
+        for (UnitDTO unit : message.entities()) {
             builder.addUnits(toGrpcPlayerUnit(unit));
         }
         return builder.build();
     }
 
-    public static L1UpdateDTO fromGrpcL1Message(proto.L1Message updateRequest) {
-        ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
-        for (proto.PlayerUnit unit : updateRequest.getUnitsList()) {
-            unitUpdates.add(fromGrpcUnitInfo(unit));
+    public static L1UpdateDTO fromGrpcL1Message(proto.L1Message message) {
+        ArrayList<UnitDTO> units = new ArrayList<>();
+        for (proto.PlayerUnit unit : message.getUnitsList()) {
+            units.add(fromGrpcUnitInfo(unit));
         }
-        return new L1UpdateDTO(unitUpdates, updateRequest.getUserId());
+        return new L1UpdateDTO(message.getUserId(), units, message.getSeverity());
     }
 }

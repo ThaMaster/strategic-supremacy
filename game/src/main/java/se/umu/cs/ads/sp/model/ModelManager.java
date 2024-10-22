@@ -18,6 +18,7 @@ import se.umu.cs.ads.sp.utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,6 +32,7 @@ public class ModelManager {
     private FowModel fow;
 
     private Timer l3Timer;
+    private Timer l2Timer;
 
     private Timer gameTimer;
     private long remainingTime = 150;
@@ -76,7 +78,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            comHandler.sendL1Update(constructL1Message(targetId));
+            sendL1Update(constructL1Message(targetId));
             return true;
         }
 
@@ -89,7 +91,8 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            comHandler.sendL1Update(constructL1Message(-1));
+
+            sendL1Update(constructL1Message(-1));
             return true;
         }
         return false;
@@ -164,6 +167,7 @@ public class ModelManager {
 
         started = true;
         startL3Timer(Constants.L3_UPDATE_TIME);
+        startL2Timer(Constants.L2_UPDATE_TIME);
         startRoundTimer();
     }
 
@@ -182,8 +186,15 @@ public class ModelManager {
         }, 0, updateTime);
     }
 
-    private void sendL3Update() {
-        comHandler.sendL3Update(constructL3Message(iAmLeader()), iAmLeader());
+    private void startL2Timer(long updateTime) {
+        l2Timer = new Timer();
+        l2Timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sendL2Update();
+            }
+        }, 0, updateTime);
+
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
@@ -193,7 +204,7 @@ public class ModelManager {
             entities = objectHandler.getAllEntitySkeletons();
             msgCount = lobbyHandler.incMsgCount();
         } else {
-            entities = objectHandler.getMyUnitsToEntitySkeletons();
+            entities = new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(player.id, objectHandler.getMyUnitsToEntitySkeletons())));
         }
 
         return new L3UpdateDTO(
@@ -207,17 +218,23 @@ public class ModelManager {
         );
     }
 
-    // TODO: Implement below method
     public L2UpdateDTO constructL2Message() {
-        return new L2UpdateDTO();
+        return new L2UpdateDTO(
+                player.id,
+                objectHandler.getMyUnitsToEntitySkeletons(),
+                objectHandler.getCollectedIds(),
+                objectHandler.getAllEnvironmentsDTO(),
+                Constants.LOW_SEVERITY
+        );
     }
 
     public L1UpdateDTO constructL1Message(long targetId) {
-        ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
+        ArrayList<UnitDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
-            unitUpdates.add(new EntityDTO(
+            unitUpdates.add(new UnitDTO(
                     unit.getId(),
                     targetId,
+                    unit.getEntityType(),
                     unit.getPosition(),
                     unit.getDestination(),
                     unit.getMaxHp(),
@@ -226,12 +243,29 @@ public class ModelManager {
                     unit.getAttackBuff())
             );
         }
-        return new L1UpdateDTO(unitUpdates, player.id);
+        return new L1UpdateDTO(
+                player.id,
+                unitUpdates,
+                Constants.LOW_SEVERITY
+        );
+    }
+
+    private void sendL3Update() {
+        comHandler.sendL3Update(constructL3Message(iAmLeader()), iAmLeader());
+    }
+
+    private void sendL2Update() {
+        comHandler.sendL2Update(constructL2Message());
+    }
+
+    private void sendL1Update(L1UpdateDTO update) {
+        if (comHandler.getNrL1Clients() > 0) {
+            comHandler.sendL1Update(update);
+        }
     }
 
     public void receiveL3Update(L3UpdateDTO update) {
 
-        //Todo do not update units or stuff if the author of the message is within l2 or l1
         if (!iAmLeader()) {
             lobbyHandler.updateMsgCount(update.msgCount());
             this.remainingTime = update.remainingTime();
@@ -241,26 +275,20 @@ public class ModelManager {
         objectHandler.updateEnvironments(update.environments());
         this.currentScoreHolderId = update.currentScoreLeader();
 
-        // Update the boundaries
-        for (UserSkeletonsDTO skeletons : update.entities()) {
-            // Skip ourselves
-            if (skeletons.userId() == player.id) {
-                continue;
-            }
-            ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
-            // Check l1, then l2, otherwise just move user to l3
-            if (isInsideLayer(skeletonPos, 1)) {
-                comHandler.moveUserToL1(skeletons.userId());
-            } else if (isInsideLayer(skeletonPos, 2)) {
-                comHandler.moveUserToL2(skeletons.userId());
-            } else {
-                comHandler.moveUserToL3(skeletons.userId());
-            }
-        }
+        updateBoundaries(update.entities());
+    }
+
+    public void receiveL2Update(L2UpdateDTO update) {
+        objectHandler.updateUnitPositions(
+                new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(update.userId(), update.entities()))));
+        objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.updateEnvironments(update.environments());
+        updateBoundariesFromL2Message(update);
     }
 
     public void receiveL1Update(L1UpdateDTO update) {
-        objectHandler.updateEnemyUnits(update.unitUpdates());
+        objectHandler.updateEnemyUnits(update.entities());
+        updateBoundariesFromL1Message(update);
     }
 
     private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
@@ -293,19 +321,16 @@ public class ModelManager {
         started = true;
         l3Timer = new Timer();
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        startL2Timer(Constants.L2_UPDATE_TIME);
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
     }
 
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
 
-        if (l3Timer != null) {
-            l3Timer.cancel();
-        }
-
-        if (gameTimer != null) {
-            gameTimer.cancel();
-        }
+        if (l3Timer != null) l3Timer.cancel();
+        if (l2Timer != null) l2Timer.cancel();
+        if (gameTimer != null) gameTimer.cancel();
 
         comHandler.removePlayerUnits();
         objectHandler.clearSelectedUnitIds();
@@ -313,6 +338,7 @@ public class ModelManager {
         objectHandler.getEnvironments().clear();
         objectHandler.getCollectables().clear();
         lobbyHandler.leaveLobby();
+        started = false;
     }
 
     public UserSkeletonsDTO createMySkeletonList() {
@@ -411,6 +437,37 @@ public class ModelManager {
         return currentPoints;
     }
 
+    private void updateBoundariesFromL2Message(L2UpdateDTO message) {
+        updateBoundaries(new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(message.userId(), message.entities()))));
+    }
+
+    private void updateBoundariesFromL1Message(L1UpdateDTO message) {
+        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>(message.entities().stream()
+                .map(unit -> new EntitySkeletonDTO(message.userId(), unit.unitType(), unit.position()))
+                .toList()
+        );
+        updateBoundaries(new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(message.userId(), skeletons))));
+    }
+
+
+    private void updateBoundaries(ArrayList<UserSkeletonsDTO> userSkeletons) {
+        for (UserSkeletonsDTO skeletons : userSkeletons) {
+            // Skip ourselves
+            if (skeletons.userId() == player.id) {
+                continue;
+            }
+            ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
+            // Check l1, then l2, otherwise just move user to l3
+            if (isInsideLayer(skeletonPos, 1)) {
+                comHandler.moveUserToL1(skeletons.userId());
+            } else if (isInsideLayer(skeletonPos, 2)) {
+                comHandler.moveUserToL2(skeletons.userId());
+            } else {
+                comHandler.moveUserToL3(skeletons.userId());
+            }
+        }
+    }
+
     public ArrayList<Rectangle> getBBByUnits(ArrayList<PlayerUnit> units) {
         return getBBByPositions(new ArrayList<>(units.stream().map(GameObject::getPosition).toList()));
     }
@@ -447,16 +504,6 @@ public class ModelManager {
         Position maxPosL2 = new Position(maxX + Constants.L2_RADIUS, maxY + Constants.L2_RADIUS);
         bbs.add(new Rectangle(minPosL2.getX(), minPosL2.getY(), maxPosL2.getX() - minPosL2.getX(), maxPosL2.getY() - minPosL2.getY()));
         return bbs;
-    }
-
-    public int getL1Range() {
-        // Adjust to ensure that the units do not teleport into view
-        return fow.getFowRange();
-    }
-
-    public int getL2Range() {
-        // Adjust to ensure that the units do not teleport into view
-        return fow.getFowRange() + 250;
     }
 
     public boolean iAmLeader() {

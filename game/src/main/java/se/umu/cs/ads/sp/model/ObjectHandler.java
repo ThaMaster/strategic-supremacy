@@ -238,7 +238,6 @@ public class ObjectHandler {
                     spawnGoldMine(map, env.position(), env.remainingResource(), env.id());
                     break;
                 default:
-                    System.out.println("Unexpected type on collectable: " + type.label);
                     break;
             }
         }
@@ -255,11 +254,7 @@ public class ObjectHandler {
                 case FLAG:
                     spawnFlag(map, collectable.position(), collectable.id());
                     break;
-                case POINT:
-                    // TODO: Remove this one?
-                    break;
                 default:
-                    System.out.println("Unexpected type on collectable: " + type.label);
                     break;
             }
         }
@@ -339,14 +334,12 @@ public class ObjectHandler {
         }
     }
 
-    public ArrayList<UserSkeletonsDTO> getMyUnitsToEntitySkeletons() {
-        UserSkeletonsDTO skeletons = new UserSkeletonsDTO(user.id, new ArrayList<>());
+    public ArrayList<EntitySkeletonDTO> getMyUnitsToEntitySkeletons() {
+        ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
         for (PlayerUnit unit : myUnits.values()) {
-            skeletons.addSkeleton(new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition()));
+            skeletons.add(new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition()));
         }
-        ArrayList<UserSkeletonsDTO> mySkeletons = new ArrayList<>();
-        mySkeletons.add(skeletons);
-        return mySkeletons;
+        return skeletons;
     }
 
     //Return the base ID
@@ -421,8 +414,8 @@ public class ObjectHandler {
         }
     }
 
-    public void updateEnemyUnits(ArrayList<EntityDTO> updates) {
-        for (EntityDTO update : updates) {
+    public void updateEnemyUnits(ArrayList<UnitDTO> updates) {
+        for (UnitDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             enemyUnit.setPosition(update.position());
 

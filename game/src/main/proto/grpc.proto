@@ -15,17 +15,13 @@ message Position {
 message PlayerUnit {
   int64 unitId = 1;
   int64 targetUnitId = 2;
-  Position position = 3;
-  Position destination = 4;
+  string unitType = 3;
+  Position position = 4;
+  Position destination = 5;
   int32 maxHp = 6;
-  int32 currentHp = 5;
-  int32 speedBuff = 9;
-  int32 attackBuff = 11;
-}
-
-message L1Message {
-  int64 userId = 1;
-  repeated PlayerUnit units = 2;
+  int32 currentHp = 7;
+  int32 speedBuff = 8;
+  int32 attackBuff = 9;
 }
 
 message EntitySkeleton {
@@ -63,6 +59,20 @@ message StartGameRequest {
   repeated UserSkeletons entities = 1;
   repeated Collectable collectables = 2;
   repeated Environment environments = 3;
+}
+
+message L1Message {
+  int64 userId = 1;
+  repeated PlayerUnit units = 2;
+  int32 severity = 3;
+}
+
+message L2Message {
+  int64 userId = 1;
+  repeated EntitySkeleton entities = 2;
+  repeated int64 pickedUpCollectables = 3;
+  repeated Environment environments = 4;
+  int32 severity = 5;
 }
 
 message L3Message {
@@ -105,6 +115,7 @@ service GameService {
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
   rpc l1Update (L1Message) returns (google.protobuf.Empty);
+  rpc l2Update (L2Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
   rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
 }
