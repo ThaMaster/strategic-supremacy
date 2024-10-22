@@ -400,15 +400,8 @@ public class GameController implements ActionListener {
         mainFrame.getHudPanel().toggleUpgradeMenu();
     }
 
-    public Rectangle getL1BoundingBox() {
-        return modelManager.getPlayerBoundingBox(
-                new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()),
-                modelManager.getL1Range());
-    }
-
-    public Rectangle getL2BoundingBox() {
-        return modelManager.getPlayerBoundingBox(
-                new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()),
-                modelManager.getL2Range());
+    public ArrayList<Rectangle> getPlayerBoundingBoxes() {
+        return modelManager.getBoundingBoxes(
+                new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()));
     }
 }

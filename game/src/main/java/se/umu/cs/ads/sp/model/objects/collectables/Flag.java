@@ -9,4 +9,9 @@ public class Flag extends Collectable {
         super(pos, map);
     }
 
+    public Flag(Position pos, Map map, long id) {
+        super(pos, map);
+        this.id = id;
+    }
+
 }

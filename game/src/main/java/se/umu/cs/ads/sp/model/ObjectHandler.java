@@ -36,13 +36,13 @@ public class ObjectHandler {
     }
 
     public void update(Map map) {
-        for (PlayerUnit entity : myUnits.values()) {
-            entity.update();
-            if (entity.getState() == EntityState.DEAD && entity.hasFlag()) {
-                spawnFlag(map, entity.getPosition());
-                entity.setHasFlag(false);
+        for (PlayerUnit unit : myUnits.values()) {
+            unit.update();
+            if (unit.getState() == EntityState.DEAD && unit.hasFlag()) {
+                spawnFlag(map, unit.getPosition(), unit.getFlagId());
+                unit.setHasFlag(false, null);
             }
-            checkCollectables(entity);
+            checkCollectables(unit);
         }
 
         for (PlayerUnit entity : enemyUnits.values()) {
@@ -133,7 +133,7 @@ public class ObjectHandler {
                 GameEvents.getInstance().addEvent(new GameEvent(collected.getId(),
                         "Flag picked up, hurry up and get it to the base",
                         EventType.FLAG_PICK_UP, playerUnit.getId()));
-                playerUnit.setHasFlag(true);
+                playerUnit.setHasFlag(true, collected.getId());
                 this.collectables.remove(collected.getId());
             }
             pickedUpCollectableIds.add(collected.getId());
@@ -188,13 +188,13 @@ public class ObjectHandler {
             long userId = user.id;
             Position basePos = basePositions.get(0);
             Position goldMinePos = map.generateGoldMinePosition(basePos);
-            long goldMineId = spawnGoldMine(map, goldMinePos);
+            long goldMineId = spawnGoldMine(map, goldMinePos, 100, null);
             //Spawning base
             startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoType.BASE.label, 0));
+            long baseId = spawnBase(map, basePos, null);
 
             //Spawning goldmine
             startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoType.GOLDMINE.label, 0));
-            long baseId = spawnBase(map, basePos);
 
 
             //Spawning 3 entities
@@ -227,13 +227,13 @@ public class ObjectHandler {
             switch (type) {
                 case BASE:
                     if (env.userId() == user.id) {
-                        baseId = spawnBase(map, env.position());
+                        baseId = spawnBase(map, env.position(), env.id());
                     } else {
-                        spawnBase(map, env.position());
+                        spawnBase(map, env.position(), env.id());
                     }
                     break;
                 case GOLDMINE:
-                    spawnGoldMine(map, env.position());
+                    spawnGoldMine(map, env.position(), env.remainingResource(), env.id());
                     break;
                 default:
                     System.out.println("Unexpected type on collectable");
@@ -247,10 +247,10 @@ public class ObjectHandler {
                     spawnGold(map, collectable.position(), collectable.id());
                     break;
                 case CHEST:
-                    spawnChest(map, collectable.position(), collectable.reward());
+                    spawnChest(map, collectable.position(), collectable.reward(), collectable.id());
                     break;
                 case FLAG:
-                    spawnFlag(map, collectable.position());
+                    spawnFlag(map, collectable.position(), collectable.id());
                 default:
                     System.out.println("Unexpected type on collectable");
                     break;
@@ -277,8 +277,8 @@ public class ObjectHandler {
 
     public ArrayList<EnvironmentDTO> getAllEnvironmentsDTO() {
         ArrayList<EnvironmentDTO> environmentDtos = new ArrayList<>();
-        for(Environment env : this.environments.values()){
-            if(env instanceof GoldMine goldmine){
+        for (Environment env : this.environments.values()) {
+            if (env instanceof GoldMine goldmine) {
                 environmentDtos.add(new EnvironmentDTO(env.getId(), -1, env.getPosition(), DtoType.BASE.label, goldmine.getRemainingResource()));
             }
         }
@@ -293,31 +293,21 @@ public class ObjectHandler {
         }
     }
 
-    public void removeCollectables(Map map, ArrayList<Long> collectableIds){
-        int sizeBefore = this.collectables.size();
+    public void removeCollectables(Map map, ArrayList<Long> collectableIds) {
         for (Long collectableId : collectableIds) {
             if (this.collectables.containsKey(collectableId)) {
                 this.collectables.get(collectableId).pickUp(map);
                 this.collectables.remove(collectableId);
             }
         }
-        if(collectableIds.size() > 0 && sizeBefore >= collectables.size()){
-            for(Long collId : collectableIds){
-                System.out.println("You should remove id -> " + collId);
-            }
-            for(Long collId : collectableIds){
-                System.out.println("You should remove id -> " + collId);
-            }
-            System.out.println("We should have removed an item.");
-        }
     }
 
-    public void updateEnvironments(ArrayList<EnvironmentDTO> envDtos){
-        for(EnvironmentDTO env : envDtos){
-            if(this.environments.containsKey(env.id())){
-                if(DtoType.fromLabel(env.type()) == DtoType.GOLDMINE){
-                    GoldMine mine = (GoldMine)this.environments.get(env.id());
-                    if(mine.getRemainingResource() > env.remainingResource()){
+    public void updateEnvironments(ArrayList<EnvironmentDTO> envDTOs) {
+        for (EnvironmentDTO env : envDTOs) {
+            if (this.environments.containsKey(env.id())) {
+                if (DtoType.fromLabel(env.type()) == DtoType.GOLDMINE) {
+                    GoldMine mine = (GoldMine) this.environments.get(env.id());
+                    if (mine.getRemainingResource() > env.remainingResource()) {
                         mine.setResource(env.remainingResource());
                     }
                 }
@@ -335,38 +325,61 @@ public class ObjectHandler {
     }
 
     //Return the base ID
-    private long spawnBase(Map map, Position position) {
-        Base base = new Base(position, map);
+    private long spawnBase(Map map, Position position, Long id) {
+        Base base;
+        if (id != null) {
+            base = new Base(position, map, id);
+        } else {
+            base = new Base(position, map);
+        }
+
         addEnvironment(base);
         return base.getId();
     }
 
-    public long spawnFlag(Map map, Position position) {
-        Flag flag = new Flag(position, map);
+    public long spawnFlag(Map map, Position position, Long id) {
+        Flag flag;
+        if (id != null) {
+            flag = new Flag(position, map, id);
+        } else {
+            flag = new Flag(position, map);
+        }
+
         flag.setReward(new Reward(1, RewardType.FLAG));
         addCollectable(flag);
         return flag.getId();
     }
 
-    private long spawnGoldMine(Map map, Position position) {
-        GoldMine goldMine = new GoldMine(position, map, 100);
+    private long spawnGoldMine(Map map, Position position, int goldReserve, Long id) {
+        GoldMine goldMine;
+        if (id != null) {
+            goldMine = new GoldMine(position, map, goldReserve);
+        } else {
+            goldMine = new GoldMine(position, map, goldReserve);
+        }
+
         addEnvironment(goldMine);
         return goldMine.getId();
     }
 
     private void spawnGold(Map map, Position position, Long id) {
         Gold coin;
-        if(id != null){
+        if (id != null) {
             coin = new Gold(position, map, id);
-        }else{
+        } else {
             coin = new Gold(position, map);
         }
         coin.setReward(new Reward(10, RewardType.GOLD));
         addCollectable(coin);
     }
 
-    private void spawnChest(Map map, Position position, Reward reward) {
-        Chest chest = new Chest(position, map);
+    private void spawnChest(Map map, Position position, Reward reward, Long id) {
+        Chest chest;
+        if (id != null) {
+            chest = new Chest(position, map, id);
+        } else {
+            chest = new Chest(position, map);
+        }
         chest.setReward(reward);
         addCollectable(chest);
     }
@@ -419,9 +432,9 @@ public class ObjectHandler {
     public void upgradeUnit(long unitId, String type, int amount) {
         PlayerUnit unit;
 
-        if(myUnits.containsKey(unitId)){
+        if (myUnits.containsKey(unitId)) {
             unit = myUnits.get(unitId);
-        }else{
+        } else {
             unit = enemyUnits.get(unitId);
         }
         RewardType upgrade = RewardType.fromLabel(type);

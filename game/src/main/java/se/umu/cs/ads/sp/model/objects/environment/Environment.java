@@ -9,4 +9,10 @@ public abstract class Environment extends GameObject {
     public Environment(Position pos, Map map) {
         super(pos, map);
     }
+
+    public Environment(Position pos, Map map, long id) {
+        super(pos, map);
+        this.id = id;
+    }
+
 }

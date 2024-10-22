@@ -270,8 +270,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         if (AppSettings.DEBUG) {
-            Rectangle l1BB = gController.getL1BoundingBox();
-            Rectangle l2BB = gController.getL2BoundingBox();
+            ArrayList<Rectangle> bbs = gController.getPlayerBoundingBoxes();
+            Rectangle l1BB = bbs.get(0);
+            Rectangle l2BB = bbs.get(1);
             if (l1BB == null || l2BB == null) {
                 System.out.println("Trying to render bounding box but got null!");
             } else {

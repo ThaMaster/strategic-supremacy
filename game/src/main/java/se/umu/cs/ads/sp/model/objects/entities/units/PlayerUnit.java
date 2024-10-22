@@ -39,6 +39,7 @@ public class PlayerUnit extends Entity {
     private boolean hit = false;
 
     private boolean hasFlag;
+    private Long flagId = null;
 
     public PlayerUnit(String name, Position startPos, Map map, long baseId) {
         super(name, startPos, map);
@@ -58,12 +59,17 @@ public class PlayerUnit extends Entity {
         myBaseId = baseId;
     }
 
-    public void setHasFlag(boolean hasFlag) {
+    public void setHasFlag(boolean hasFlag, Long flagId) {
         this.hasFlag = hasFlag;
+        this.flagId = flagId;
     }
 
     public boolean hasFlag() {
         return hasFlag;
+    }
+
+    public Long getFlagId() {
+        return flagId;
     }
 
     public PlayerUnit(long id, String name, Position startPos, Map map) {

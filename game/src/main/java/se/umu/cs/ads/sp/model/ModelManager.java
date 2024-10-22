@@ -18,7 +18,6 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 
 import java.awt.*;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,7 +29,6 @@ public class ModelManager {
     private final LobbyHandler lobbyHandler;
     private final ComHandler comHandler;
     private final User player;
-
     private FowModel fow;
 
     private Timer l3Timer;
@@ -175,10 +173,9 @@ public class ModelManager {
         l3Timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(comHandler.leaderIsAlive()){
+                if (comHandler.leaderIsAlive()) {
                     sendL3Update();
-                }
-                else if(!iAmLeader()){ //Should not need to check this probably
+                } else if (!iAmLeader()) { //Should not need to check this probably
                     System.out.println("START LEADER ELECTION");
                     lobbyHandler.initiateLeaderElection();
                 }
@@ -215,20 +212,20 @@ public class ModelManager {
     public void receiveL3Update(L3UpdateDTO update) {
 
         //Todo do not update units or stuff if the author of the message is within l2 or l1
-        if(!iAmLeader()){
+        if (!iAmLeader()) {
             lobbyHandler.updateMsgCount(update.msgCount());
         }
         objectHandler.updateUnitPositions(update.entities());
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
-        if(!iAmLeader()){
+        if (!iAmLeader()) {
             this.remainingTime = update.remainingTime();
         }
         this.currentScoreHolderId = update.currentScoreLeader();
     }
 
-    private boolean iAmLeader(){
-        return lobbyHandler.getLobby().leader.id == player.id;
+    private boolean iAmLeader() {
+        return lobbyHandler.getLobby() != null && lobbyHandler.getLobby().leader.id == player.id;
     }
 
     // A request has come in to start the game
@@ -296,8 +293,8 @@ public class ModelManager {
                         unit = objectHandler.getEnemyUnits().get(event.getId());
                     }
                     if (unit.hasFlag()) {
-                        long id = objectHandler.spawnFlag(map, unit.getPosition());
-                        unit.setHasFlag(false);
+                        objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
+                        unit.setHasFlag(false, null);
                     }
                     break;
                 case ATTACK:
@@ -363,11 +360,12 @@ public class ModelManager {
         return currentPoints;
     }
 
-    public Rectangle getPlayerBoundingBox(ArrayList<PlayerUnit> units, int unitRadius) {
+    public ArrayList<Rectangle> getBoundingBoxes(ArrayList<PlayerUnit> units) {
         if (units.isEmpty()) {
             System.out.println("Error: Must at least have one unit to create a bounding box!");
             return null;
         }
+        ArrayList<Rectangle> bbs = new ArrayList<>();
 
         // Initialize min and max coordinates to the first position
         int minX = units.get(0).getPosition().getX();
@@ -386,12 +384,14 @@ public class ModelManager {
         }
 
         // Expand the bounding box by the radius
-        minX -= unitRadius;
-        minY -= unitRadius;
-        maxX += unitRadius;
-        maxY += unitRadius;
+        Position minPosL1 = new Position(minX - Constants.L1_RADIUS, minY - Constants.L1_RADIUS);
+        Position maxPosL1 = new Position(maxX + Constants.L1_RADIUS, maxY + Constants.L1_RADIUS);
+        bbs.add(new Rectangle(minPosL1.getX(), minPosL1.getY(), maxPosL1.getX() - minPosL1.getX(), maxPosL1.getY() - minPosL1.getY()));
 
-        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        Position minPosL2 = new Position(minX - Constants.L2_RADIUS, minY - Constants.L2_RADIUS);
+        Position maxPosL2 = new Position(maxX + Constants.L2_RADIUS, maxY + Constants.L2_RADIUS);
+        bbs.add(new Rectangle(minPosL2.getX(), minPosL2.getY(), maxPosL2.getX() - minPosL2.getX(), maxPosL2.getY() - minPosL2.getY()));
+        return bbs;
     }
 
     public int getL1Range() {

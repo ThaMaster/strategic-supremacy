@@ -9,6 +9,10 @@ public class Chest extends Collectable {
         super(pos, map);
     }
 
+    public Chest(Position pos, Map map, Long id) {
+        super(pos, map, id);
+    }
+
     @Override
     public void pickUp(Map map) {
         hasBeenCollected = true;

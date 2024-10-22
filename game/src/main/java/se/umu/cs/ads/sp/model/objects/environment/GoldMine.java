@@ -1,4 +1,5 @@
 package se.umu.cs.ads.sp.model.objects.environment;
+
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.utils.Position;
 
@@ -11,6 +12,12 @@ public class GoldMine extends Environment {
         this.goldReserve = goldReserve;
     }
 
+    public GoldMine(Position pos, Map map, int goldReserve, long id) {
+        super(pos, map);
+        this.goldReserve = goldReserve;
+        this.id = id;
+    }
+
     public void harvestGold(int amount) {
         goldReserve -= amount;
     }
@@ -19,11 +26,11 @@ public class GoldMine extends Environment {
         return goldReserve >= 0;
     }
 
-    public int getRemainingResource(){
+    public int getRemainingResource() {
         return goldReserve;
     }
 
-    public void setResource(int amount){
+    public void setResource(int amount) {
         this.goldReserve = amount;
     }
 

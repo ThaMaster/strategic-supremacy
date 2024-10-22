@@ -16,4 +16,7 @@ public class Constants {
     public static final int MID_SEVERITY = 2;
     public static final int LOW_SEVERITY = 3;
 
+    public static final int FIELD_OF_VIEW_RADIUS = 250;
+    public static final int L2_RADIUS = FIELD_OF_VIEW_RADIUS * 2;
+    public static final int L1_RADIUS = FIELD_OF_VIEW_RADIUS;
 }

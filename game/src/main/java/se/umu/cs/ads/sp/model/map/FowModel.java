@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 
 import java.util.ArrayList;
@@ -8,11 +9,10 @@ import java.util.ArrayList;
 public class FowModel {
 
     private ArrayList<PlayerUnit> units;
-    private final int fowRange;
+    private final int fowRange = Constants.FIELD_OF_VIEW_RADIUS;
 
     public FowModel(ArrayList<PlayerUnit> units) {
         this.units = units;
-        this.fowRange = 250;
     }
 
     public boolean isInFow(Position posToCheck) {

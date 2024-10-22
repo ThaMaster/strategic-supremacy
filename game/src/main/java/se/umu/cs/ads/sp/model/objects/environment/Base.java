@@ -9,4 +9,9 @@ public class Base extends Environment {
         super(pos, map);
     }
 
+    public Base(Position pos, Map map, long id) {
+        super(pos, map);
+        this.id = id;
+    }
+
 }
