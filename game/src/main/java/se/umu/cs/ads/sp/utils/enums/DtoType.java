@@ -8,7 +8,6 @@ public enum DtoType {
     GOLD("GOLD"),
     FLAG("FLAG"),
     INCREASED_DMG("INCREASED_DMG"),
-    POINT("POINT"),
     ATTACK_DMG("ATTACK_DMG"),
     MOVEMENT("MOVEMENT_SPEED");
 

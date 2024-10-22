@@ -187,7 +187,7 @@ public class ModelManager {
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
-        ArrayList<UsersEntitiesDTO> entities;
+        ArrayList<UserSkeletonsDTO> entities;
         int msgCount = lobbyHandler.getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
@@ -238,6 +238,36 @@ public class ModelManager {
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
         this.currentScoreHolderId = update.currentScoreLeader();
+
+        // Update the boundaries
+        for (UserSkeletonsDTO skeletons : update.entities()) {
+            ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
+            if (isInsideLayer(skeletonPos, 1)) {
+                comHandler.moveUserToL1(skeletons.userId());
+            } else if (isInsideLayer(skeletonPos, 2)) {
+                comHandler.moveUserToL2(skeletons.userId());
+            }
+            comHandler.moveUserToL3(skeletons.userId());
+        }
+    }
+
+    private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
+        ArrayList<Rectangle> myBBs = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
+        ArrayList<Rectangle> externalBBs = getBBByPositions(positions);
+        int index = layerIndex - 1;
+
+        if ((index != 0 && index != 1) || myBBs == null || externalBBs == null) {
+            return false;
+        }
+
+        if (myBBs.get(index).intersects(externalBBs.get(index))) {
+            for (Position pos : positions) {
+                if (myBBs.get(index).contains(new Point(pos.getX(), pos.getY()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // A request has come in to start the game
@@ -270,12 +300,12 @@ public class ModelManager {
         lobbyHandler.leaveLobby();
     }
 
-    public UsersEntitiesDTO createMySkeletonList() {
+    public UserSkeletonsDTO createMySkeletonList() {
         ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>(objectHandler.getMyUnits().values().stream()
                 .map(
                         playerUnit -> new EntitySkeletonDTO(playerUnit.getId(), playerUnit.getEntityType(), playerUnit.getPosition())
                 ).toList());
-        return new UsersEntitiesDTO(player.id, skeletons);
+        return new UserSkeletonsDTO(player.id, skeletons);
     }
 
     public boolean hasGameStarted() {
@@ -366,23 +396,27 @@ public class ModelManager {
         return currentPoints;
     }
 
-    public ArrayList<Rectangle> getBoundingBoxes(ArrayList<PlayerUnit> units) {
-        if (units.isEmpty()) {
-            System.out.println("Error: Must at least have one unit to create a bounding box!");
+    public ArrayList<Rectangle> getBBByUnits(ArrayList<PlayerUnit> units) {
+        return getBBByPositions(new ArrayList<>(units.stream().map(GameObject::getPosition).toList()));
+    }
+
+    public ArrayList<Rectangle> getBBByPositions(ArrayList<Position> positions) {
+        if (positions.isEmpty()) {
             return null;
         }
+
         ArrayList<Rectangle> bbs = new ArrayList<>();
 
         // Initialize min and max coordinates to the first position
-        int minX = units.get(0).getPosition().getX();
-        int minY = units.get(0).getPosition().getY();
-        int maxX = units.get(0).getPosition().getX();
-        int maxY = units.get(0).getPosition().getY();
+        int minX = positions.get(0).getX();
+        int minY = positions.get(0).getY();
+        int maxX = positions.get(0).getX();
+        int maxY = positions.get(0).getY();
 
         // Iterate over the positions to find the min/max x and y values
-        for (PlayerUnit unit : units) {
-            int x = unit.getPosition().getX();
-            int y = unit.getPosition().getY();
+        for (Position pos : positions) {
+            int x = pos.getX();
+            int y = pos.getY();
             if (x < minX) minX = x;
             if (y < minY) minY = y;
             if (x > maxX) maxX = x;

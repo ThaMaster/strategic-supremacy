@@ -194,35 +194,49 @@ public class ComHandler {
 
     }
 
-    public void updateLayers(ArrayList<Long> newL3Clients, ArrayList<Long> newL2Clients, ArrayList<Long> newL1Clients) {
-        for (Long id : newL3Clients) {
-            if (l2Clients.containsKey(id)) {
-                l3Clients.put(id, l2Clients.get(id));
-                l2Clients.remove(id);
-            } else if (l1Clients.containsKey(id)) {
-                l3Clients.put(id, l1Clients.get(id));
-                l1Clients.remove(id);
-            }
+    public void moveUserToL3(Long userId) {
+        if (l3Clients.containsKey(userId)) {
+            return;
         }
 
-        for (Long id : newL2Clients) {
-            if (l3Clients.containsKey(id)) {
-                l2Clients.put(id, l3Clients.get(id));
-                l3Clients.remove(id);
-            } else if (l1Clients.containsKey(id)) {
-                l2Clients.put(id, l1Clients.get(id));
-                l1Clients.remove(id);
-            }
+        if (l2Clients.containsKey(userId)) {
+            l3Clients.put(userId, l2Clients.get(userId));
+            l2Clients.remove(userId);
+        } else if (l1Clients.containsKey(userId)) {
+            l3Clients.put(userId, l1Clients.get(userId));
+            l1Clients.remove(userId);
+        }
+    }
+
+    public void moveUserToL2(Long userId) {
+        if (l2Clients.containsKey(userId)) {
+            return;
         }
 
-        for (Long id : newL1Clients) {
-            if (l3Clients.containsKey(id)) {
-                l1Clients.put(id, l3Clients.get(id));
-                l3Clients.remove(id);
-            } else if (l2Clients.containsKey(id)) {
-                l1Clients.put(id, l2Clients.get(id));
-                l2Clients.remove(id);
-            }
+        if (l3Clients.containsKey(userId)) {
+//            l2Clients.put(userId, l3Clients.get(userId));
+//            l3Clients.remove(userId);
+            System.out.println("MOVE PLAYER " + userId + " TO ZONE 2");
+        } else if (l1Clients.containsKey(userId)) {
+//            l2Clients.put(userId, l1Clients.get(userId));
+//            l1Clients.remove(userId);
+            System.out.println("MOVE PLAYER " + userId + " TO ZONE 2");
+        }
+    }
+
+    public void moveUserToL1(Long userId) {
+        if (l1Clients.containsKey(userId)) {
+            return;
+        }
+
+        if (l3Clients.containsKey(userId)) {
+//            l1Clients.put(userId, l3Clients.get(userId));
+//            l3Clients.remove(userId);
+            System.out.println("MOVE PLAYER " + userId + " TO ZONE 1");
+        } else if (l2Clients.containsKey(userId)) {
+//            l1Clients.put(userId, l2Clients.get(userId));
+//            l2Clients.remove(userId);
+            System.out.println("MOVE PLAYER " + userId + " TO ZONE 1");
         }
     }
 }

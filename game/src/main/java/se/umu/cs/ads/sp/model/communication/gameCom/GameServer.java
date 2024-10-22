@@ -8,7 +8,7 @@ import proto.*;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.UsersEntitiesDTO;
+import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,8 +70,8 @@ public class GameServer {
         }
 
         @Override
-        public void removePlayerUnits(EntitySkeletons request, StreamObserver<Empty> responseObserver) {
-            UsersEntitiesDTO skeletons = GrpcUtil.fromGrpcEntitySkeletons(request);
+        public void removePlayerUnits(UserSkeletons request, StreamObserver<Empty> responseObserver) {
+            UserSkeletonsDTO skeletons = GrpcUtil.fromGrpcUserSkeletons(request);
             long userId = skeletons.userId();
             System.out.println("[Server] Got request to remove " + skeletons.entities().size() + " units from player with id: " + userId);
 

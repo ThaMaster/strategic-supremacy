@@ -186,6 +186,9 @@ public class ObjectHandler {
 
         for (User user : users) {
             long userId = user.id;
+            if (userId == this.user.id) {
+            }
+
             Position basePos = basePositions.get(0);
             Position goldMinePos = map.generateGoldMinePosition(basePos);
             long goldMineId = spawnGoldMine(map, goldMinePos, 100, null);
@@ -195,7 +198,6 @@ public class ObjectHandler {
 
             //Spawning goldmine
             startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoType.GOLDMINE.label, 0));
-
 
             // Spawning 3 entities
             ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
@@ -210,7 +212,7 @@ public class ObjectHandler {
                 spawnUnit(map, entitySkeletonDTO.id(), entitySkeletonDTO.unitType(), offsetPosition, userId, baseId);
                 skeletons.add(entitySkeletonDTO);
             }
-            startGameRequest.entitySkeletons().add(new UsersEntitiesDTO(userId, skeletons));
+            startGameRequest.userSkeletons().add(new UserSkeletonsDTO(userId, skeletons));
 
             if (!basePositions.isEmpty()) {
                 basePositions.remove(0);
@@ -236,10 +238,11 @@ public class ObjectHandler {
                     spawnGoldMine(map, env.position(), env.remainingResource(), env.id());
                     break;
                 default:
-                    System.out.println("Unexpected type on collectable");
+                    System.out.println("Unexpected type on collectable: " + type.label);
                     break;
             }
         }
+
         for (CollectableDTO collectable : request.collectables()) {
             DtoType type = DtoType.fromLabel(collectable.type());
             switch (type) {
@@ -251,13 +254,14 @@ public class ObjectHandler {
                     break;
                 case FLAG:
                     spawnFlag(map, collectable.position(), collectable.id());
+                    break;
                 default:
-                    System.out.println("Unexpected type on collectable");
+                    System.out.println("Unexpected type on collectable: " + type.label);
                     break;
             }
         }
 
-        for (UsersEntitiesDTO skeletons : request.entitySkeletons()) {
+        for (UserSkeletonsDTO skeletons : request.userSkeletons()) {
             for (EntitySkeletonDTO skeleton : skeletons.entities()) {
                 spawnUnit(map, skeleton.id(), skeleton.unitType(), skeleton.position(), skeletons.userId(), baseId);
             }
@@ -268,8 +272,8 @@ public class ObjectHandler {
         return pickedUpCollectableIds;
     }
 
-    public ArrayList<UsersEntitiesDTO> getAllEntitySkeletons() {
-        HashMap<Long, UsersEntitiesDTO> skeletons = new HashMap<>();
+    public ArrayList<UserSkeletonsDTO> getAllEntitySkeletons() {
+        HashMap<Long, UserSkeletonsDTO> skeletons = new HashMap<>();
         ArrayList<PlayerUnit> allUnits = new ArrayList<>();
         allUnits.addAll(myUnits.values());
         allUnits.addAll(enemyUnits.values());
@@ -278,7 +282,7 @@ public class ObjectHandler {
             if (skeletons.containsKey(unit.getUserId())) {
                 skeletons.get(unit.getUserId()).addSkeleton(skeletonDTO);
             } else {
-                skeletons.put(unit.getUserId(), new UsersEntitiesDTO(unit.getUserId(), new ArrayList<>()));
+                skeletons.put(unit.getUserId(), new UserSkeletonsDTO(unit.getUserId(), new ArrayList<>()));
                 skeletons.get(unit.getUserId()).addSkeleton(skeletonDTO);
             }
         }
@@ -300,8 +304,8 @@ public class ObjectHandler {
         return environmentDTOs;
     }
 
-    public void updateUnitPositions(ArrayList<UsersEntitiesDTO> skeletons) {
-        for (UsersEntitiesDTO units : skeletons) {
+    public void updateUnitPositions(ArrayList<UserSkeletonsDTO> skeletons) {
+        for (UserSkeletonsDTO units : skeletons) {
             for (EntitySkeletonDTO unit : units.entities()) {
                 if (enemyUnits.containsKey(unit.id())) {
                     enemyUnits.get(unit.id()).setPosition(unit.position());
@@ -332,12 +336,12 @@ public class ObjectHandler {
         }
     }
 
-    public ArrayList<UsersEntitiesDTO> getMyUnitsToEntitySkeletons() {
-        UsersEntitiesDTO skeletons = new UsersEntitiesDTO(user.id, new ArrayList<>());
+    public ArrayList<UserSkeletonsDTO> getMyUnitsToEntitySkeletons() {
+        UserSkeletonsDTO skeletons = new UserSkeletonsDTO(user.id, new ArrayList<>());
         for (PlayerUnit unit : myUnits.values()) {
             skeletons.addSkeleton(new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition()));
         }
-        ArrayList<UsersEntitiesDTO> mySkeletons = new ArrayList<>();
+        ArrayList<UserSkeletonsDTO> mySkeletons = new ArrayList<>();
         mySkeletons.add(skeletons);
         return mySkeletons;
     }

@@ -2,7 +2,7 @@ package se.umu.cs.ads.sp.model.communication.dto;
 
 import java.util.ArrayList;
 
-public record UsersEntitiesDTO(
+public record UserSkeletonsDTO(
         long userId,
         ArrayList<EntitySkeletonDTO> entities
 ) {

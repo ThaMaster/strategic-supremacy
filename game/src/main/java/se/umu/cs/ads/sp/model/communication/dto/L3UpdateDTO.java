@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public record L3UpdateDTO(
         int msgCount,
-        ArrayList<UsersEntitiesDTO> entities,
+        ArrayList<UserSkeletonsDTO> entities,
         ArrayList<Long> pickedUpCollectables,
         Long remainingTime,
         Long currentScoreLeader,

@@ -401,7 +401,7 @@ public class GameController implements ActionListener {
     }
 
     public ArrayList<Rectangle> getPlayerBoundingBoxes() {
-        return modelManager.getBoundingBoxes(
+        return modelManager.getBBByUnits(
                 new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()));
     }
 }

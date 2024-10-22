@@ -12,7 +12,7 @@ import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
-import se.umu.cs.ads.sp.model.communication.dto.UsersEntitiesDTO;
+import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
@@ -136,11 +136,11 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void removePlayerUnits(UsersEntitiesDTO entitySkeletons) {
+    public void removePlayerUnits(UserSkeletonsDTO entitySkeletons) {
         System.out.println("[Client] Trying to leave ongoing game...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .removePlayerUnits(GrpcUtil.toGrpcEntitySkeletons(entitySkeletons));
+                .removePlayerUnits(GrpcUtil.toGrpcUserSkeletons(entitySkeletons));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
