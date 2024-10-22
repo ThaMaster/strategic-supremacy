@@ -11,6 +11,7 @@ public class EnemyUnitView extends PlayerUnitView {
 
     @Override
     protected void initAnimator() {
+        this.collectedFlagImage = ImageLoader.loadImage("/sprites/collectables/flag/flagCollected.png");
         this.animator.addAnimation(
                 new Animation(
                         "idle",

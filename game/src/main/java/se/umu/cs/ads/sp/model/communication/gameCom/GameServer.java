@@ -54,9 +54,9 @@ public class GameServer {
         }
 
         @Override
-        public void updatePlayerUnit(PlayerUnits request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Updating enemy units...");
-            comHandler.updateEnemyUnits(GrpcUtil.fromGrpcUpdatePlayerUnits(request));
+        public void l1Update(L1Message request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] Received L1 update...");
+            comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
@@ -64,9 +64,9 @@ public class GameServer {
         @Override
         public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
             System.out.println("[Server] Received L3 update...");
+            comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
-            comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
         }
 
         @Override

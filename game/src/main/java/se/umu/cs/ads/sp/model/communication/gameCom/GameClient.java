@@ -12,10 +12,10 @@ import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
-import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 
 import java.util.concurrent.TimeUnit;
 
@@ -77,7 +77,7 @@ public class GameClient {
     }
 
     public void sendL3Message(L3UpdateDTO msg) {
-        System.out.println("[Client] Sending L3 update");
+        System.out.println("[Client] Sending L3 update...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l3Update(GrpcUtil.toGrpcL3Message(msg));
@@ -95,22 +95,20 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void updateUnits(L1UpdateDTO playerUnitUpdateRequest) {
-        System.out.println("[Client] Trying to update enemy units...");
+    public void sendL1Message(L1UpdateDTO msg) {
+        System.out.println("[Client] Sending L1 update...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
-                .updatePlayerUnit(GrpcUtil.toGrpcUpdatePlayerUnits(playerUnitUpdateRequest));
+                .l1Update(GrpcUtil.toGrpcL1Message(msg));
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                System.out.println("\t Updated enemy units.");
-
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("\t Failed to update enemy units.");
+                System.out.println("\t Failed to send L1 Update to client " + ip + ":" + port);
                 System.out.println("\t" + t.getMessage());
             }
         }, MoreExecutors.directExecutor());

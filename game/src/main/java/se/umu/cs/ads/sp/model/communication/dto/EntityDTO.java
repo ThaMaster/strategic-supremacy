@@ -9,6 +9,7 @@ public record EntityDTO(
         Position destination,
         int maxHp,
         int currentHp,
-        int speed
+        int speedBuff,
+        int attackBuff
 ) {
 }

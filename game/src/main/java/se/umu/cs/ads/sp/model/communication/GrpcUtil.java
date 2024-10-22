@@ -239,18 +239,27 @@ public class GrpcUtil {
                 .setTargetUnitId(unit.targetUnitId())
                 .setPosition(toGrpcPosition(unit.position()))
                 .setDestination(toGrpcPosition(unit.destination()))
-                .setCurrentHealth(unit.currentHp())
-                .setMaxHealth(unit.maxHp())
-                .setSpeed(unit.speed())
+                .setMaxHp(unit.maxHp())
+                .setCurrentHp(unit.currentHp())
+                .setSpeedBuff(unit.speedBuff())
+                .setAttackBuff(unit.attackBuff())
                 .build();
     }
 
     public static EntityDTO fromGrpcUnitInfo(proto.PlayerUnit unit) {
-        return new EntityDTO(unit.getUnitId(), unit.getTargetUnitId(), fromGrpcPosition(unit.getPosition()), fromGrpcPosition(unit.getDestination()), unit.getCurrentHealth(), unit.getMaxHealth(), unit.getSpeed());
+        return new EntityDTO(
+                unit.getUnitId(),
+                unit.getTargetUnitId(),
+                fromGrpcPosition(unit.getPosition()),
+                fromGrpcPosition(unit.getDestination()),
+                unit.getMaxHp(),
+                unit.getCurrentHp(),
+                unit.getSpeedBuff(),
+                unit.getAttackBuff());
     }
 
-    public static proto.PlayerUnits toGrpcUpdatePlayerUnits(L1UpdateDTO playerUnitUpdateRequest) {
-        proto.PlayerUnits.Builder builder = proto.PlayerUnits.newBuilder()
+    public static proto.L1Message toGrpcL1Message(L1UpdateDTO playerUnitUpdateRequest) {
+        proto.L1Message.Builder builder = proto.L1Message.newBuilder()
                 .setUserId(playerUnitUpdateRequest.playerId());
         for (EntityDTO unit : playerUnitUpdateRequest.unitUpdates()) {
             builder.addUnits(toGrpcPlayerUnit(unit));
@@ -258,7 +267,7 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static L1UpdateDTO fromGrpcUpdatePlayerUnits(proto.PlayerUnits updateRequest) {
+    public static L1UpdateDTO fromGrpcL1Message(proto.L1Message updateRequest) {
         ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
         for (proto.PlayerUnit unit : updateRequest.getUnitsList()) {
             unitUpdates.add(fromGrpcUnitInfo(unit));

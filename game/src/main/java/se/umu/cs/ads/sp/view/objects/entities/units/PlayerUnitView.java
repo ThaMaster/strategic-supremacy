@@ -17,7 +17,7 @@ public class PlayerUnitView extends EntityView {
 
     public String unitType;
     private boolean hasFlag = false;
-    private BufferedImage collectedFlagImage;
+    protected BufferedImage collectedFlagImage;
 
     private int attackDamage = 0;
     private int speed;

@@ -255,6 +255,9 @@ public class ObjectHandler {
                 case FLAG:
                     spawnFlag(map, collectable.position(), collectable.id());
                     break;
+                case POINT:
+                    // TODO: Remove this one?
+                    break;
                 default:
                     System.out.println("Unexpected type on collectable: " + type.label);
                     break;
@@ -421,6 +424,8 @@ public class ObjectHandler {
     public void updateEnemyUnits(ArrayList<EntityDTO> updates) {
         for (EntityDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
+            enemyUnit.setPosition(update.position());
+
             long targetUnit = update.targetUnitId();
             if (targetUnit != -1) {
                 enemyUnit.setAttackTarget(
@@ -430,10 +435,10 @@ public class ObjectHandler {
                 enemyUnit.setDestination(update.destination());
             }
 
-            enemyUnit.setPosition(update.position());
-            enemyUnit.setCurrentHp(update.currentHp());
             enemyUnit.setMaxHp(update.maxHp());
-            enemyUnit.setSpeedBuff(update.speed());
+            enemyUnit.setCurrentHp(update.currentHp());
+            enemyUnit.setSpeedBuff(update.speedBuff());
+            enemyUnit.setAttackBuff(update.attackBuff());
         }
     }
 

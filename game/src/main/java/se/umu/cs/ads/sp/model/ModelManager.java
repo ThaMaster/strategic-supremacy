@@ -76,7 +76,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            //comHandler.updatePlayerUnits(createUnitUpdateRequest(targetId), getPlayersToUpdate());
+            comHandler.sendL1Update(constructL1Message(targetId));
             return true;
         }
 
@@ -89,7 +89,7 @@ public class ModelManager {
                     offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            //comHandler.updatePlayerUnits(createUnitUpdateRequest(-1), getPlayersToUpdate());
+            comHandler.sendL1Update(constructL1Message(-1));
             return true;
         }
         return false;
@@ -222,7 +222,9 @@ public class ModelManager {
                     unit.getDestination(),
                     unit.getMaxHp(),
                     unit.getCurrentHp(),
-                    unit.getBaseSpeed()));
+                    unit.getSpeedBuff(),
+                    unit.getAttackBuff())
+            );
         }
         return new L1UpdateDTO(unitUpdates, player.id);
     }
@@ -241,14 +243,24 @@ public class ModelManager {
 
         // Update the boundaries
         for (UserSkeletonsDTO skeletons : update.entities()) {
+            // Skip ourselves
+            if (skeletons.userId() == player.id) {
+                continue;
+            }
             ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
+            // Check l1, then l2, otherwise just move user to l3
             if (isInsideLayer(skeletonPos, 1)) {
                 comHandler.moveUserToL1(skeletons.userId());
             } else if (isInsideLayer(skeletonPos, 2)) {
                 comHandler.moveUserToL2(skeletons.userId());
+            } else {
+                comHandler.moveUserToL3(skeletons.userId());
             }
-            comHandler.moveUserToL3(skeletons.userId());
         }
+    }
+
+    public void receiveL1Update(L1UpdateDTO update) {
+        objectHandler.updateEnemyUnits(update.unitUpdates());
     }
 
     private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
@@ -256,11 +268,14 @@ public class ModelManager {
         ArrayList<Rectangle> externalBBs = getBBByPositions(positions);
         int index = layerIndex - 1;
 
+        // Should incomplete initialize info occur, just return false
         if ((index != 0 && index != 1) || myBBs == null || externalBBs == null) {
             return false;
         }
 
+        // Checks if users bounding box intersects with other users bounding box
         if (myBBs.get(index).intersects(externalBBs.get(index))) {
+            // Now check each unit to see if they are inside the bounding box
             for (Position pos : positions) {
                 if (myBBs.get(index).contains(new Point(pos.getX(), pos.getY()))) {
                     return true;

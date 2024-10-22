@@ -17,12 +17,13 @@ message PlayerUnit {
   int64 targetUnitId = 2;
   Position position = 3;
   Position destination = 4;
-  int32 currentHealth = 5;
-  int32 maxHealth = 6;
-  int32 speed = 7;
+  int32 maxHp = 6;
+  int32 currentHp = 5;
+  int32 speedBuff = 9;
+  int32 attackBuff = 11;
 }
 
-message PlayerUnits {
+message L1Message {
   int64 userId = 1;
   repeated PlayerUnit units = 2;
 }
@@ -100,10 +101,10 @@ message candidateLeaderResponse {
 }
 
 service GameService {
-  rpc updatePlayerUnit (PlayerUnits) returns (google.protobuf.Empty);
   rpc removePlayerUnits (UserSkeletons) returns (google.protobuf.Empty);
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
+  rpc l1Update (L1Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
   rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
 }

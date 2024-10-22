@@ -40,7 +40,7 @@ public class ComHandler {
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         if (fromLeader) {
             for (GameClient client : l3Clients.values()) {
-                //Send l3 update to everyone
+                // Send l3 update to everyone
                 client.sendL3Message(message);
             }
         } else {
@@ -49,19 +49,34 @@ public class ComHandler {
                 GameClient client = l3Clients.get(leader.id);
                 client.sendL3Message(message);
             }
-
         }
+    }
+
+    public void handleReceiveL3Msg(L3UpdateDTO message) {
+        timeSinceL3Update = System.currentTimeMillis();
+        modelManager.receiveL3Update(message);
+    }
+
+    public void sendL1Update(L1UpdateDTO message) {
+        if(l1Clients.isEmpty()) {
+            return;
+        }
+        System.out.println("L1 client size: " + l1Clients.size());
+
+        for (GameClient client : l1Clients.values()) {
+            // Send l1 update only to those in the zone
+            client.sendL1Message(message);
+        }
+    }
+
+    public void handleReceiveL1Msg(L1UpdateDTO message) {
+        modelManager.receiveL1Update(message);
     }
 
     public boolean leaderIsAlive() {
         return (System.currentTimeMillis() - timeSinceL3Update) <
                 Utils.getRandomInt((int) Constants.L3_UPDATE_TIME, (int) Constants.L3_UPDATE_TIME + 2000);
         //Randomize to minimize the risk of two candidates starting election at the same time
-    }
-
-    public void handleReceiveL3Msg(L3UpdateDTO message) {
-        timeSinceL3Update = System.currentTimeMillis();
-        modelManager.receiveL3Update(message);
     }
 
     public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
@@ -112,15 +127,6 @@ public class ComHandler {
         timeSinceL3Update = System.currentTimeMillis();
     }
 
-    public void updatePlayerUnits(L1UpdateDTO req, ArrayList<Long> playerIds) {
-        for (Long id : playerIds) {
-            if (id == modelManager.getPlayer().id) {
-                continue;
-            }
-            l3Clients.get(id).updateUnits(req);
-        }
-    }
-
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
     }
@@ -151,10 +157,6 @@ public class ComHandler {
         }
     }
 
-    public void updateEnemyUnits(L1UpdateDTO req) {
-        modelManager.getObjectHandler().updateEnemyUnits(req.unitUpdates());
-    }
-
     public void removePlayerUnits() {
         if (modelManager.getObjectHandler().getMyUnits().isEmpty()) {
             return;
@@ -176,11 +178,19 @@ public class ComHandler {
     }
 
     private void removeGameClient(long userId) {
-        if (l3Clients.containsKey(userId)) {
-            GameClient client = l3Clients.get(userId);
-            client.shutdown();
-            l3Clients.remove(userId);
+        GameClient client;
+        if (l1Clients.containsKey(userId)) {
+            client = l1Clients.get(userId);
+            l1Clients.remove(userId);
+        } else if (l2Clients.containsKey(userId)) {
+            client = l2Clients.get(userId);
+            l2Clients.remove(userId);
+        } else {
+            client = l3Clients.get(userId);
         }
+
+        client.shutdown();
+        l3Clients.remove(userId);
     }
 
     public boolean requestVote() {
@@ -195,16 +205,12 @@ public class ComHandler {
     }
 
     public void moveUserToL3(Long userId) {
-        if (l3Clients.containsKey(userId)) {
-            return;
-        }
-
         if (l2Clients.containsKey(userId)) {
-            l3Clients.put(userId, l2Clients.get(userId));
-            l2Clients.remove(userId);
+//            l2Clients.remove(userId);
+            System.out.println("[Client] MOVE " + userId + " to L3 from L2");
         } else if (l1Clients.containsKey(userId)) {
-            l3Clients.put(userId, l1Clients.get(userId));
             l1Clients.remove(userId);
+            System.out.println("[Client] MOVE " + userId + " to L3 from L1");
         }
     }
 
@@ -213,14 +219,13 @@ public class ComHandler {
             return;
         }
 
-        if (l3Clients.containsKey(userId)) {
-//            l2Clients.put(userId, l3Clients.get(userId));
-//            l3Clients.remove(userId);
-            System.out.println("MOVE PLAYER " + userId + " TO ZONE 2");
-        } else if (l1Clients.containsKey(userId)) {
+        if (l1Clients.containsKey(userId)) {
 //            l2Clients.put(userId, l1Clients.get(userId));
 //            l1Clients.remove(userId);
-            System.out.println("MOVE PLAYER " + userId + " TO ZONE 2");
+            System.out.println("[Client] MOVE " + userId + " to L2 from L1");
+        } else {
+//            l2Clients.put(userId, l3Clients.get(userId));
+            System.out.println("[Client] MOVE " + userId + " TO L2 from L3");
         }
     }
 
@@ -229,14 +234,14 @@ public class ComHandler {
             return;
         }
 
-        if (l3Clients.containsKey(userId)) {
-//            l1Clients.put(userId, l3Clients.get(userId));
-//            l3Clients.remove(userId);
-            System.out.println("MOVE PLAYER " + userId + " TO ZONE 1");
-        } else if (l2Clients.containsKey(userId)) {
-//            l1Clients.put(userId, l2Clients.get(userId));
-//            l2Clients.remove(userId);
-            System.out.println("MOVE PLAYER " + userId + " TO ZONE 1");
+        if (l2Clients.containsKey(userId)) {
+//          l1Clients.put(userId, l2Clients.get(userId));
+//          l2Clients.remove(userId);
+            System.out.println("[Client] MOVE " + userId + " TO L1 from L2");
+        } else {
+            l1Clients.put(userId, l3Clients.get(userId));
+            System.out.println("[Client] MOVE " + userId + " TO L1 from L3");
+
         }
     }
 }
