@@ -48,6 +48,7 @@ public class LobbyHandler {
     }
 
     public Lobby joinLobby(long lobbyId) {
+        raft = new Raft(this, LobbyClientState.FOLLOWER);
         lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
         return lobby;
     }

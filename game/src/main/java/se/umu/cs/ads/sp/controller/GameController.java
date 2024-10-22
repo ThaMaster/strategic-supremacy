@@ -2,6 +2,7 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
@@ -134,6 +135,7 @@ public class GameController implements ActionListener {
             mainFrame.getGamePanel().invalidate();
             mainFrame.getGamePanel().repaint();
         });
+
     }
 
     public boolean setEntityDestination(Position newPos) {

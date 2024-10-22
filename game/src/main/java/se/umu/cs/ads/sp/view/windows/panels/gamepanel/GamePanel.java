@@ -470,7 +470,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     private void collectEvents() {
-        ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
+        ArrayList<GameEvent> events = GameEvents.getInstance().getHistory();
         for (GameEvent event : events) {
             switch (event.getType()) {
                 case NEW_ROUND:
@@ -505,7 +505,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     break;
             }
         }
-        GameEvents.getInstance().clearEvents();
+        GameEvents.getInstance().clearHistory();
     }
 
     private void addTextEvent(GameEvent event, int size, EventColor color) {

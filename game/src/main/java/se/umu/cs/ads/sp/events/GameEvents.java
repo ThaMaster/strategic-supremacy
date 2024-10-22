@@ -6,9 +6,11 @@ public class GameEvents {
 
     private static GameEvents instance;
     private ArrayList<GameEvent> events;
+    private ArrayList<GameEvent> history;
 
     private GameEvents() {
         events = new ArrayList<>();
+        history = new ArrayList<>();
     }
 
     public void addEvent(GameEvent event) {
@@ -29,4 +31,17 @@ public class GameEvents {
         }
         return instance;
     }
+
+    public ArrayList<GameEvent> getHistory(){
+        return history;
+    }
+
+    public synchronized void clearHistory(){
+        history.clear();
+    }
+
+    public synchronized void moveToHistory(GameEvent event){
+        history.add(event);
+    }
+
 }

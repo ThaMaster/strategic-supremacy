@@ -13,6 +13,12 @@ public abstract class Collectable extends GameObject {
         hasBeenCollected = false;
     }
 
+    public Collectable(Position pos, Map map, Long id){
+        super(pos, map);
+        hasBeenCollected = false;
+        this.id = id;
+    }
+
     public void pickUp(Map map){
         hasBeenCollected = true;
         this.destroy(map);

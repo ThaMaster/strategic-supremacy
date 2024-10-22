@@ -11,6 +11,7 @@ public class Raft {
     LobbyHandler lobbyHandler;
     private int numClients;
     private int receivedVotes;
+
     public Raft(LobbyHandler lobbyHandler, LobbyClientState state){
         this.lobbyHandler = lobbyHandler;
         msgCount = 0;
@@ -37,7 +38,9 @@ public class Raft {
     private void resetVotes(){
         numVotes = 0;
         receivedVotes = 0;
-        numClients = lobbyHandler.getLobby().currentPlayers;
+        if(lobbyHandler.getLobby() != null){
+            numClients = lobbyHandler.getLobby().currentPlayers;
+        }
     }
 
     public void receiveVote(boolean approved){

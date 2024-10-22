@@ -18,6 +18,7 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 
 import java.awt.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -178,6 +179,7 @@ public class ModelManager {
                     sendL3Update();
                 }
                 else if(!iAmLeader()){ //Should not need to check this probably
+                    System.out.println("START LEADER ELECTION");
                     lobbyHandler.initiateLeaderElection();
                 }
             }
@@ -322,7 +324,9 @@ public class ModelManager {
                 default:
                     break;
             }
+            GameEvents.getInstance().moveToHistory(event);
         }
+        GameEvents.getInstance().clearEvents();
     }
 
     public long getRoundRemainingTime() {

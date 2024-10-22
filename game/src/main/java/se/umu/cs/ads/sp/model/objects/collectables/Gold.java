@@ -8,4 +8,8 @@ public class Gold extends Collectable {
     public Gold(Position pos, Map map) {
         super(pos, map);
     }
+
+    public Gold(Position pos, Map map, Long id) {
+        super(pos, map, id);
+    }
 }

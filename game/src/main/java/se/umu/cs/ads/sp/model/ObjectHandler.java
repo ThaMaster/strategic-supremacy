@@ -244,7 +244,7 @@ public class ObjectHandler {
             DtoType type = DtoType.fromLabel(collectable.type());
             switch (type) {
                 case GOLD:
-                    spawnGold(map, collectable.position());
+                    spawnGold(map, collectable.position(), collectable.id());
                     break;
                 case CHEST:
                     spawnChest(map, collectable.position(), collectable.reward());
@@ -294,12 +294,21 @@ public class ObjectHandler {
     }
 
     public void removeCollectables(Map map, ArrayList<Long> collectableIds){
+        int sizeBefore = this.collectables.size();
         for (Long collectableId : collectableIds) {
             if (this.collectables.containsKey(collectableId)) {
-                System.out.println("Remove id -> " + collectableId);
-                this.collectables.get(collectableId).destroy(map);
+                this.collectables.get(collectableId).pickUp(map);
                 this.collectables.remove(collectableId);
             }
+        }
+        if(collectableIds.size() > 0 && sizeBefore >= collectables.size()){
+            for(Long collId : collectableIds){
+                System.out.println("You should remove id -> " + collId);
+            }
+            for(Long collId : collectableIds){
+                System.out.println("You should remove id -> " + collId);
+            }
+            System.out.println("We should have removed an item.");
         }
     }
 
@@ -345,8 +354,13 @@ public class ObjectHandler {
         return goldMine.getId();
     }
 
-    private void spawnGold(Map map, Position position) {
-        Gold coin = new Gold(position, map);
+    private void spawnGold(Map map, Position position, Long id) {
+        Gold coin;
+        if(id != null){
+            coin = new Gold(position, map, id);
+        }else{
+            coin = new Gold(position, map);
+        }
         coin.setReward(new Reward(10, RewardType.GOLD));
         addCollectable(coin);
     }
