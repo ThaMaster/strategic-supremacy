@@ -2,7 +2,6 @@ package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
@@ -42,12 +41,12 @@ public class ModelManager {
     private int currentGold = 180;
     private int currentPoints;
 
-    public ModelManager(GameController controller, User player) {
+    public ModelManager(User player) {
         map = new Map();
         this.player = player;
         lobbyHandler = new LobbyHandler(this);
         objectHandler = new ObjectHandler(player);
-        comHandler = new ComHandler(player.port, controller, this);
+        comHandler = new ComHandler(player.port, this);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::leaveOngoingGame));
     }
@@ -207,6 +206,23 @@ public class ModelManager {
         );
     }
 
+    public L2UpdateDTO
+
+    public L1UpdateDTO constructL1Message(long targetId) {
+        ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
+        for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
+            unitUpdates.add(new EntityDTO(
+                    unit.getId(),
+                    targetId,
+                    unit.getPosition(),
+                    unit.getDestination(),
+                    unit.getMaxHp(),
+                    unit.getCurrentHp(),
+                    unit.getBaseSpeed()));
+        }
+        return new L1UpdateDTO(unitUpdates, player.id);
+    }
+
     public void receiveL3Update(L3UpdateDTO update) {
 
         //Todo do not update units or stuff if the author of the message is within l2 or l1
@@ -236,27 +252,15 @@ public class ModelManager {
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
 
+        l3Timer.cancel();
+        gameTimer.cancel();
+
         comHandler.removePlayerUnits();
         objectHandler.clearSelectedUnitIds();
         objectHandler.getMyUnits().clear();
         objectHandler.getEnvironments().clear();
         objectHandler.getCollectables().clear();
         lobbyHandler.leaveLobby();
-    }
-
-    public L1UpdateDTO createUnitUpdateRequest(long targetId) {
-        ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
-        for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
-            unitUpdates.add(new EntityDTO(
-                    unit.getId(),
-                    targetId,
-                    unit.getPosition(),
-                    unit.getDestination(),
-                    unit.getMaxHp(),
-                    unit.getCurrentHp(),
-                    unit.getBaseSpeed()));
-        }
-        return new L1UpdateDTO(unitUpdates, player.id);
     }
 
     public ArrayList<EntitySkeletonDTO> createMySkeletonList() {

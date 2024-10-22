@@ -3,7 +3,6 @@ package se.umu.cs.ads.sp.model.communication;
 import io.grpc.Context;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
@@ -19,22 +18,20 @@ import java.util.HashMap;
 
 public class ComHandler {
 
-    private NsClient nsClient;
-    private GameController controller;
-    private ModelManager modelManager;
-    private GameServer server;
-    private HashMap<Long, GameClient> l3Clients;
-    private HashMap<Long, GameClient> l2Clients;
-    private HashMap<Long, GameClient> l1Clients;
+    private final NsClient nsClient;
+    private final ModelManager modelManager;
+    private final GameServer server;
+    private final HashMap<Long, GameClient> l3Clients;
+    private final HashMap<Long, GameClient> l2Clients;
+    private final HashMap<Long, GameClient> l1Clients;
     private long timeSinceL3Update;
 
-    public ComHandler(int port, GameController controller, ModelManager modelManager) {
+    public ComHandler(int port, ModelManager modelManager) {
         l3Clients = new HashMap<>();
         l2Clients = new HashMap<>();
         l1Clients = new HashMap<>();
 
         nsClient = new NsClient();
-        this.controller = controller;
         this.modelManager = modelManager;
         server = new GameServer(port, this);
         server.start();
@@ -117,7 +114,7 @@ public class ComHandler {
 
     public void updatePlayerUnits(L1UpdateDTO req, ArrayList<Long> playerIds) {
         for (Long id : playerIds) {
-            if (id == controller.getModelManager().getPlayer().id) {
+            if (id == modelManager.getPlayer().id) {
                 continue;
             }
             l3Clients.get(id).updateUnits(req);
@@ -135,7 +132,7 @@ public class ComHandler {
             // Make all async calls here
             for (User user : lobby.users) {
                 //No need to send the update to ourselves
-                if (user.id == controller.getModelManager().getPlayer().id) {
+                if (user.id == modelManager.getPlayer().id) {
                     continue;
                 }
                 GameClient client;
@@ -165,7 +162,7 @@ public class ComHandler {
 
         for (User user : modelManager.getLobbyHandler().getLobby().users) {
             //No need to send the update to ourselves
-            if (user.id == controller.getModelManager().getPlayer().id) {
+            if (user.id == modelManager.getPlayer().id) {
                 continue;
             }
             l3Clients.get(user.id).removePlayerUnits(modelManager.createMySkeletonList());
@@ -174,7 +171,8 @@ public class ComHandler {
 
     public void removePlayer(long userId, ArrayList<Long> unitIds) {
         removeGameClient(userId);
-        controller.removeEnemyUnits(userId, unitIds);
+        modelManager.getObjectHandler().removeEnemyUnits(unitIds);
+        modelManager.getLobbyHandler().removePlayer(userId);
     }
 
     private void removeGameClient(long userId) {

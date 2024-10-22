@@ -237,7 +237,7 @@ public class GameController implements ActionListener {
             }
             mainFrame.setPlayerName(inputName);
             GameController.this.player = new User(inputName, Utils.getLocalIP(), Utils.getFreePort());
-            modelManager = new ModelManager(GameController.this, GameController.this.player);
+            modelManager = new ModelManager(GameController.this.player);
             tileManager = new TileManager();
             tileManager.setMap(modelManager.getMap().getModelMap());
             System.out.println("[Client] Creating my user " + GameController.this.player.ip + ":" + GameController.this.player.port);
@@ -376,12 +376,6 @@ public class GameController implements ActionListener {
 
     public void openQuitWindow() {
         mainFrame.getQuitFrame().showFrame(true);
-    }
-
-    public void removeEnemyUnits(long playerId, ArrayList<Long> unitIds) {
-        modelManager.getObjectHandler().removeEnemyUnits(unitIds);
-        modelManager.getLobbyHandler().removePlayer(playerId);
-        mainFrame.getGamePanel().removeEntities(unitIds);
     }
 
     public void updateHudTimer(int remainingTime) {

@@ -44,12 +44,12 @@ import java.util.HashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
-    private TileManager tileManager;
+    private final TileManager tileManager;
     private GameController gController;
 
-    private HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
-    private HashMap<Long, CollectableView> collectables = new HashMap<>();
-    private HashMap<Long, EnvironmentView> environments = new HashMap<>();
+    private final HashMap<Long, EntityView> gameEntitiesView = new HashMap<>();
+    private final HashMap<Long, CollectableView> collectables = new HashMap<>();
+    private final HashMap<Long, EnvironmentView> environments = new HashMap<>();
 
     private final int edgeThreshold = 50;
 
@@ -376,24 +376,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         // If the view is missing keys to objects in model, add them.
         ArrayList<Collectable> collectablesToAdd = new ArrayList<>(collectableModels.stream()
-                .filter(collectableModel -> !collectables.containsKey(collectableModel.getId())).toList());
+                .filter(collectableModel -> !collectables.containsKey(collectableModel.getId()))
+                .toList());
+        collectablesToAdd.forEach(this::addCollectable);
 
         // If the view contains keys to objects missing in model, they are to be removed.
-        ArrayList<Long> collectablesToRemove = new ArrayList<>(
-                collectables.values().stream()
-                        .map(ObjectView::getId)
-                        .filter(id -> !collectableModels.stream().map(GameObject::getId).toList().contains(id))
-                        .toList()
-        );
-
-        for (Collectable collectable : collectablesToAdd) {
-            addCollectable(collectable);
-        }
-
-        for (Long id : collectablesToRemove) {
-            System.out.println("Removing id: " + id);
-            collectables.remove(id);
-        }
+        // Also, save values in separate collection to avoid concurrent modification exception!
+        ArrayList<Long> collectablesToRemove = new ArrayList<>(collectables.values().stream()
+                .map(ObjectView::getId)
+                .filter(id -> !collectableModels.stream().map(GameObject::getId).toList().contains(id))
+                .toList());
+        collectablesToRemove.forEach(collectables::remove);
 
         for (CollectableView collectable : collectables.values()) {
             collectable.update();
@@ -407,6 +400,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void updateEntityViews(ArrayList<Entity> entities) {
+
+        // If the view contains entities that the model does not have, remove them!
+        ArrayList<Long> entityViewsToRemove = new ArrayList<>(gameEntitiesView.values().stream()
+                .map(ObjectView::getId)
+                .filter(id -> !entities.stream().map(GameObject::getId).toList().contains(id)).toList());
+        entityViewsToRemove.forEach(gameEntitiesView::remove);
+
         ArrayList<PlayerUnitView> myUnits = new ArrayList<>();
         for (Entity entityModel : entities) {
             EntityView entity = this.gameEntitiesView.get(entityModel.getId());
@@ -452,11 +452,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         if (Camera.getPosition().getY() + yAmount < 0) {
             return false;
         }
-        if ((Camera.getPosition().getY() + yAmount > Constants.TILE_HEIGHT * tileManager.getNumRows())) {
-            return false;
-        }
 
-        return true;
+        return Camera.getPosition().getY() + yAmount <= Constants.TILE_HEIGHT * tileManager.getNumRows();
     }
 
     private boolean canMoveCameraHorizontaly(int xAmount) {
@@ -537,12 +534,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             }
         }
         addTextEvent(event, 25, EventColor.SUCCESS);
-    }
-
-    public void removeEntities(ArrayList<Long> unitIds) {
-        for (Long id : unitIds) {
-            this.gameEntitiesView.remove(id);
-        }
     }
 
     @Override

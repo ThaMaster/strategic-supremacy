@@ -7,4 +7,5 @@ public record EntitySkeletonDTO(
         long userId,
         String unitType,
         Position position
-) {}
+) {
+}

@@ -5,4 +5,5 @@ import java.util.ArrayList;
 public record L1UpdateDTO(
         ArrayList<EntityDTO> unitUpdates,
         long playerId
-) {}
+) {
+}

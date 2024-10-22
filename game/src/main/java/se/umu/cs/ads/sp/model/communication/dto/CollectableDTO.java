@@ -8,4 +8,5 @@ public record CollectableDTO(
         Position position,
         String type,
         Reward reward
-) {}
+) {
+}

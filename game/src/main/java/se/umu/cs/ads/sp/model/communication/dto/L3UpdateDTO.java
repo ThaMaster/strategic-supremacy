@@ -10,4 +10,5 @@ public record L3UpdateDTO(
         Long currentScoreLeader,
         ArrayList<EnvironmentDTO> environments,
         int msgSeverity
-) {}
+) {
+}

@@ -7,4 +7,5 @@ public record EnvironmentDTO(
         long userId,
         Position position,
         String type,
-        int remainingResource) {}
+        int remainingResource) {
+}
