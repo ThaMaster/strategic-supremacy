@@ -11,6 +11,7 @@ import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
+import se.umu.cs.ads.sp.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ComHandler {
     private HashMap<Long, GameClient> l1Clients;
     private HashMap<Long, GameClient> l2Clients;
     private HashMap<Long, GameClient> l3Clients;
-
+    private long timeSinceL3Update;
     public ComHandler(int port, GameController controller, ModelManager modelManager) {
         l3Clients = new HashMap<>();
         nsClient = new NsClient();
@@ -42,12 +43,23 @@ public class ComHandler {
             }
         }else{
             User leader = modelManager.getLobbyHandler().getLobby().leader;
-            GameClient client = l3Clients.get(leader.id);
-            client.sendL3Message(message);
+            if(l3Clients.containsKey(leader.id)){
+                GameClient client = l3Clients.get(leader.id);
+                client.sendL3Message(message);
+            }
+
         }
     }
 
+    public boolean leaderIsAlive(){
+        return (System.currentTimeMillis() - timeSinceL3Update) <
+                se.umu.cs.ads.sp.utils.Utils.
+                getRandomInt((int)Constants.L3_UPDATE_TIME,(int)Constants.L3_UPDATE_TIME+2000);
+                //Randomize to minimize the risk of two candidates starting election at the same time
+    }
+
     public void handleReceiveL3Msg(L3UpdateDTO message){
+        timeSinceL3Update = System.currentTimeMillis();
         modelManager.receiveL3Update(message);
     }
 
@@ -65,8 +77,7 @@ public class ComHandler {
 
     public void updateLobby(Lobby updatedLobby) {
         for (User user : updatedLobby.users) {
-
-            if (!l3Clients.containsKey(user.id)) {
+            if (!l3Clients.containsKey(user.id) && user.id != modelManager.getPlayer().id) {
                 GameClient client = new GameClient();
                 client.create(user.ip, user.port);
                 l3Clients.put(user.id, client);
@@ -90,6 +101,7 @@ public class ComHandler {
     public void sendStartGameRequest(StartGameRequestDTO req, User user) {
         GameClient client = l3Clients.get(user.id);
         client.startGame(req);
+        timeSinceL3Update = System.currentTimeMillis();
     }
 
     public void updatePlayerUnits(L1UpdateDTO req, ArrayList<Long> playerIds) {
@@ -160,5 +172,16 @@ public class ComHandler {
             client.shutdown();
             l3Clients.remove(userId);
         }
+    }
+
+    public boolean requestVote(){
+        //for(GameClient client : l3Clients){
+
+       // }
+        return true;
+    }
+
+    public void voteReceived(){
+
     }
 }

@@ -343,18 +343,20 @@ public class GameController implements ActionListener {
                     sBuilder.toString()
             };
         }
+        if(!modelManager.hasGameStarted()) {
+            modelManager.loadMap(updatedLobby.selectedMap);
+            tileManager.setMap(modelManager.getMap().getModelMap());
+            BufferedImage mapPreview = MiniMap.createMinimapPreview(
+                    tileManager.getViewMap(),
+                    tileManager.getMapWidth(),
+                    tileManager.getMapHeight(),
+                    100,
+                    100);
 
-        modelManager.loadMap(updatedLobby.selectedMap);
-        tileManager.setMap(modelManager.getMap().getModelMap());
-        BufferedImage mapPreview = MiniMap.createMinimapPreview(
-                tileManager.getViewMap(),
-                tileManager.getMapWidth(),
-                tileManager.getMapHeight(),
-                100,
-                100);
-
-        mainFrame.setLobbyData(playerData, updatedLobby.name, mapPreview, updatedLobby.selectedMap,
-                true, updatedLobby.currentPlayers, updatedLobby.maxPlayers);
+            mainFrame.setLobbyData(playerData, updatedLobby.name, mapPreview, updatedLobby.selectedMap,
+                    true, updatedLobby.currentPlayers, updatedLobby.maxPlayers);
+            modelManager.getLobbyHandler().setLobby(updatedLobby);
+        }
 
         if (modelManager.hasGameStarted() && (oldLobby.currentPlayers != updatedLobby.currentPlayers)) {
             oldLobby.users.removeAll(updatedLobby.users);
@@ -362,7 +364,6 @@ public class GameController implements ActionListener {
                 UtilView.displayInfoMessage(mainFrame, user.username + " has left the lobby!");
             }
         }
-        modelManager.getLobbyHandler().setLobby(updatedLobby);
     }
 
     public void openQuitWindow() {

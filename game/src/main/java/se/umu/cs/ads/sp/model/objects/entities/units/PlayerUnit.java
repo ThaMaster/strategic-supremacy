@@ -146,11 +146,9 @@ public class PlayerUnit extends Entity {
             for (int i = coll.size() - 1; i >= 0; i--) {
                 if (coll.get(i) instanceof Collectable collectable) {
                     if (this.getCollisionBox().checkCollision(coll.get(i).getCollisionBox())) {
-
                         if (collectable.hasBeenCollected()) {
                             continue;
                         }
-
                         this.collected.add(collectable);
                         collectable.pickUp(map); //This removes the collectable from the map
                         continue;

@@ -7,6 +7,7 @@ import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
+import se.umu.cs.ads.sp.model.lobby.LobbyHandler;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -173,7 +174,12 @@ public class ModelManager {
         l3Timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                sendL3Update();
+                if(comHandler.leaderIsAlive()){
+                    sendL3Update();
+                }
+                else if(!iAmLeader()){ //Should not need to check this probably
+                    lobbyHandler.initiateLeaderElection();
+                }
             }
         }, 0, updateTime);
     }
@@ -184,13 +190,18 @@ public class ModelManager {
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
-        ArrayList<EntitySkeletonDTO> entities;
+        L3UpdateDTO dto;
+        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+        int msgCount = lobbyHandler.getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
+            msgCount = lobbyHandler.incMsgCount();
         } else {
             entities = objectHandler.getMyUnitsToEntitySkeletons();
         }
-        return new L3UpdateDTO(entities,
+        return new L3UpdateDTO(
+                msgCount,
+                entities,
                 objectHandler.getCollectedIds(),
                 remainingTime,
                 currentScoreHolderId,
@@ -202,16 +213,19 @@ public class ModelManager {
     public void receiveL3Update(L3UpdateDTO update) {
 
         //Todo do not update units or stuff if the author of the message is within l2 or l1
+        if(!iAmLeader()){
+            lobbyHandler.updateMsgCount(update.msgCount());
+        }
         objectHandler.updateUnitPositions(update.entities());
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
-        if (!iAmLeader()) {
+        if(!iAmLeader()){
             this.remainingTime = update.remainingTime();
         }
         this.currentScoreHolderId = update.currentScoreLeader();
     }
 
-    private boolean iAmLeader() {
+    private boolean iAmLeader(){
         return lobbyHandler.getLobby().leader.id == player.id;
     }
 

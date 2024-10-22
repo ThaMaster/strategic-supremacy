@@ -65,12 +65,13 @@ message StartGameRequest {
 }
 
 message L3Message {
-  EntitySkeletons entities = 1;
-  repeated int64 pickedUpCollectables = 2;
-  int64 remainingTime = 3;
-  int64 currentScoreLeader = 4;
-  repeated Environment environments = 5;
-  int32 severity = 6;
+  int32 messageCount = 1;
+  EntitySkeletons entities = 2;
+  repeated int64 pickedUpCollectables = 3;
+  int64 remainingTime = 4;
+  int64 currentScoreLeader = 5;
+  repeated Environment environments = 6;
+  int32 severity = 7;
 }
 
 message User {
@@ -89,10 +90,20 @@ message DetailedLobbyInfo {
   string selectedMap = 6;
 }
 
+message candidateLeaderRequest {
+  int32 msgCount = 1;
+  int32 userId = 2;
+}
+
+message candidateLeaderResponse {
+  int32 acknoweldgement = 1;
+}
+
 service GameService {
   rpc updatePlayerUnit (PlayerUnits) returns (google.protobuf.Empty);
   rpc removePlayerUnits (EntitySkeletons) returns (google.protobuf.Empty);
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
+  rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
 }

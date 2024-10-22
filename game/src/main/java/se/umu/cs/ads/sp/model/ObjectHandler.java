@@ -38,12 +38,10 @@ public class ObjectHandler {
     public void update(Map map) {
         for (PlayerUnit entity : myUnits.values()) {
             entity.update();
-
             if (entity.getState() == EntityState.DEAD && entity.hasFlag()) {
                 spawnFlag(map, entity.getPosition());
                 entity.setHasFlag(false);
             }
-
             checkCollectables(entity);
         }
 
@@ -115,11 +113,9 @@ public class ObjectHandler {
 
     private void checkCollectables(PlayerUnit playerUnit) {
         for (Collectable collected : playerUnit.getCollected()) {
-
             if (playerUnit.getState() == EntityState.DEAD) {
                 continue;
             }
-
             if (collected instanceof Chest chest) {
                 if (collected.getReward().getType().equals(RewardType.GOLD)) {
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
@@ -298,9 +294,12 @@ public class ObjectHandler {
     }
 
     public void removeCollectables(Map map, ArrayList<Long> collectableIds){
-        for(Long collectableId : collectableIds){
-            this.collectables.get(collectableId).destroy(map);
-            this.collectables.remove(collectableId);
+        for (Long collectableId : collectableIds) {
+            if (this.collectables.containsKey(collectableId)) {
+                System.out.println("Remove id -> " + collectableId);
+                this.collectables.get(collectableId).destroy(map);
+                this.collectables.remove(collectableId);
+            }
         }
     }
 

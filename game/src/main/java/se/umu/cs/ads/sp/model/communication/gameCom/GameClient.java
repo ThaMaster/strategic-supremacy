@@ -42,6 +42,11 @@ public class GameClient {
         stub = GameServiceGrpc.newFutureStub(channel);
     }
 
+    @Override
+    public String toString(){
+        return ip+":"+port;
+    }
+
     public void destroy() {
         // Shut down the channel.
         try {

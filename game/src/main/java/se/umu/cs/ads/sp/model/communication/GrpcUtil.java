@@ -152,6 +152,7 @@ public class GrpcUtil {
     public static proto.L3Message toGrpcL3Message(L3UpdateDTO message){
         proto.L3Message.Builder builder = proto.L3Message.newBuilder();
 
+        builder.setMessageCount(message.msgCount());
         for(long pickedUpCollectables : message.pickedUpCollectables()){
             builder.addPickedUpCollectables(pickedUpCollectables);
         }
@@ -181,6 +182,7 @@ public class GrpcUtil {
         }
 
         return new L3UpdateDTO(
+                message.getMessageCount(),
                 entities,
                 pickedUp,
                 message.getRemainingTime(),
