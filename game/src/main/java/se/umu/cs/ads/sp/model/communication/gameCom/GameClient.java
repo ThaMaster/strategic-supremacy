@@ -9,13 +9,12 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.GameServiceGrpc;
-import proto.L3Message;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 
 import java.util.ArrayList;
@@ -91,7 +90,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void updateUnits(PlayerUnitUpdateRequestDTO playerUnitUpdateRequest) {
+    public void updateUnits(L1UpdateDTO playerUnitUpdateRequest) {
         System.out.println("[Client] Trying to update enemy units...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)

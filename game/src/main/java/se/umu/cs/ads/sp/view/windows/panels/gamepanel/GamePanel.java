@@ -9,6 +9,7 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.Environment;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
+import se.umu.cs.ads.sp.utils.AppSettings;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
@@ -266,6 +267,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 break;
             }
             animation.update();
+        }
+
+        if(AppSettings.DEBUG) {
+            Rectangle l1BB = gController.getL1BoundingBox();
+            Rectangle l2BB = gController.getL2BoundingBox();
+            if (l1BB == null || l2BB == null) {
+                System.out.println("Trying to render bounding box but got null!");
+            } else {
+                Position screenPosL1 = Camera.worldToScreen((int) l1BB.getX(), (int) l1BB.getY());
+                Position screenPosL2 = Camera.worldToScreen((int) l2BB.getX(), (int) l2BB.getY());
+
+                g2d.setColor(Color.RED);
+                g2d.drawRect(screenPosL1.getX(), screenPosL1.getY(), (int) l1BB.getWidth(), (int) l1BB.getHeight());
+                g2d.setColor(Color.ORANGE);
+                g2d.drawRect(screenPosL2.getX(), screenPosL2.getY(), (int) l2BB.getWidth(), (int) l2BB.getHeight());
+
+            }
         }
     }
 

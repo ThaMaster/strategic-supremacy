@@ -28,4 +28,8 @@ public class FowModel {
         this.units = unitPositions;
     }
 
+    public int getFowRange() {
+        return fowRange;
+    }
+
 }

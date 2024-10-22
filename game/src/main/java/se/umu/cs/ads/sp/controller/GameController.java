@@ -47,10 +47,10 @@ public class GameController implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 long remainingTime = modelManager.getRoundRemainingTime();
-                if(remainingTime <= 0){
+                if (remainingTime <= 0) {
                     //Todo next round stuff
-                }else{
-                    updateHudTimer((int)remainingTime);
+                } else {
+                    updateHudTimer((int) remainingTime);
                 }
             }
         });
@@ -399,5 +399,17 @@ public class GameController implements ActionListener {
 
     public void toggleShopWindow() {
         mainFrame.getHudPanel().toggleUpgradeMenu();
+    }
+
+    public Rectangle getL1BoundingBox() {
+        return modelManager.getPlayerBoundingBox(
+                new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()),
+                modelManager.getL1Range());
+    }
+
+    public Rectangle getL2BoundingBox() {
+        return modelManager.getPlayerBoundingBox(
+                new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()),
+                modelManager.getL2Range());
     }
 }

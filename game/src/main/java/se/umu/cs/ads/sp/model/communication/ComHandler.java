@@ -6,7 +6,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.PlayerUnitUpdateRequestDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
@@ -92,7 +92,7 @@ public class ComHandler {
         client.startGame(req);
     }
 
-    public void updatePlayerUnits(PlayerUnitUpdateRequestDTO req, ArrayList<Long> playerIds) {
+    public void updatePlayerUnits(L1UpdateDTO req, ArrayList<Long> playerIds) {
         for (Long id : playerIds) {
             if (id == controller.getModelManager().getPlayer().id) {
                 continue;
@@ -131,7 +131,7 @@ public class ComHandler {
         }
     }
 
-    public void updateEnemyUnits(PlayerUnitUpdateRequestDTO req) {
+    public void updateEnemyUnits(L1UpdateDTO req) {
         modelManager.getObjectHandler().updateEnemyUnits(req.unitUpdates());
     }
 

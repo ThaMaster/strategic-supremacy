@@ -7,7 +7,6 @@ import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
-import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -17,29 +16,32 @@ import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ModelManager {
 
-    private int currentGold = 180;
-    private int currentPoints;
     private final Map map;
-    private ObjectHandler objectHandler;
+    private final GameController controller;
+    private final ObjectHandler objectHandler;
+    private final LobbyHandler lobbyHandler;
+    private final ComHandler comHandler;
+    private final User player;
 
     private FowModel fow;
 
-    private final ComHandler comHandler;
-    private final User player;
-    private final LobbyHandler lobbyHandler;
-    private boolean started = false;
     private Timer l3Timer;
+
+    private Timer gameTimer;
+    private long remainingTime = 150;
+    private boolean started = false;
+
     private long currentScoreHolderId;
 
-    private GameController controller;
-    private Timer gameTimer;
-    private long remainingTime = 2 * 60 + 30;
+    private int currentGold = 180;
+    private int currentPoints;
 
     public ModelManager(GameController controller, User player) {
         map = new Map();
@@ -160,7 +162,6 @@ public class ModelManager {
             }
         }
 
-        System.out.println("nr units: " + objectHandler.getMyUnits().values().size());
         this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
@@ -185,19 +186,17 @@ public class ModelManager {
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
-        L3UpdateDTO dto;
-        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+        ArrayList<EntitySkeletonDTO> entities;
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
         } else {
             entities = objectHandler.getMyUnitsToEntitySkeletons();
         }
-        ArrayList<Long> collectedIds = objectHandler.getCollectedIds();
         return new L3UpdateDTO(entities,
                 objectHandler.getCollectedIds(),
                 remainingTime,
                 currentScoreHolderId,
-                objectHandler.getAllEnvironmentsDTO(), //Todo send environment
+                objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
     }
@@ -208,13 +207,13 @@ public class ModelManager {
         objectHandler.updateUnitPositions(update.entities());
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
-        if(!iAmLeader()){
+        if (!iAmLeader()) {
             this.remainingTime = update.remainingTime();
         }
         this.currentScoreHolderId = update.currentScoreLeader();
     }
 
-    private boolean iAmLeader(){
+    private boolean iAmLeader() {
         return lobbyHandler.getLobby().leader.id == player.id;
     }
 
@@ -240,10 +239,10 @@ public class ModelManager {
         lobbyHandler.leaveLobby();
     }
 
-    public PlayerUnitUpdateRequestDTO createUnitUpdateRequest(long targetId) {
-        ArrayList<CompleteUnitInfoDTO> unitUpdates = new ArrayList<>();
+    public L1UpdateDTO createUnitUpdateRequest(long targetId) {
+        ArrayList<EntityDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
-            unitUpdates.add(new CompleteUnitInfoDTO(
+            unitUpdates.add(new EntityDTO(
                     unit.getId(),
                     targetId,
                     unit.getPosition(),
@@ -252,12 +251,7 @@ public class ModelManager {
                     unit.getCurrentHp(),
                     unit.getBaseSpeed()));
         }
-        return new PlayerUnitUpdateRequestDTO(unitUpdates, player.id);
-    }
-
-    public ArrayList<Long> getPlayersToUpdate() {
-        // This function will maybe check which users are in L1, L2, L3?
-        return new ArrayList<>(lobbyHandler.getLobby().users.stream().map(user -> user.id).toList());
+        return new L1UpdateDTO(unitUpdates, player.id);
     }
 
     public ArrayList<EntitySkeletonDTO> createMySkeletonList() {
@@ -298,18 +292,18 @@ public class ModelManager {
                 case TAKE_DMG:
                     break;
                 case FLAG_TO_BASE:
-                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                    if (eventCreatedByMyUnit(event.getEventAuthor())) {
                         this.currentPoints += 10;
                     }
                     break;
                 case POINT_PICK_UP:
-                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                    if (eventCreatedByMyUnit(event.getEventAuthor())) {
                         int point = Reward.parseQuantity(event.getEvent());
                         this.currentPoints += point;
                     }
                     break;
                 case GOLD_PICK_UP:
-                    if(eventCreatedByMyUnit(event.getEventAuthor())){
+                    if (eventCreatedByMyUnit(event.getEventAuthor())) {
                         int gold = Reward.parseQuantity(event.getEvent());
                         this.currentGold += gold;
                     }
@@ -320,11 +314,11 @@ public class ModelManager {
         }
     }
 
-    public long getRoundRemainingTime(){
+    public long getRoundRemainingTime() {
         return remainingTime;
     }
 
-    private void startRoundTimer(){
+    private void startRoundTimer() {
         this.gameTimer = new Timer();
         this.gameTimer.schedule(new TimerTask() {
             @Override
@@ -338,7 +332,7 @@ public class ModelManager {
         }, 0, 1000);
     }
 
-    private boolean eventCreatedByMyUnit(long eventId){
+    private boolean eventCreatedByMyUnit(long eventId) {
         return objectHandler.getMyUnitIds().contains(eventId);
     }
 
@@ -352,5 +346,46 @@ public class ModelManager {
 
     public int getCurrentPoints() {
         return currentPoints;
+    }
+
+    public Rectangle getPlayerBoundingBox(ArrayList<PlayerUnit> units, int unitRadius) {
+        if (units.isEmpty()) {
+            System.out.println("Error: Must at least have one unit to create a bounding box!");
+            return null;
+        }
+
+        // Initialize min and max coordinates to the first position
+        int minX = units.get(0).getPosition().getX();
+        int minY = units.get(0).getPosition().getY();
+        int maxX = units.get(0).getPosition().getX();
+        int maxY = units.get(0).getPosition().getY();
+
+        // Iterate over the positions to find the min/max x and y values
+        for (PlayerUnit unit : units) {
+            int x = unit.getPosition().getX();
+            int y = unit.getPosition().getY();
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+
+        // Expand the bounding box by the radius
+        minX -= unitRadius;
+        minY -= unitRadius;
+        maxX += unitRadius;
+        maxY += unitRadius;
+
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    public int getL1Range() {
+        // Adjust to ensure that the units do not teleport into view
+        return fow.getFowRange();
+    }
+
+    public int getL2Range() {
+        // Adjust to ensure that the units do not teleport into view
+        return fow.getFowRange() + 250;
     }
 }

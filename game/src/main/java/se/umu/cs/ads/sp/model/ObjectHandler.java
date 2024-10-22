@@ -364,8 +364,8 @@ public class ObjectHandler {
         }
     }
 
-    public void updateEnemyUnits(ArrayList<CompleteUnitInfoDTO> updates) {
-        for (CompleteUnitInfoDTO update : updates) {
+    public void updateEnemyUnits(ArrayList<EntityDTO> updates) {
+        for (EntityDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             long targetUnit = update.targetUnitId();
             if (targetUnit != -1) {

@@ -9,14 +9,4 @@ public record L3UpdateDTO(
         Long currentScoreLeader,
         ArrayList<EnvironmentDTO> environments,
         int msgSeverity
-)
-{}
-/*
-
-  EntitySkeletons entities = 1;
-  repeated int64 pickedUpCollectables = 2;
-  int64 remainingTime = 3;
-  int64 currentScoreLeader = 4;
-  repeated Environment environments = 5;
-  int32 severity = 6;
- */
+) {}
