@@ -5,13 +5,14 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
 import se.umu.cs.ads.sp.utils.Constants;
+import se.umu.cs.ads.sp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,12 +23,16 @@ public class ComHandler {
     private GameController controller;
     private ModelManager modelManager;
     private GameServer server;
-    private HashMap<Long, GameClient> l1Clients;
-    private HashMap<Long, GameClient> l2Clients;
     private HashMap<Long, GameClient> l3Clients;
+    private HashMap<Long, GameClient> l2Clients;
+    private HashMap<Long, GameClient> l1Clients;
     private long timeSinceL3Update;
+
     public ComHandler(int port, GameController controller, ModelManager modelManager) {
         l3Clients = new HashMap<>();
+        l2Clients = new HashMap<>();
+        l1Clients = new HashMap<>();
+
         nsClient = new NsClient();
         this.controller = controller;
         this.modelManager = modelManager;
@@ -35,15 +40,15 @@ public class ComHandler {
         server.start();
     }
 
-    public void sendL3Update(L3UpdateDTO message, boolean fromLeader){
-        if(fromLeader){
-            for(GameClient client : l3Clients.values()){
+    public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
+        if (fromLeader) {
+            for (GameClient client : l3Clients.values()) {
                 //Send l3 update to everyone
                 client.sendL3Message(message);
             }
-        }else{
+        } else {
             User leader = modelManager.getLobbyHandler().getLobby().leader;
-            if(l3Clients.containsKey(leader.id)){
+            if (l3Clients.containsKey(leader.id)) {
                 GameClient client = l3Clients.get(leader.id);
                 client.sendL3Message(message);
             }
@@ -51,14 +56,13 @@ public class ComHandler {
         }
     }
 
-    public boolean leaderIsAlive(){
+    public boolean leaderIsAlive() {
         return (System.currentTimeMillis() - timeSinceL3Update) <
-                se.umu.cs.ads.sp.utils.Utils.
-                getRandomInt((int)Constants.L3_UPDATE_TIME,(int)Constants.L3_UPDATE_TIME+2000);
-                //Randomize to minimize the risk of two candidates starting election at the same time
+                Utils.getRandomInt((int) Constants.L3_UPDATE_TIME, (int) Constants.L3_UPDATE_TIME + 2000);
+        //Randomize to minimize the risk of two candidates starting election at the same time
     }
 
-    public void handleReceiveL3Msg(L3UpdateDTO message){
+    public void handleReceiveL3Msg(L3UpdateDTO message) {
         timeSinceL3Update = System.currentTimeMillis();
         modelManager.receiveL3Update(message);
     }
@@ -73,6 +77,9 @@ public class ComHandler {
             lobbyToLeave.leader = newLeader;
             sendUpdatedLobby(lobbyToLeave);
         }
+        l3Clients.clear();
+        l2Clients.clear();
+        l1Clients.clear();
     }
 
     public void updateLobby(Lobby updatedLobby) {
@@ -83,12 +90,16 @@ public class ComHandler {
                 l3Clients.put(user.id, client);
             }
         }
-        controller.updateLobby(updatedLobby);
+
+        if (!modelManager.hasGameStarted()) {
+            modelManager.loadMap(updatedLobby.selectedMap);
+            modelManager.getLobbyHandler().setLobby(updatedLobby);
+        }
     }
 
     public Lobby joinLobby(Long lobbyId, User user) {
         Lobby joinedLobby = nsClient.joinLobby(lobbyId, user);
-        if(joinedLobby != null) {
+        if (joinedLobby != null) {
             sendUpdatedLobby(joinedLobby);
         }
         return joinedLobby;
@@ -114,7 +125,7 @@ public class ComHandler {
     }
 
     public void startGame(StartGameRequestDTO req) {
-        controller.startGame(req);
+        modelManager.startGameReq(req);
     }
 
     private void sendUpdatedLobby(Lobby lobby) {
@@ -148,7 +159,7 @@ public class ComHandler {
     }
 
     public void removePlayerUnits() {
-        if(modelManager.getObjectHandler().getMyUnits().isEmpty()) {
+        if (modelManager.getObjectHandler().getMyUnits().isEmpty()) {
             return;
         }
 
@@ -174,14 +185,18 @@ public class ComHandler {
         }
     }
 
-    public boolean requestVote(){
+    public boolean requestVote() {
         //for(GameClient client : l3Clients){
 
-       // }
+        // }
         return true;
     }
 
-    public void voteReceived(){
+    public void voteReceived() {
+
+    }
+
+    public void updateLayers(ArrayList<Long> newL3Clients, ArrayList<Long> newL2Clients, ArrayList<Long> newL1Clients) {
 
     }
 }

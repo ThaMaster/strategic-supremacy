@@ -2,9 +2,7 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Position;
@@ -28,8 +26,8 @@ public class GameController implements ActionListener {
     private final int FPS = 60;
 
     private Timer updateTimer;
-
     private Timer gameTimer;
+    private Timer updateLobbyTimer;
 
     private MainFrame mainFrame;
 
@@ -44,22 +42,27 @@ public class GameController implements ActionListener {
         mainFrame = new MainFrame();
         setActionListeners();
         this.updateTimer = new Timer(1000 / FPS, this);
-        this.gameTimer = new Timer(700, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                long remainingTime = modelManager.getRoundRemainingTime();
-                if (remainingTime <= 0) {
-                    //Todo next round stuff
-                } else {
-                    updateHudTimer((int) remainingTime);
-                }
+
+        this.gameTimer = new Timer(700, e -> {
+            long remainingTime = modelManager.getRoundRemainingTime();
+            if (remainingTime <= 0) {
+                //Todo next round stuff
+            } else {
+                updateHudTimer((int) remainingTime);
+            }
+        });
+
+        this.updateLobbyTimer = new Timer(500, e -> {
+            updateLobby();
+            if (modelManager.hasGameStarted()) {
+                startGame();
+                updateLobbyTimer.stop();
             }
         });
     }
 
     //We got a message/request to start the game
-    public void startGame(StartGameRequestDTO req) {
-        modelManager.startGameReq(req);
+    public void startGame() {
         initializeView();
         updateTimer.start();
         gameTimer.start();
@@ -70,7 +73,8 @@ public class GameController implements ActionListener {
     }
 
     //We have started the game
-    public void startGame() {
+    public void initiateStartGame() {
+        updateLobbyTimer.stop();
         initializeView();
         updateTimer.start();
         gameTimer.start();
@@ -219,8 +223,7 @@ public class GameController implements ActionListener {
             mainFrame.getCreateLobbyFrame().showFrame(false);
 
             createLobby(lobbyName, maxPlayers, selectedMap);
-            mainFrame.getLobbyPanel().showStartButton(true);
-            mainFrame.switchPanel("Lobby");
+            updateLobbyTimer.start();
         }
     }
 
@@ -258,6 +261,7 @@ public class GameController implements ActionListener {
             int selectedRow = mainFrame.getBrowseTable().getSelectedRow();
             String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(selectedRow, 0);
             joinLobby(Long.parseLong(lobbyId));
+            updateLobbyTimer.start();
         }
     }
 
@@ -268,6 +272,7 @@ public class GameController implements ActionListener {
             modelManager.getLobbyHandler().leaveLobby();
             mainFrame.switchPanel("Browse");
             fetchLobbies();
+            updateLobbyTimer.stop();
         }
     }
 
@@ -275,7 +280,7 @@ public class GameController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             modelManager.startGame();
-            startGame();
+            initiateStartGame();
         }
     }
 
@@ -310,7 +315,9 @@ public class GameController implements ActionListener {
     private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         modelManager.getLobbyHandler().createLobby(lobbyName, maxPlayers, selectedMap);
         SwingUtilities.invokeLater(() -> {
-            updateLobby(modelManager.getLobbyHandler().getLobby());
+            updateLobby();
+            mainFrame.getLobbyPanel().showStartButton(true);
+            mainFrame.switchPanel("Lobby");
         });
     }
 
@@ -320,8 +327,9 @@ public class GameController implements ActionListener {
             UtilView.displayWarningMessage(mainFrame, "Failed to join lobby! (Lobby is already full)");
             return;
         }
+
         SwingUtilities.invokeLater(() -> {
-            updateLobby(lobby);
+            updateLobby();
             mainFrame.getLobbyPanel().showStartButton(false);
             mainFrame.switchPanel("Lobby");
         });
@@ -329,8 +337,8 @@ public class GameController implements ActionListener {
 
     //---------------------------------------//
 
-    public void updateLobby(Lobby updatedLobby) {
-        Lobby oldLobby = modelManager.getLobbyHandler().getLobby();
+    public void updateLobby() {
+        Lobby updatedLobby = modelManager.getLobbyHandler().getLobby();
         String[][] playerData = new String[updatedLobby.users.size()][];
         for (int i = 0; i < updatedLobby.users.size(); i++) {
             User currentUser = updatedLobby.users.get(i);
@@ -345,8 +353,8 @@ public class GameController implements ActionListener {
                     sBuilder.toString()
             };
         }
-        if(!modelManager.hasGameStarted()) {
-            modelManager.loadMap(updatedLobby.selectedMap);
+
+        if (!modelManager.hasGameStarted()) {
             tileManager.setMap(modelManager.getMap().getModelMap());
             BufferedImage mapPreview = MiniMap.createMinimapPreview(
                     tileManager.getViewMap(),
@@ -356,16 +364,14 @@ public class GameController implements ActionListener {
                     100);
 
             mainFrame.setLobbyData(playerData, updatedLobby.name, mapPreview, updatedLobby.selectedMap,
-                    true, updatedLobby.currentPlayers, updatedLobby.maxPlayers);
-            modelManager.getLobbyHandler().setLobby(updatedLobby);
+                    modelManager.iAmLeader(), updatedLobby.currentPlayers, updatedLobby.maxPlayers);
+            mainFrame.getLobbyPanel().revalidate();
+            mainFrame.getLobbyPanel().repaint();
         }
 
-        if (modelManager.hasGameStarted() && (oldLobby.currentPlayers != updatedLobby.currentPlayers)) {
-            oldLobby.users.removeAll(updatedLobby.users);
-            for (User user : oldLobby.users) {
-                UtilView.displayInfoMessage(mainFrame, user.username + " has left the lobby!");
-            }
-        }
+//        if (modelManager.hasGameStarted() && (oldLobby.currentPlayers != updatedLobby.currentPlayers)) {
+//            // TODO: Check if any players has left the lobby in an ongoing game
+//        }
     }
 
     public void openQuitWindow() {

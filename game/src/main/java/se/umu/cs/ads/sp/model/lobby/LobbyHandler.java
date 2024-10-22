@@ -27,6 +27,7 @@ public class LobbyHandler {
         raft = new Raft(this, LobbyClientState.LEADER);
         lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
+        modelManager.loadMap(selectedMap);
         lobby.currentPlayers = 1;
     }
 
@@ -50,6 +51,7 @@ public class LobbyHandler {
     public Lobby joinLobby(long lobbyId) {
         raft = new Raft(this, LobbyClientState.FOLLOWER);
         lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
+        modelManager.loadMap(lobby.selectedMap);
         return lobby;
     }
 

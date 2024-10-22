@@ -184,13 +184,11 @@ public class ModelManager {
     }
 
     private void sendL3Update() {
-        boolean isLeader = lobbyHandler.getLobby().leader.id == player.id;
-        comHandler.sendL3Update(constructL3Message(isLeader), isLeader);
+        comHandler.sendL3Update(constructL3Message(iAmLeader()), iAmLeader());
     }
 
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
-        L3UpdateDTO dto;
-        ArrayList<EntitySkeletonDTO> entities = new ArrayList<>();
+        ArrayList<EntitySkeletonDTO> entities;
         int msgCount = lobbyHandler.getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
@@ -222,10 +220,6 @@ public class ModelManager {
             this.remainingTime = update.remainingTime();
         }
         this.currentScoreHolderId = update.currentScoreLeader();
-    }
-
-    private boolean iAmLeader() {
-        return lobbyHandler.getLobby() != null && lobbyHandler.getLobby().leader.id == player.id;
     }
 
     // A request has come in to start the game
@@ -402,5 +396,9 @@ public class ModelManager {
     public int getL2Range() {
         // Adjust to ensure that the units do not teleport into view
         return fow.getFowRange() + 250;
+    }
+
+    public boolean iAmLeader() {
+        return lobbyHandler.getLobby() != null && lobbyHandler.getLobby().leader.id == player.id;
     }
 }
