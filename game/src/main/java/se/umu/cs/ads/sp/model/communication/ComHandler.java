@@ -1,15 +1,14 @@
 package se.umu.cs.ads.sp.model.communication;
 
+import proto.userId;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
-import se.umu.cs.ads.sp.model.communication.dto.L2UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
+import se.umu.cs.ads.sp.model.lobby.Raft;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Utils;
 
@@ -111,7 +110,7 @@ public class ComHandler {
         for (User user : updatedLobby.users) {
             if (!l3Clients.containsKey(user.id) && user.id != modelManager.getPlayer().id) {
                 GameClient client = new GameClient();
-                client.create(user.ip, user.port);
+                client.create(user.ip, user.port, user.username);
                 l3Clients.put(user.id, client);
             }
         }
@@ -154,7 +153,7 @@ public class ComHandler {
             GameClient client;
             if (!l3Clients.containsKey(user.id)) {
                 client = new GameClient();
-                client.create(user.ip, user.port);
+                client.create(user.ip, user.port, user.username);
                 l3Clients.put(user.id, client);
             } else {
                 client = l3Clients.get(user.id);
@@ -194,9 +193,6 @@ public class ComHandler {
         l3Clients.get(userId).destroy();
         l3Clients.remove(userId);
     }
-
-    public boolean requestVote() {
-        //for(GameClient client : l3Clients){
     public void requestVote(Raft raft){
         long playerId = modelManager.getPlayer().id;
         LeaderRequestDto dto = new LeaderRequestDto(raft.getMsgCount(), playerId);
@@ -204,14 +200,10 @@ public class ComHandler {
         for(GameClient client : l3Clients.values()){
             client.requestVote(raft, dto);
         }
-        // }
-        return true;
     }
 
     public boolean requestVoteRequest(int msgCount){
         return modelManager.getRaft().approveNewLeader(msgCount);
-    }
-    public void voteReceived() {
     }
 
     public void moveUserToL3(Long userId) {
@@ -238,13 +230,14 @@ public class ComHandler {
             // If in L3, need to create a new client since context causes problem
             GameClient l3Client = l3Clients.get(userId);
             newClient = new GameClient();
-            newClient.create(l3Client.getIp(), l3Client.getPort());
+            newClient.create(l3Client.getIp(), l3Client.getPort(), l3Client.getUsername());
         }
 
         l2Clients.put(userId, newClient);
     }
 
     public void moveUserToL1(Long userId) {
+
         if (l1Clients.containsKey(userId)) {
             return;
         }
@@ -258,7 +251,7 @@ public class ComHandler {
             // If in L3, need to create a new client since context causes problem
             GameClient l3Client = l3Clients.get(userId);
             newClient = new GameClient();
-            newClient.create(l3Client.getIp(), l3Client.getPort());
+            newClient.create(l3Client.getIp(), l3Client.getPort(), l3Client.getUsername());
         }
 
         l1Clients.put(userId, newClient);
@@ -267,16 +260,19 @@ public class ComHandler {
     public void notifyNewLeader(){
         long playerId = modelManager.getPlayer().id;
         for(GameClient client : l3Clients.values()){
+            System.out.println("\t Sending to " + client.getUsername());
             client.notifyNewLeader(GrpcUtil.toGrpcUserId(playerId));
         }
-        modelManager.setNewLeader(modelManager.getPlayer());
+        modelManager.setNewLeader(modelManager.getPlayer().id);
         timeSinceL3Update = System.currentTimeMillis();
     }
 
     public void newLeaderReceived(Long userId){
-        GameClient user = l3Clients.get(userId);
-        modelManager.setNewLeader(new User(user.getUsername(), user.getIp(), user.getPort()));
+        System.out.println("Gamecom -> received new leader");
+        modelManager.setNewLeader(userId);
         timeSinceL3Update = System.currentTimeMillis();
+    }
+
     public int getNrL1Clients() {
         return l1Clients.size();
     }

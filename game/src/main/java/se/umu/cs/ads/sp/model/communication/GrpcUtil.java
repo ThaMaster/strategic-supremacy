@@ -33,7 +33,6 @@ public class GrpcUtil {
     public static proto.EntitySkeleton toGrpcEntitySkeleton(EntitySkeletonDTO skeleton) {
         return proto.EntitySkeleton.newBuilder()
                 .setId(skeleton.id())
-                .setUserId(skeleton.userId())
                 .setUnitType(skeleton.unitType())
                 .setPosition(toGrpcPosition(skeleton.position().getX(), skeleton.position().getY()))
                 .build();
@@ -183,6 +182,17 @@ public class GrpcUtil {
             builder.addUsers(toGrpcUser(user));
         }
         return builder.build();
+    }
+
+    public static proto.userId toGrpcUserId(Long userId){
+        return proto.userId.newBuilder().setUserId(userId).build();
+    }
+
+    public static proto.candidateLeaderRequest toGrpcLeaderRequest(LeaderRequestDto request){
+        return proto.candidateLeaderRequest.newBuilder()
+                .setMsgCount(request.msgCount())
+                .setUserId(request.userId())
+                .build();
     }
 
     public static proto.PlayerUnit toGrpcPlayerUnit(UnitDTO unit) {

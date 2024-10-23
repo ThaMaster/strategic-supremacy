@@ -38,7 +38,7 @@ public class GameController implements ActionListener {
     private User player;
 
     public GameController() {
-        UtilView.changeScreenSize(1600, 800);
+        UtilView.changeScreenSize(800 , 600);
         mainFrame = new MainFrame();
         setActionListeners();
         this.updateTimer = new Timer(1000 / FPS, this);

@@ -178,6 +178,7 @@ public class ModelManager {
         startL3Timer(Constants.L3_UPDATE_TIME);
         startL2Timer(Constants.L2_UPDATE_TIME);
         startRoundTimer();
+        lobbyHandler.getRaft().setComHandler(comHandler);
     }
 
     /**
@@ -196,6 +197,7 @@ public class ModelManager {
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
         startL2Timer(Constants.L2_UPDATE_TIME);
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+        lobbyHandler.getRaft().setComHandler(comHandler);
     }
 
     /**
@@ -213,7 +215,7 @@ public class ModelManager {
                 if (comHandler.leaderIsAlive()) {
                     sendL3Update();
                 }
-                else if(iAmNotLeader() && !lobbyHandler.getRaft().leaderElectionStarted()){
+                else if(!iAmLeader() && !lobbyHandler.getRaft().leaderElectionStarted()){
                     System.out.println("START LEADER ELECTION");
                     lobbyHandler.getRaft().initiateLeaderElection();
                 }
@@ -264,7 +266,7 @@ public class ModelManager {
 
         } else {
             // Follower gets update from leader
-            lobbyHandler.updateMsgCount(update.msgCount());
+            lobbyHandler.getRaft().updateMsgCount(update.msgCount());
             this.remainingTime = update.remainingTime();
         }
         objectHandler.updateUnitPositions(update.entities());
@@ -350,35 +352,6 @@ public class ModelManager {
                 objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
-    public void receiveL3Update(L3UpdateDTO update) {
-
-        //Todo do not update units or stuff if the author of the message is within l2 or l1
-        if(iAmNotLeader()){
-            lobbyHandler.getRaft().updateMsgCount(update.msgCount());
-        }
-        objectHandler.updateUnitPositions(update.entities());
-        objectHandler.removeCollectables(map, update.pickedUpCollectables());
-        objectHandler.updateEnvironments(update.environments());
-        if(iAmNotLeader()){
-            this.remainingTime = update.remainingTime();
-        }
-        this.currentScoreHolderId = update.currentScoreLeader();
-    }
-
-    private boolean iAmNotLeader(){
-        return lobbyHandler.getLobby().leader.id != player.id;
-    }
-
-    // A request has come in to start the game
-    public void startGameReq(StartGameRequestDTO request) {
-        //Check bounding boxes
-        objectHandler.populateWorld(request, map);
-        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
-        started = true;
-        l3Timer = new Timer();
-        startL3Timer(Constants.L3_UPDATE_TIME / 2);
-        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
-        lobbyHandler.getRaft().setComHandler(comHandler);
     }
 
     public Raft getRaft(){
@@ -503,8 +476,8 @@ public class ModelManager {
                         unit = objectHandler.getEnemyUnits().get(event.getId());
                     }
                     if (unit.hasFlag()) {
-                        long id = objectHandler.spawnFlag(map, unit.getPosition());
-                        unit.setHasFlag(false);
+                        objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
+                        unit.setHasFlag(false, null);
                     }
                     break;
                 case ATTACK:
@@ -640,16 +613,15 @@ public class ModelManager {
     }
 
     public boolean iAmLeader() {
-        return lobbyHandler.getLobby() != null && lobbyHandler.getLobby().leader.id == player.id;
+        return lobbyHandler.getLobby() != null && lobbyHandler.getRaft().iAmLeader();
     }
 
-    public void setNewLeader(User user){
+    public void setNewLeader(long userId){
         l3Timer.cancel();
         l3Timer = new Timer();
-        lobbyHandler.setNewLeader(user);
+        lobbyHandler.setNewLeader(userId);
         long updateTime = Constants.L3_UPDATE_TIME;
-        System.out.println("\tNew game leader elected");
-        if(iAmNotLeader()){
+        if(!iAmLeader()){
             updateTime /= 2;
         }
         startL3Timer(updateTime);

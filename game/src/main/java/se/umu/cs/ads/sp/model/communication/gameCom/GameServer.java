@@ -63,7 +63,6 @@ public class GameServer {
 
         @Override
         public void l2Update(L2Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L2 update...");
             comHandler.handleReceiveL2Msg(GrpcUtil.fromGrpcL2Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
@@ -71,7 +70,6 @@ public class GameServer {
 
         @Override
         public void l1Update(L1Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L1 update...");
             comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
@@ -99,7 +97,7 @@ public class GameServer {
 
         @Override
         public void notifyNewLeader(userId request, StreamObserver<Empty> responseObserver) {
-            comHandler.newLeaderReceived(GrpcUtil.fromGrpcUserId(request));
+            comHandler.newLeaderReceived(request.getUserId());
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }

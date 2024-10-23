@@ -40,6 +40,10 @@ public class GameClient {
         return port;
     }
 
+    public String getUsername(){
+        return username;
+    }
+
     public void create(String ip, int port, String username) {
         this.ip = ip;
         this.port = port;
@@ -48,15 +52,6 @@ public class GameClient {
                 .usePlaintext()
                 .build();
         stub = GameServiceGrpc.newFutureStub(channel);
-    }
-    public String getIp(){
-        return ip;
-    }
-    public int getPort(){
-        return port;
-    }
-    public String getUsername(){
-        return username;
     }
 
     @Override
@@ -114,7 +109,6 @@ public class GameClient {
     }
 
     public void sendL2Message(L2UpdateDTO msg) {
-        System.out.println("[Client] Sending L2 update...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l2Update(GrpcUtil.toGrpcL2Message(msg));
@@ -132,7 +126,6 @@ public class GameClient {
     }
 
     public void sendL1Message(L1UpdateDTO msg) {
-        System.out.println("[Client] Sending L1 update...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l1Update(GrpcUtil.toGrpcL1Message(msg));
@@ -171,7 +164,6 @@ public class GameClient {
     }
 
     public void removePlayerUnits(UserSkeletonsDTO entitySkeletons) {
-        System.out.println("[Client] Trying to leave ongoing game...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .removePlayerUnits(GrpcUtil.toGrpcUserSkeletons(entitySkeletons));

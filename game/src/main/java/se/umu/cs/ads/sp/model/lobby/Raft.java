@@ -11,7 +11,7 @@ import se.umu.cs.ads.sp.utils.enums.LobbyClientState;
 public class Raft {
 
     private int msgCount;
-    private int numVotes;
+    private int numApprovedVotes;
     LobbyClientState state;
     LobbyHandler lobbyHandler;
     private int numClients;
@@ -21,6 +21,7 @@ public class Raft {
     public Raft(LobbyHandler lobbyHandler, LobbyClientState state){
         this.lobbyHandler = lobbyHandler;
         msgCount = 0;
+        this.state = state;
         resetVotes();
     }
 
@@ -42,13 +43,13 @@ public class Raft {
     public void initiateLeaderElection(){
         state = LobbyClientState.CANDIDATE;
         receivedVotes = 1;
-        numVotes++;
+        numApprovedVotes++;
         numClients = lobbyHandler.getLobby().currentPlayers;
         comHandler.requestVote(this);
     }
 
     private void resetVotes(){
-        numVotes = 0;
+        numApprovedVotes = 0;
         receivedVotes = 0;
         if(lobbyHandler.getLobby() != null){
             numClients = lobbyHandler.getLobby().currentPlayers;
@@ -58,30 +59,38 @@ public class Raft {
     }
 
     public void receiveVote(boolean approved){
+        System.out.println("Received a vote -> " + approved);
         receivedVotes++;
         if(approved){
-            numVotes++;
-            if(numVotes <= numClients){
+            numApprovedVotes++;
+            if(numApprovedVotes > numClients/2){
                 //Got a majority of the votes, I am now the leader
                 state = LobbyClientState.LEADER;
                 if(AppSettings.DEBUG){
                     GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "I have become the new game leader", EventType.LOGG, lobbyHandler.getLobby().id));
                 }
+                System.out.println("I am now the leader baby");
                 comHandler.notifyNewLeader();
             }
         }
-        else if(receivedVotes <= numClients/2){
+        else if(receivedVotes >= numClients/2 && numApprovedVotes <= numClients/2){
             // I have not the majority of the votes, going back to follower
+            System.out.println("I did not win the vote, damn it");
             state = LobbyClientState.FOLLOWER;
             resetVotes();
         }
+    }
+
+    public boolean iAmLeader(){
+        return state == LobbyClientState.LEADER;
     }
 
     public void newLeaderElected(){
         if(AppSettings.DEBUG){
             GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "New leader has been elected", EventType.LOGG, lobbyHandler.getLobby().id));
         }
-        state = LobbyClientState.CANDIDATE;
+        System.out.println("New leader elected!");
+        state = LobbyClientState.FOLLOWER;
     }
 
     public boolean leaderElectionStarted(){

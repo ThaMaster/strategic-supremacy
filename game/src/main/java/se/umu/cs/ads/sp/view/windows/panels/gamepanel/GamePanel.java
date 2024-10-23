@@ -474,7 +474,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     addTextEvent(event, 15, EventColor.ALERT);
                     break;
                 case LOGG:
-                    addTextEvent(event, 15, EventColor.DEFAULT);
+                    addTextEvent(event, 30, EventColor.ALERT);
                     break;
                 case MINE_DEPLETED:
                     GoldMineView goldMine = (GoldMineView) environments.get(event.getId());
