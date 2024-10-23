@@ -3,7 +3,6 @@ package se.umu.cs.ads.sp.model.lobby;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.utils.enums.LobbyClientState;
 
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class LobbyHandler {
     }
 
     public void removePlayer(long playerId) {
-        ArrayList<User> users = this.lobby.users;
+        ArrayList<User> users = lobby.users;
         int userIndex = -1;
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).id == playerId) {
@@ -72,27 +71,38 @@ public class LobbyHandler {
             }
         }
         if (userIndex != -1) {
-            this.lobby.users.remove(userIndex);
+            lobby.users.remove(userIndex);
         }
     }
 
-
+    public User getPlayer(long userId) {
+        for (User user : getLobby().users) {
+            if (user.id == userId) {
+                return user;
+            }
+        }
+        return null;
+    }
 
 
     //Raft
-    public void updateMsgCount(int msgCount){
+    public void updateMsgCount(int msgCount) {
         raft.updateMsgCount(msgCount);
     }
-    public int incMsgCount(){
+
+    public int incMsgCount() {
         return raft.incMsgCount();
     }
-    public int getMsgCount(){
+
+    public int getMsgCount() {
         return raft.getMsgCount();
     }
-    public void initiateLeaderElection(){
+
+    public void initiateLeaderElection() {
         raft.initiateLeaderElection(modelManager.getComHandler());
     }
-    public boolean approveNewLeader(int msgCount){
+
+    public boolean approveNewLeader(int msgCount) {
         return raft.approveNewLeader(msgCount);
     }
 

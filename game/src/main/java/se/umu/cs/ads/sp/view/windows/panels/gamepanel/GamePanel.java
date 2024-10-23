@@ -501,6 +501,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                         addTextEvent(event, 15, EventColor.SUCCESS);
                     }
                     break;
+                case PLAYER_LEFT:
+                    addTextEvent(event, 20, EventColor.WARNING);
+                    break;
                 default:
                     //This is default case, it's a collectable we have stored
                     handleCollectableEvent(event);

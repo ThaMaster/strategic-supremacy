@@ -179,8 +179,7 @@ public class ComHandler {
 
     public void removePlayer(long userId, ArrayList<Long> unitIds) {
         removeGameClient(userId);
-        modelManager.getObjectHandler().removeEnemyUnits(unitIds);
-        modelManager.getLobbyHandler().removePlayer(userId);
+        modelManager.removePlayer(userId, unitIds);
     }
 
     private void removeGameClient(long userId) {

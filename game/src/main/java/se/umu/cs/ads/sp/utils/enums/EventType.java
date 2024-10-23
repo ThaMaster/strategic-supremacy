@@ -17,5 +17,7 @@ public enum EventType {
     //Game actions
     TAKE_DMG,
     ATTACK,
-    DEATH
+    DEATH,
+
+    PLAYER_LEFT
 }

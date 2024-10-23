@@ -15,6 +15,7 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -199,6 +200,7 @@ public class ModelManager {
      * Function for starting the L3 timer and have it send L3 updates at a specified
      * interval. This timer will keep track if the leader has become unresponsive and
      * start leader election.
+     *
      * @param updateTime Specified interval (ms) to send L3 updates.
      */
     private void startL3Timer(long updateTime) {
@@ -426,6 +428,13 @@ public class ModelManager {
         objectHandler.clearGameObjects();
         lobbyHandler.leaveLobby();
         started = false;
+    }
+
+    public void removePlayer(long userId, ArrayList<Long> unitIds) {
+        objectHandler.removeEnemyUnits(unitIds);
+        User leavingPlayer = lobbyHandler.getPlayer(userId);
+        GameEvents.getInstance().addEvent(new GameEvent(leavingPlayer.id, leavingPlayer.username + " left the game!", EventType.PLAYER_LEFT, userId));
+        lobbyHandler.removePlayer(userId);
     }
 
     public UserSkeletonsDTO createMySkeletonList() {

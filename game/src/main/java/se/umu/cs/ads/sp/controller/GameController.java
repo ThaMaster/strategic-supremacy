@@ -368,10 +368,6 @@ public class GameController implements ActionListener {
             mainFrame.getLobbyPanel().revalidate();
             mainFrame.getLobbyPanel().repaint();
         }
-
-//        if (modelManager.hasGameStarted() && (oldLobby.currentPlayers != updatedLobby.currentPlayers)) {
-//            // TODO: Check if any players has left the lobby in an ongoing game
-//        }
     }
 
     public void openQuitWindow() {
