@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.view.animation;
 
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.util.Camera;
 
 import java.awt.*;

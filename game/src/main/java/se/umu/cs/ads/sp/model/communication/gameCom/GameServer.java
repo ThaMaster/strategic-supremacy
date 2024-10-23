@@ -55,7 +55,6 @@ public class GameServer {
 
         @Override
         public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
-            System.out.println("[Server] Received L3 update...");
             comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
@@ -89,8 +88,8 @@ public class GameServer {
         @Override
         public void requestVote(candidateLeaderRequest request, StreamObserver<candidateLeaderResponse> responseObserver) {
             boolean acknowledgement = comHandler.requestVoteRequest(request.getMsgCount());
-            candidateLeaderResponse.Builder response =  candidateLeaderResponse.newBuilder().
-                        setAcknowledgement(acknowledgement);
+            candidateLeaderResponse.Builder response = candidateLeaderResponse.newBuilder().
+                    setAcknowledgement(acknowledgement);
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         }

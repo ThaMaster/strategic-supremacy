@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.enums.TileType;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.TileType;
 import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;

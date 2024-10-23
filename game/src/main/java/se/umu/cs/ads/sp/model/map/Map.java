@@ -6,10 +6,10 @@ import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
 import se.umu.cs.ads.sp.model.objects.collectables.Gold;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.RewardType;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.RewardType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static se.umu.cs.ads.sp.utils.Utils.getRandomSuccess;
+import static se.umu.cs.ads.sp.util.UtilModel.getRandomSuccess;
 
 public class Map {
 
@@ -167,8 +167,8 @@ public class Map {
         Position minePosition;
         do {
             minePosition = new Position(
-                    basePosition.getX() + Utils.getRandomInt(-Constants.TILE_HEIGHT, Constants.TILE_HEIGHT),
-                    basePosition.getY() + Utils.getRandomInt(-Constants.TILE_WIDTH, Constants.TILE_WIDTH));
+                    basePosition.getX() + UtilModel.getRandomInt(-Constants.TILE_HEIGHT, Constants.TILE_HEIGHT),
+                    basePosition.getY() + UtilModel.getRandomInt(-Constants.TILE_WIDTH, Constants.TILE_WIDTH));
         } while (!isWalkable(minePosition));
         return minePosition;
     }
@@ -208,8 +208,8 @@ public class Map {
         Position offsetPos;
         do {
             offsetPos = new Position(
-                    flagPosition.getX() + Utils.getRandomInt(-10, 10),
-                    flagPosition.getY() + Utils.getRandomInt(-10, 10));
+                    flagPosition.getX() + UtilModel.getRandomInt(-10, 10),
+                    flagPosition.getY() + UtilModel.getRandomInt(-10, 10));
         } while (!isWalkable(offsetPos));
         return offsetPos;
     }
@@ -220,8 +220,8 @@ public class Map {
         Position randomPosition;
         do {
             randomPosition = new Position(
-                    Utils.getRandomInt(0, cols) * Constants.TILE_WIDTH + Utils.getRandomInt(0, Constants.TILE_WIDTH),
-                    Utils.getRandomInt(0, rows) * Constants.TILE_HEIGHT + Utils.getRandomInt(0, Constants.TILE_HEIGHT));
+                    UtilModel.getRandomInt(0, cols) * Constants.TILE_WIDTH + UtilModel.getRandomInt(0, Constants.TILE_WIDTH),
+                    UtilModel.getRandomInt(0, rows) * Constants.TILE_HEIGHT + UtilModel.getRandomInt(0, Constants.TILE_HEIGHT));
         } while (!isWalkable(randomPosition));
         return randomPosition;
     }
@@ -237,8 +237,8 @@ public class Map {
                 if (!map.get(row).get(col).hasCollision()) {
                     Position currentTile =
                             new Position(
-                                    col * Constants.TILE_WIDTH + Utils.getRandomInt(0, Constants.TILE_WIDTH),
-                                    row * Constants.TILE_HEIGHT + Utils.getRandomInt(0, Constants.TILE_HEIGHT));
+                                    col * Constants.TILE_WIDTH + UtilModel.getRandomInt(0, Constants.TILE_WIDTH),
+                                    row * Constants.TILE_HEIGHT + UtilModel.getRandomInt(0, Constants.TILE_HEIGHT));
                     double minDistance = getMinDistance(currentTile, spawnPositions);
                     // Find the spawn point with the maximum of these minimum distances
                     if (minDistance > maxMinDistance) {

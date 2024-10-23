@@ -10,13 +10,13 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.Environment;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
-import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.Direction;
-import se.umu.cs.ads.sp.utils.enums.EventColor;
-import se.umu.cs.ads.sp.utils.enums.EventType;
+import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.Direction;
+import se.umu.cs.ads.sp.util.enums.EventColor;
+import se.umu.cs.ads.sp.util.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
@@ -106,7 +106,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
             if (allowedDestination && !gController.getSelectedUnits().isEmpty()) {
                 // 80 % chance we play move sound
-                if (Utils.getRandomSuccess(80)) {
+                if (UtilModel.getRandomSuccess(80)) {
                     SoundManager.getInstance().playMove();
                 }
             }

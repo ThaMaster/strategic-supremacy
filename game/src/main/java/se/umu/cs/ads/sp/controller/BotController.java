@@ -3,14 +3,13 @@ package se.umu.cs.ads.sp.controller;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
-public class AiController implements Runnable {
+public class BotController implements Runnable {
 
     private ModelManager modelManager;
     private User user;
@@ -19,22 +18,23 @@ public class AiController implements Runnable {
     private Timer updateTimer;
     private Timer gameTimer;
 
-    public AiController(long lobbyId) {
-        user = new User(Utils.generateRandomString(10), Utils.getLocalIP(), Utils.getFreePort());
+    public BotController(long lobbyId) {
+        user = new User(UtilModel.generateRandomString(10), UtilModel.getLocalIP(), UtilModel.getFreePort());
         modelManager = new ModelManager(user);
-        System.out.println("Ai port: " + user.port);
         initTimers();
-        joinLobby(lobbyId);
+        if (lobbyId == -1) {
+            joinLobby(modelManager.getLobbyHandler().fetchLobbies().get(0).id);
+        } else {
+            joinLobby(lobbyId);
+        }
     }
-
-
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             try {
                 Thread.sleep(1000);
-                if(modelManager.hasGameStarted()){
+                if (modelManager.hasGameStarted()) {
                     Thread.sleep(1000);
                     moveRandomUnits();
                 }
@@ -60,9 +60,10 @@ public class AiController implements Runnable {
                 // TODO: If game has started, start updating the game!
                 updateLobbyTimer.stop();
                 updateTimer.start();
+                gameTimer.start();
             }
         });
-        updateTimer = new Timer(1000/60, e -> {
+        updateTimer = new Timer(1000 / 60, e -> {
             update();
         });
     }
@@ -72,26 +73,25 @@ public class AiController implements Runnable {
         updateLobbyTimer.start();
     }
 
-    public void update(){
+    public void update() {
         modelManager.update();
     }
 
     private void moveRandomUnits() {
-        int unitsToMove = Utils.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size());
+        int unitsToMove = UtilModel.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size());
         for (int i = 0; i < unitsToMove; i++) {
             PlayerUnit unit = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(i);
             modelManager.setSelection(unit.getId());
-            modelManager.setEntityDestination(getRandomDestination());
+            modelManager.setEntityDestination(getRandomDestination(unit.getPosition()));
         }
     }
 
-    private Position getRandomDestination() {
-        int maxX = modelManager.getMap().getCols() * Constants.TILE_WIDTH;
-        int maxY = modelManager.getMap().getRows() * Constants.TILE_HEIGHT;
-
+    private Position getRandomDestination(Position pos) {
         Position newPosition;
+        int offset = 100;
         do {
-            newPosition = new Position(Utils.getRandomInt(0, maxX), Utils.getRandomInt(0, maxY));
+            newPosition = new Position(UtilModel.getRandomInt(pos.getX(), pos.getX() + offset), UtilModel.getRandomInt(pos.getY(), pos.getY() + offset));
+            offset += 100;
         } while (!modelManager.isWalkable(newPosition) && !modelManager.isInFov(newPosition));
         return newPosition;
     }

@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
 
 import java.util.ArrayList;
 

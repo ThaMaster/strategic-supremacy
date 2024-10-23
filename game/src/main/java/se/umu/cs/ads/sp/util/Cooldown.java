@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.utils;
+package se.umu.cs.ads.sp.util;
 
 import java.util.concurrent.TimeUnit;
 

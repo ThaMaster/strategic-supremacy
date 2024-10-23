@@ -3,7 +3,7 @@ package se.umu.cs.ads.sp.model.lobby;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
-import se.umu.cs.ads.sp.utils.enums.LobbyClientState;
+import se.umu.cs.ads.sp.util.enums.LobbyClientState;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.entities.units;
 
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 

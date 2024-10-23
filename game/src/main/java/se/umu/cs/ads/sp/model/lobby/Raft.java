@@ -3,10 +3,10 @@ package se.umu.cs.ads.sp.model.lobby;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
-import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.EventType;
-import se.umu.cs.ads.sp.utils.enums.LobbyClientState;
+import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.EventType;
+import se.umu.cs.ads.sp.util.enums.LobbyClientState;
 
 public class Raft {
 
@@ -64,7 +64,7 @@ public class Raft {
                 //Got a majority of the votes, I am now the leader
                 state = LobbyClientState.LEADER;
                 if(AppSettings.DEBUG){
-                    GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "I have become the new game leader", EventType.LOGG, lobbyHandler.getLobby().id));
+                    GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "I have become the new game leader", EventType.LOGG, lobbyHandler.getLobby().id));
                 }
                 System.out.println("I am now the leader baby");
                 comHandler.notifyNewLeader();
@@ -84,7 +84,7 @@ public class Raft {
 
     public void newLeaderElected(){
         if(AppSettings.DEBUG){
-            GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "New leader has been elected", EventType.LOGG, lobbyHandler.getLobby().id));
+            GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "New leader has been elected", EventType.LOGG, lobbyHandler.getLobby().id));
         }
         System.out.println("New leader elected!");
         state = LobbyClientState.FOLLOWER;

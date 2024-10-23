@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.view.objects.entities;
 
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 
 import java.awt.*;

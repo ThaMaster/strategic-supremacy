@@ -5,11 +5,11 @@ import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Cooldown;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.enums.EntityState;
-import se.umu.cs.ads.sp.utils.enums.EventType;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Cooldown;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.EntityState;
+import se.umu.cs.ads.sp.util.enums.EventType;
 
 public abstract class Entity extends GameObject {
 

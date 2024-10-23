@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.utils.enums;
+package se.umu.cs.ads.sp.util.enums;
 
 public enum LobbyClientState {
     FOLLOWER,

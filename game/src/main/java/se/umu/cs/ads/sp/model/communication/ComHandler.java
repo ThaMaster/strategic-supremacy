@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model.communication;
 
-import proto.userId;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -9,8 +8,8 @@ import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
 import se.umu.cs.ads.sp.model.lobby.Raft;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.UtilModel;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +87,7 @@ public class ComHandler {
 
     public boolean leaderIsAlive() {
         return (System.currentTimeMillis() - timeSinceL3Update) <
-                Utils.getRandomInt((int) Constants.L3_UPDATE_TIME, (int) Constants.L3_UPDATE_TIME + 2000);
+                UtilModel.getRandomInt((int) Constants.L3_UPDATE_TIME, (int) Constants.L3_UPDATE_TIME + 2000);
         //Randomize to minimize the risk of two candidates starting election at the same time
     }
 
@@ -165,6 +164,7 @@ public class ComHandler {
         }
     }
 
+    // TODO: Concurrent modification error!
     public void removePlayerUnits() {
         if (modelManager.getObjectHandler().getMyUnits().isEmpty()) {
             return;
@@ -191,32 +191,29 @@ public class ComHandler {
         } else if (l2Clients.containsKey(userId)) {
             l2Clients.get(userId).destroy();
             l2Clients.remove(userId);
+        } else {
         }
-
         l3Clients.get(userId).destroy();
         l3Clients.remove(userId);
     }
-    public void requestVote(Raft raft){
+
+    public void requestVote(Raft raft) {
         long playerId = modelManager.getPlayer().id;
         LeaderRequestDto dto = new LeaderRequestDto(raft.getMsgCount(), playerId);
 
-        for(GameClient client : l3Clients.values()){
+        for (GameClient client : l3Clients.values()) {
             client.requestVote(raft, dto);
         }
     }
 
-    public boolean requestVoteRequest(int msgCount){
+    public boolean requestVoteRequest(int msgCount) {
         return modelManager.getRaft().approveNewLeader(msgCount);
     }
 
     public void moveUserToL3(Long userId) {
         if (l2Clients.containsKey(userId)) {
-            System.out.println("Just before error");
-            l2Clients.get(userId).destroy();
-            System.out.println("just after error");
             l2Clients.remove(userId);
         } else if (l1Clients.containsKey(userId)) {
-            l1Clients.get(userId).destroy();
             l1Clients.remove(userId);
         }
     }
@@ -233,9 +230,7 @@ public class ComHandler {
             l1Clients.remove(userId);
         } else {
             // If in L3, need to create a new client since context causes problem
-            GameClient l3Client = l3Clients.get(userId);
-            newClient = new GameClient();
-            newClient.create(l3Client.getIp(), l3Client.getPort(), l3Client.getUsername());
+            newClient = l3Clients.get(userId);
         }
 
         l2Clients.put(userId, newClient);
@@ -254,17 +249,15 @@ public class ComHandler {
             l2Clients.remove(userId);
         } else {
             // If in L3, need to create a new client since context causes problem
-            GameClient l3Client = l3Clients.get(userId);
-            newClient = new GameClient();
-            newClient.create(l3Client.getIp(), l3Client.getPort(), l3Client.getUsername());
+            newClient = l3Clients.get(userId);
         }
 
         l1Clients.put(userId, newClient);
     }
 
-    public void notifyNewLeader(){
+    public void notifyNewLeader() {
         long playerId = modelManager.getPlayer().id;
-        for(GameClient client : l3Clients.values()){
+        for (GameClient client : l3Clients.values()) {
             System.out.println("\t Sending to " + client.getUsername());
             client.notifyNewLeader(GrpcUtil.toGrpcUserId(playerId));
         }
@@ -272,7 +265,7 @@ public class ComHandler {
         timeSinceL3Update = System.currentTimeMillis();
     }
 
-    public void newLeaderReceived(Long userId){
+    public void newLeaderReceived(Long userId) {
         System.out.println("Gamecom -> received new leader");
         modelManager.setNewLeader(userId);
         timeSinceL3Update = System.currentTimeMillis();

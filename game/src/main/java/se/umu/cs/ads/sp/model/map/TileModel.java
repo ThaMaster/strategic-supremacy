@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.model.map;
 
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.utils.enums.TileType;
+import se.umu.cs.ads.sp.util.enums.TileType;
 
 import java.util.ArrayList;
 

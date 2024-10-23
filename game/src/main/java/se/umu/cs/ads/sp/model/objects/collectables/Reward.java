@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.model.objects.collectables;
 
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.RewardType;
-import se.umu.cs.ads.sp.utils.enums.UpgradeType;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.RewardType;
+import se.umu.cs.ads.sp.util.enums.UpgradeType;
 
 public class Reward {
     private int quantity;
@@ -38,12 +38,12 @@ public class Reward {
     }
 
     public static Reward getRandomReward() {
-        int randomNum = Utils.getRandomInt(0, 4);
+        int randomNum = UtilModel.getRandomInt(0, 4);
         return switch (randomNum) {
-            case 0 -> new Reward(Utils.getRandomInt(1, 5), RewardType.POINT);
+            case 0 -> new Reward(UtilModel.getRandomInt(1, 5), RewardType.POINT);
             case 1 -> new Reward(UpgradeType.MOVEMENT_SPEED.upgradeAmount, RewardType.MOVEMENT_SPEED);
             case 2 -> new Reward(UpgradeType.ATTACK_DMG.upgradeAmount, RewardType.ATTACK_DMG);
-            default -> new Reward(Utils.getRandomInt(10, 20), RewardType.GOLD);
+            default -> new Reward(UtilModel.getRandomInt(10, 20), RewardType.GOLD);
         };
 
     }

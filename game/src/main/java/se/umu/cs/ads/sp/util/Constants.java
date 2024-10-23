@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.utils;
+package se.umu.cs.ads.sp.util;
 
 public class Constants {
     public static final int TILE_WIDTH = 64;

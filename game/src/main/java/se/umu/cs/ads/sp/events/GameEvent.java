@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.events;
 
-import se.umu.cs.ads.sp.utils.enums.EventType;
+import se.umu.cs.ads.sp.util.enums.EventType;
 
 public class GameEvent {
     private long id;

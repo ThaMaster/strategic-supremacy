@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.panels.gamepanel.map;
 
-import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 
 import java.util.ArrayList;

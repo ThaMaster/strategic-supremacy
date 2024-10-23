@@ -1,15 +1,5 @@
 package se.umu.cs.ads.sp.unit.model.components;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import se.umu.cs.ads.sp.model.components.CollisionBox;
-import se.umu.cs.ads.sp.utils.Position;
-
-import java.awt.*;
-import java.awt.geom.Line2D;
-
 public class CollisionBoxTest {
 //
 //    private CollisionBox cBox;

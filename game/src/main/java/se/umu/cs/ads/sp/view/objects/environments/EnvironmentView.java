@@ -1,12 +1,7 @@
 package se.umu.cs.ads.sp.view.objects.environments;
 
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
-import se.umu.cs.ads.sp.view.util.ImageLoader;
-import se.umu.cs.ads.sp.view.util.UtilView;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public abstract class EnvironmentView extends ObjectView {
 

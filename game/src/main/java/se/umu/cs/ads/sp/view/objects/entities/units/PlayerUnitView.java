@@ -1,10 +1,10 @@
 package se.umu.cs.ads.sp.view.objects.entities.units;
 
-import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.enums.EntityState;
-import se.umu.cs.ads.sp.utils.enums.UpgradeType;
+import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.EntityState;
+import se.umu.cs.ads.sp.util.enums.UpgradeType;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.objects.entities.EntityView;
 import se.umu.cs.ads.sp.view.util.Camera;

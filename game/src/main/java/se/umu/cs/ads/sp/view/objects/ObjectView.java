@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.view.objects;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.animation.Animator;
 import se.umu.cs.ads.sp.view.util.Camera;
 

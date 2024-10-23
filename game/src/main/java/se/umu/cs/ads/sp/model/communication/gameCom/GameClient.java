@@ -16,7 +16,6 @@ import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.lobby.Raft;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class GameClient {
@@ -40,7 +39,7 @@ public class GameClient {
         return port;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
@@ -93,7 +92,6 @@ public class GameClient {
     }
 
     public void sendL3Message(L3UpdateDTO msg) {
-        System.out.println("[Client] Sending L3 update...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l3Update(GrpcUtil.toGrpcL3Message(msg));
@@ -186,7 +184,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void requestVote(Raft raft, LeaderRequestDto request){
+    public void requestVote(Raft raft, LeaderRequestDto request) {
         System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<candidateLeaderResponse> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -201,13 +199,13 @@ public class GameClient {
 
             @Override
             public void onFailure(Throwable throwable) {
-                System.out.println("\tFailed to receive a vote from "+ip+":"+port);
+                System.out.println("\tFailed to receive a vote from " + ip + ":" + port);
                 System.out.println("\t" + throwable.getMessage());
             }
         }, MoreExecutors.directExecutor());
     }
 
-    public void notifyNewLeader(proto.userId user){
+    public void notifyNewLeader(proto.userId user) {
         System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -220,7 +218,7 @@ public class GameClient {
 
             @Override
             public void onFailure(Throwable throwable) {
-                System.out.println("\tFailed to receive a vote from "+ip+":"+port);
+                System.out.println("\tFailed to receive a vote from " + ip + ":" + port);
                 System.out.println("\t" + throwable.getMessage());
             }
         }, MoreExecutors.directExecutor());

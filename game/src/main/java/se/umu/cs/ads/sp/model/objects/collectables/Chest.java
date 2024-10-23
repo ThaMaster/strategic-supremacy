@@ -1,8 +1,8 @@
 package se.umu.cs.ads.sp.model.objects.collectables;
 
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.enums.CollectableType;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.CollectableType;
 
 public class Chest extends Collectable {
 

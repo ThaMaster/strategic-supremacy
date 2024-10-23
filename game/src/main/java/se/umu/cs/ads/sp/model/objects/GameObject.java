@@ -2,9 +2,9 @@ package se.umu.cs.ads.sp.model.objects;
 
 import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.map.Map;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
 
 public abstract class GameObject {
 
@@ -14,7 +14,7 @@ public abstract class GameObject {
 
     public GameObject(Position pos, Map map) {
         // Should the object generate it or should you need to input it to the constructor?
-        this.id = Utils.generateId();
+        this.id = UtilModel.generateId();
         this.position = pos;
         collisionBox = new CollisionBox(position, Constants.OBJECT_WIDTH, Constants.OBJECT_HEIGHT);
         this.spawn(map);

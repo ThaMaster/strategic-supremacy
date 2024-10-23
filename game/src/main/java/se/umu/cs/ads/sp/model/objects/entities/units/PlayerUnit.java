@@ -11,12 +11,12 @@ import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
-import se.umu.cs.ads.sp.utils.Cooldown;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.EntityState;
-import se.umu.cs.ads.sp.utils.enums.EventType;
-import se.umu.cs.ads.sp.utils.enums.RewardType;
+import se.umu.cs.ads.sp.util.Cooldown;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.EntityState;
+import se.umu.cs.ads.sp.util.enums.EventType;
+import se.umu.cs.ads.sp.util.enums.RewardType;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -167,7 +167,7 @@ public class PlayerUnit extends Entity {
                 }
                 if (this.position.equals(getDestination()) && coll.get(i) instanceof Base base) {
                     if (hasFlag && base.getId() == myBaseId) {
-                        GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "+10 Points", EventType.FLAG_TO_BASE, id));
+                        GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "+10 Points", EventType.FLAG_TO_BASE, id));
                         hasFlag = false;
                     }
                 }

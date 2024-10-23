@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp.view.util;
 
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.Position;
 
 public class Camera {
 

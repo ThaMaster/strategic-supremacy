@@ -1,6 +1,4 @@
-package se.umu.cs.ads.sp.utils.enums;
-
-import java.util.ArrayList;
+package se.umu.cs.ads.sp.util.enums;
 
 public enum UpgradeType {
     MOVEMENT_SPEED("MOVEMENT_SPEED", 100, 2),

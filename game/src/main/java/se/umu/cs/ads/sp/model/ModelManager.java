@@ -13,10 +13,10 @@ import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.EventType;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.EventType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setDestination(offsetPosition);
                 do {
-                    offsetPosition = new Position(newPosition.getX() + Utils.getRandomInt(-15, 15), newPosition.getY() + Utils.getRandomInt(-15, 15));
+                    offsetPosition = new Position(newPosition.getX() + UtilModel.getRandomInt(-15, 15), newPosition.getY() + UtilModel.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
 
@@ -153,7 +153,7 @@ public class ModelManager {
     }
 
     public void loadMap(String mapName) {
-        if(map.getModelMap().isEmpty()){
+        if (map.getModelMap().isEmpty()) {
             map.loadMap("maps/" + mapName + ".txt");
         }
     }
@@ -241,7 +241,7 @@ public class ModelManager {
     }
 
     private void sendL2Update() {
-        if(comHandler.getNrL2Clients() > 0){
+        if (comHandler.getNrL2Clients() > 0) {
             comHandler.sendL2Update(constructL2Message());
         }
     }
@@ -570,14 +570,10 @@ public class ModelManager {
             // Check l1, then l2, otherwise just move user to l3
 
             if (isInsideLayer(skeletonPos, 1)) {
-                System.out.println("Checking inside layer 1" + Thread.currentThread());
                 comHandler.moveUserToL1(skeletons.userId());
-                System.out.println("\tChecking inside layer 1 after" + Thread.currentThread());
 
             } else if (isInsideLayer(skeletonPos, 2)) {
-                System.out.println("Checking inside layer 2" + Thread.currentThread());
                 comHandler.moveUserToL2(skeletons.userId());
-                System.out.println("\tChecking inside layer 2 after" + Thread.currentThread());
             } else {
                 comHandler.moveUserToL3(skeletons.userId());
             }
@@ -627,7 +623,7 @@ public class ModelManager {
     }
 
     public void setNewLeader(long userId) {
-        l3Timer.cancel();
+        if (l3Timer != null) l3Timer.cancel();
         l3Timer = new Timer();
         lobbyHandler.setNewLeader(userId);
         long updateTime = Constants.L3_UPDATE_TIME;

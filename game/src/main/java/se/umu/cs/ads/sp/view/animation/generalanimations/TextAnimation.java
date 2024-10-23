@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp.view.animation.generalanimations;
 
-import se.umu.cs.ads.sp.utils.Cooldown;
-import se.umu.cs.ads.sp.utils.enums.EventColor;
+import se.umu.cs.ads.sp.util.Cooldown;
+import se.umu.cs.ads.sp.util.enums.EventColor;
 
 import javax.swing.*;
 import java.awt.*;

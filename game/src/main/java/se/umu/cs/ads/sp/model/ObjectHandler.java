@@ -12,10 +12,10 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.Environment;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
-import se.umu.cs.ads.sp.utils.Constants;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.Utils;
-import se.umu.cs.ads.sp.utils.enums.*;
+import se.umu.cs.ads.sp.util.Constants;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -203,11 +203,11 @@ public class ObjectHandler {
             for (int i = 0; i < 3; i++) {
                 Position offsetPosition;
                 do {
-                    offsetPosition = new Position((basePos.getX() + Utils.getRandomInt(-30, 30)),
-                            (basePos.getY() + Utils.getRandomInt(-30, 30)));
+                    offsetPosition = new Position((basePos.getX() + UtilModel.getRandomInt(-30, 30)),
+                            (basePos.getY() + UtilModel.getRandomInt(-30, 30)));
                 } while (!modelManager.isWalkable(offsetPosition));
 
-                EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(Utils.generateId(), UnitType.GUNNER.label, offsetPosition);
+                EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(UtilModel.generateId(), UnitType.GUNNER.label, offsetPosition);
                 spawnUnit(map, entitySkeletonDTO.id(), entitySkeletonDTO.unitType(), offsetPosition, userId, baseId);
                 skeletons.add(entitySkeletonDTO);
             }
@@ -312,7 +312,7 @@ public class ObjectHandler {
             if (this.collectables.containsKey(collectableId)) {
                 Collectable currentColl = collectables.get(collectableId);
                 currentColl.pickUp(map);
-                if(currentColl.getType() != CollectableType.CHEST) {
+                if (currentColl.getType() != CollectableType.CHEST) {
                     this.collectables.remove(collectableId);
                 }
                 GameEvents.getInstance().addEvent(new GameEvent(currentColl.getId(), currentColl.getReward().toString(), EventType.ENEMY_PICK_UP, -1));
@@ -323,10 +323,10 @@ public class ObjectHandler {
     public void updateEnvironments(ArrayList<EnvironmentDTO> envDTOs) {
         for (EnvironmentDTO env : envDTOs) {
             if (this.environments.containsKey(env.id())) {
-                if (EnvironmentType.fromLabel(env.type()) == EnvironmentType.GOLDMINE) {
-                    GoldMine mine = (GoldMine) this.environments.get(env.id());
-                    if (mine.getRemainingResource() > env.remainingResource()) {
-                        mine.setResource(env.remainingResource());
+                Environment envModel = environments.get(env.id());
+                if (envModel instanceof GoldMine goldMine) {
+                    if (goldMine.getRemainingResource() > env.remainingResource()) {
+                        goldMine.setResource(env.remainingResource());
                     }
                 }
             }

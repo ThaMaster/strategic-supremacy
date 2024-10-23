@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.view.windows;
 
+import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.dialogs.AboutDialog;
 import se.umu.cs.ads.sp.view.windows.dialogs.HelpDialog;
@@ -137,6 +138,8 @@ public class MainFrame extends JFrame {
 
         JMenu otherMenu = new JMenu("Other");
         JCheckBoxMenuItem enableDebugItem = new JCheckBoxMenuItem("Enable Debugger");
+        enableDebugItem.setState(AppSettings.DEBUG);
+        enableDebugItem.addActionListener(e -> AppSettings.DEBUG = enableDebugItem.isSelected());
         JMenuItem helpItem = new JMenuItem("Help");
         helpItem.addActionListener(e -> new HelpDialog());
         JMenuItem aboutItem = new JMenuItem("About");

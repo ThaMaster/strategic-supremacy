@@ -11,10 +11,9 @@ import nsProto.LobbyId;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.NsGrpcUtil;
-import se.umu.cs.ads.sp.utils.AppSettings;
+import se.umu.cs.ads.sp.util.AppSettings;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class NsClient {
     private ManagedChannel channel;

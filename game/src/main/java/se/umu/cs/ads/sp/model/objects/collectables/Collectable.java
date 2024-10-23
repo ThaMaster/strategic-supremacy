@@ -2,8 +2,8 @@ package se.umu.cs.ads.sp.model.objects.collectables;
 
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
-import se.umu.cs.ads.sp.utils.Position;
-import se.umu.cs.ads.sp.utils.enums.CollectableType;
+import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.CollectableType;
 
 public abstract class Collectable extends GameObject {
     protected CollectableType type;

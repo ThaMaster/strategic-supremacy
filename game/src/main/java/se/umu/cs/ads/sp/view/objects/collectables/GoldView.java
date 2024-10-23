@@ -1,11 +1,10 @@
 package se.umu.cs.ads.sp.view.objects.collectables;
 
-import se.umu.cs.ads.sp.utils.AppSettings;
-import se.umu.cs.ads.sp.utils.Position;
+import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.view.animation.Animation;
 import se.umu.cs.ads.sp.view.util.Camera;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
-import se.umu.cs.ads.sp.view.util.UtilView;
 
 import java.awt.*;
 
