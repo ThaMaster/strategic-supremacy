@@ -2,14 +2,13 @@ package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.lobby.LobbyHandler;
 import se.umu.cs.ads.sp.model.lobby.Raft;
-import se.umu.cs.ads.sp.model.map.FowModel;
+import se.umu.cs.ads.sp.model.map.FovModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
@@ -32,7 +31,7 @@ public class ModelManager {
     private final LobbyHandler lobbyHandler;
     private final ComHandler comHandler;
     private final User player;
-    private FowModel fow;
+    private FovModel fov;
 
     private Timer l3Timer;
     private Timer l2Timer;
@@ -68,7 +67,7 @@ public class ModelManager {
     public void update() {
         // Update all entities in game, including my units.
         objectHandler.update(map);
-        fow.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
+        fov.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
         collectEvents();
     }
 
@@ -78,7 +77,7 @@ public class ModelManager {
 
     public boolean setEntityDestination(Position newPosition) {
         long targetId = checkEntityHit(newPosition);
-        if (targetId != -1 && fow.isInFow(newPosition)) {
+        if (targetId != -1 && fov.isInFov(newPosition)) {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
@@ -113,6 +112,10 @@ public class ModelManager {
 
     public boolean isWalkable(Position position) {
         return map.isWalkable(position);
+    }
+
+    public boolean isInFov(Position position) {
+        return fov.isInFov(position);
     }
 
     private long checkEntityHit(Position position) {
@@ -171,7 +174,7 @@ public class ModelManager {
             }
         }
 
-        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
         started = true;
@@ -191,7 +194,7 @@ public class ModelManager {
      */
     public void startGameReq(StartGameRequestDTO request) {
         objectHandler.populateWorld(request, map);
-        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         started = true;
         l3Timer = new Timer();
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
@@ -214,8 +217,7 @@ public class ModelManager {
             public void run() {
                 if (comHandler.leaderIsAlive()) {
                     sendL3Update();
-                }
-                else if(!iAmLeader() && !lobbyHandler.getRaft().leaderElectionStarted()){
+                } else if (!iAmLeader() && !lobbyHandler.getRaft().leaderElectionStarted()) {
                     System.out.println("START LEADER ELECTION");
                     lobbyHandler.getRaft().initiateLeaderElection();
                 }
@@ -354,7 +356,7 @@ public class ModelManager {
         );
     }
 
-    public Raft getRaft(){
+    public Raft getRaft() {
         return lobbyHandler.getRaft();
     }
 
@@ -616,12 +618,12 @@ public class ModelManager {
         return lobbyHandler.getLobby() != null && lobbyHandler.getRaft().iAmLeader();
     }
 
-    public void setNewLeader(long userId){
+    public void setNewLeader(long userId) {
         l3Timer.cancel();
         l3Timer = new Timer();
         lobbyHandler.setNewLeader(userId);
         long updateTime = Constants.L3_UPDATE_TIME;
-        if(!iAmLeader()){
+        if (!iAmLeader()) {
             updateTime /= 2;
         }
         startL3Timer(updateTime);

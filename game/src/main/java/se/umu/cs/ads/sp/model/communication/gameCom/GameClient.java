@@ -97,8 +97,7 @@ public class GameClient {
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
-            public void onSuccess(@Nullable Empty result) {
-            }
+            public void onSuccess(@Nullable Empty result) {}
 
             @Override
             public void onFailure(Throwable t) {

@@ -49,11 +49,11 @@ public class TileModel {
         return inhabitants;
     }
 
-    public void removeInhabitant(Long id) {
+    public synchronized void removeInhabitant(Long id) {
         inhabitants.removeIf(gameObject -> gameObject != null && gameObject.getId() == id);
     }
 
-    public void setInhabitant(GameObject inhabitant) {
+    public synchronized void setInhabitant(GameObject inhabitant) {
         if (!inhabitants.contains(inhabitant)) {
             inhabitants.add(inhabitant);
         }

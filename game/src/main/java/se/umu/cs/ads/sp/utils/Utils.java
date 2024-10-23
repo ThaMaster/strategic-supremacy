@@ -7,7 +7,11 @@ import java.net.ServerSocket;
 import java.util.Random;
 
 public class Utils {
+
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     private static long currentId = 0;
+
     public static long generateId() {
         return currentId++;
     }
@@ -33,13 +37,24 @@ public class Utils {
 
     public static String getLocalIP() {
         String ip = null;
-        try(final DatagramSocket socket = new DatagramSocket()) {
+        try (final DatagramSocket socket = new DatagramSocket()) {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ip = socket.getLocalAddress().getHostAddress();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ip;
+    }
+
+    public static String generateRandomString(int length) {
+        StringBuilder result = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int index = getRandomInt(0, CHARACTERS.length());
+            result.append(CHARACTERS.charAt(index));
+        }
+
+        return result.toString();
     }
 
 }
