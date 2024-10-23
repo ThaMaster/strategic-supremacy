@@ -99,26 +99,4 @@ public class LobbyHandler {
         return null;
     }
 
-
-    //Raft
-    public void updateMsgCount(int msgCount) {
-        raft.updateMsgCount(msgCount);
-    }
-
-    public int incMsgCount() {
-        return raft.incMsgCount();
-    }
-
-    public int getMsgCount() {
-        return raft.getMsgCount();
-    }
-
-    public void initiateLeaderElection() {
-        raft.initiateLeaderElection(modelManager.getComHandler());
-    }
-
-    public boolean approveNewLeader(int msgCount) {
-        return raft.approveNewLeader(msgCount);
-    }
-
 }
