@@ -203,7 +203,6 @@ public class Map {
         }
         Position offsetPos;
         do {
-            System.out.println("bruh");
             offsetPos = new Position(
                     flagPosition.getX() + Utils.getRandomInt(-10, 10),
                     flagPosition.getY() + Utils.getRandomInt(-10, 10));

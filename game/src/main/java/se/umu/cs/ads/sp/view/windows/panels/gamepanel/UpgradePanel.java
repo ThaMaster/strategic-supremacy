@@ -3,6 +3,8 @@ package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
 import se.umu.cs.ads.sp.utils.enums.UnitType;
 import se.umu.cs.ads.sp.utils.enums.UpgradeType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
+import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
+import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
 
@@ -390,6 +392,7 @@ public class UpgradePanel extends JPanel {
 
                 currentPrice += (int) (initialPrice * 0.25); // Increase price for next upgrade
                 currentPriceLabel.setText("$" + currentPrice); // Update price label
+                SoundManager.getInstance().play(SoundFX.PURCHASE);
             }
         }
     }

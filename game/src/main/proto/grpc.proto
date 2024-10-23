@@ -81,8 +81,14 @@ message L3Message {
   repeated int64 pickedUpCollectables = 3;
   int64 remainingTime = 4;
   int64 currentScoreLeader = 5;
-  repeated Environment environments = 6;
-  int32 severity = 7;
+  UserScore userScore = 6;
+  repeated Environment environments = 7;
+  int32 severity = 8;
+}
+
+message UserScore {
+  int64 id = 1;
+  int32 score = 2;
 }
 
 message User {

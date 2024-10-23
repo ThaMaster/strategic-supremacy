@@ -8,6 +8,7 @@ public record L3UpdateDTO(
         ArrayList<Long> pickedUpCollectables,
         Long remainingTime,
         Long currentScoreLeader,
+        UserScoreDTO scoreInfo,
         ArrayList<EnvironmentDTO> environments,
         int msgSeverity
 ) {

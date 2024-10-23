@@ -404,4 +404,8 @@ public class GameController implements ActionListener {
         return modelManager.getBBByUnits(
                 new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()));
     }
+
+    public boolean isMyUnit(long id) {
+        return modelManager.getObjectHandler().getMyUnitIds().contains(id);
+    }
 }

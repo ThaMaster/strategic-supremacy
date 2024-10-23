@@ -12,7 +12,6 @@ public class LobbyHandler {
 
     private Lobby lobby;
     private final ModelManager modelManager;
-
     private Raft raft;
 
 

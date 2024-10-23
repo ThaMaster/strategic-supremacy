@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model.communication;
 
-import io.grpc.Context;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -15,22 +14,22 @@ import se.umu.cs.ads.sp.utils.Constants;
 import se.umu.cs.ads.sp.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ComHandler {
 
     private final NsClient nsClient;
     private final ModelManager modelManager;
     private final GameServer server;
-    private final HashMap<Long, GameClient> l3Clients;
-    private final HashMap<Long, GameClient> l2Clients;
-    private final HashMap<Long, GameClient> l1Clients;
+    private final ConcurrentHashMap<Long, GameClient> l3Clients;
+    private final ConcurrentHashMap<Long, GameClient> l2Clients;
+    private final ConcurrentHashMap<Long, GameClient> l1Clients;
     private long timeSinceL3Update;
 
     public ComHandler(int port, ModelManager modelManager) {
-        l3Clients = new HashMap<>();
-        l2Clients = new HashMap<>();
-        l1Clients = new HashMap<>();
+        l3Clients = new ConcurrentHashMap<>();
+        l2Clients = new ConcurrentHashMap<>();
+        l1Clients = new ConcurrentHashMap<>();
 
         nsClient = new NsClient();
         this.modelManager = modelManager;
@@ -211,11 +210,9 @@ public class ComHandler {
         if (l2Clients.containsKey(userId)) {
             l2Clients.get(userId).destroy();
             l2Clients.remove(userId);
-            System.out.println("[Client] MOVE " + userId + " to L3 from L2");
         } else if (l1Clients.containsKey(userId)) {
             l1Clients.get(userId).destroy();
             l1Clients.remove(userId);
-            System.out.println("[Client] MOVE " + userId + " to L3 from L1");
         }
     }
 
@@ -229,13 +226,11 @@ public class ComHandler {
             // Check if the client is in L1
             newClient = l1Clients.get(userId);
             l1Clients.remove(userId);
-            System.out.println("[Client] MOVE " + userId + " to L2 from L1");
         } else {
             // If in L3, need to create a new client since context causes problem
             GameClient l3Client = l3Clients.get(userId);
             newClient = new GameClient();
             newClient.create(l3Client.getIp(), l3Client.getPort());
-            System.out.println("[Client] MOVE " + userId + " TO L2 from L3");
         }
 
         l2Clients.put(userId, newClient);
@@ -251,13 +246,11 @@ public class ComHandler {
             // Check if the client is in L2
             newClient = l2Clients.get(userId);
             l2Clients.remove(userId);
-            System.out.println("[Client] MOVE " + userId + " TO L1 from L2");
         } else {
             // If in L3, need to create a new client since context causes problem
             GameClient l3Client = l3Clients.get(userId);
             newClient = new GameClient();
             newClient.create(l3Client.getIp(), l3Client.getPort());
-            System.out.println("[Client] MOVE " + userId + " TO L1 from L3");
         }
 
         l1Clients.put(userId, newClient);

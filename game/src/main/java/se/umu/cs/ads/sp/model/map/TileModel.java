@@ -50,7 +50,7 @@ public class TileModel {
     }
 
     public void removeInhabitant(Long id) {
-        inhabitants.removeIf(gameObject -> gameObject.getId() == id);
+        inhabitants.removeIf(gameObject -> gameObject != null && gameObject.getId() == id);
     }
 
     public void setInhabitant(GameObject inhabitant) {

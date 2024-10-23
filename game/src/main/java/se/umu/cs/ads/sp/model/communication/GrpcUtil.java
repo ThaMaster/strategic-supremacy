@@ -210,6 +210,17 @@ public class GrpcUtil {
                 unit.getAttackBuff());
     }
 
+    public static proto.UserScore toGrpcUserScore(UserScoreDTO score) {
+        return proto.UserScore.newBuilder()
+                .setId(score.userId())
+                .setScore(score.score())
+                .build();
+    }
+
+    public static UserScoreDTO fromGrpcUserScore(proto.UserScore score) {
+        return new UserScoreDTO(score.getId(), score.getScore());
+    }
+
     public static proto.L3Message toGrpcL3Message(L3UpdateDTO message) {
         proto.L3Message.Builder builder = proto.L3Message.newBuilder();
 
@@ -225,8 +236,10 @@ public class GrpcUtil {
             builder.addEntities(toGrpcUserSkeletons(skeletons));
         }
 
+
         builder.setRemainingTime(message.remainingTime())
                 .setCurrentScoreLeader(message.currentScoreLeader())
+                .setUserScore(toGrpcUserScore(message.scoreInfo()))
                 .setSeverity(message.msgSeverity());
 
         return builder.build();
@@ -253,6 +266,7 @@ public class GrpcUtil {
                 pickedUp,
                 message.getRemainingTime(),
                 message.getCurrentScoreLeader(),
+                fromGrpcUserScore(message.getUserScore()),
                 environments,
                 message.getSeverity()
         );

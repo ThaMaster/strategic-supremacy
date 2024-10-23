@@ -3,6 +3,7 @@ package se.umu.cs.ads.sp.utils.enums;
 import java.util.ArrayList;
 
 public enum RewardType {
+    
     GOLD("GOLD", false),
     POINT("POINT", false),
     FLAG("FLAG", false),

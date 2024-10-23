@@ -39,6 +39,7 @@ public class ModelManager {
     private boolean started = false;
 
     private long currentScoreHolderId;
+    private int currentScoreHolderScore;
 
     private int currentGold = 180;
     private int currentPoints;
@@ -153,6 +154,11 @@ public class ModelManager {
         return this.lobbyHandler;
     }
 
+    /**
+     * This function is run only by the leader when it
+     * should send out a start game request to all clients
+     * in the lobby. It will
+     */
     public void startGame() {
         System.out.println("[Client] Sending out start request to lobby...");
         StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
@@ -171,6 +177,30 @@ public class ModelManager {
         startRoundTimer();
     }
 
+    /**
+     * This function is run when the leader has broadcast to
+     * all clients in the lobby to start the game. It will
+     * start the L3 timer with a shorter interval than the leader
+     * to keep the leaders information more correct.
+     *
+     * @param request Incoming start game request
+     */
+    public void startGameReq(StartGameRequestDTO request) {
+        objectHandler.populateWorld(request, map);
+        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        started = true;
+        l3Timer = new Timer();
+        startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        startL2Timer(Constants.L2_UPDATE_TIME);
+        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+    }
+
+    /**
+     * Function for starting the L3 timer and have it send L3 updates at a specified
+     * interval. This timer will keep track if the leader has become unresponsive and
+     * start leader election.
+     * @param updateTime Specified interval (ms) to send L3 updates.
+     */
     private void startL3Timer(long updateTime) {
         l3Timer = new Timer();
         l3Timer.schedule(new TimerTask() {
@@ -197,6 +227,86 @@ public class ModelManager {
 
     }
 
+    private void sendL3Update() {
+        comHandler.sendL3Update(constructL3Message(iAmLeader()), iAmLeader());
+    }
+
+    private void sendL2Update() {
+        comHandler.sendL2Update(constructL2Message());
+    }
+
+    private void sendL1Update(L1UpdateDTO update) {
+        if (comHandler.getNrL1Clients() > 0) {
+            comHandler.sendL1Update(update);
+        }
+    }
+
+    /**
+     * Function for handling an incoming L3 update. Both the followers
+     * and the leader will run this function so it has to handle the
+     * content differently depending on which state the leader is in.
+     *
+     * @param update The L3 update message.
+     */
+    public void receiveL3Update(L3UpdateDTO update) {
+
+        if (iAmLeader()) {
+            // Leader gets update from follower
+            if (update.scoreInfo().score() > currentScoreHolderScore) {
+                currentScoreHolderId = update.scoreInfo().userId();
+                currentScoreHolderScore = update.scoreInfo().score();
+            }
+
+        } else {
+            // Follower gets update from leader
+            lobbyHandler.updateMsgCount(update.msgCount());
+            this.remainingTime = update.remainingTime();
+        }
+        objectHandler.updateUnitPositions(update.entities());
+        objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.updateEnvironments(update.environments());
+        this.currentScoreHolderId = update.currentScoreLeader();
+
+        updateBoundaries(update.entities());
+    }
+
+    /**
+     * Function for handling an incoming L2 update. Both the followers
+     * and the leader will run this function, but they should all handle
+     * L2 updates the same.
+     *
+     * @param update The L2 update message.
+     */
+    public void receiveL2Update(L2UpdateDTO update) {
+        objectHandler.updateUnitPositions(
+                new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(update.userId(), update.entities()))));
+        objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.updateEnvironments(update.environments());
+        updateBoundariesFromL2Message(update);
+    }
+
+    /**
+     * Function for handling an incoming L1 update. Both the followers
+     * and the leader will run this function, but they should all handle
+     * L1 updates the same.
+     *
+     * @param update The L1 update message.
+     */
+    public void receiveL1Update(L1UpdateDTO update) {
+        objectHandler.updateEnemyUnits(update.entities());
+        updateBoundariesFromL1Message(update);
+    }
+
+    /**
+     * Function for constructing a new L3 update message. This message contains
+     * information about the games state. If the leader constructs this message
+     * it will contain a message count variable and all the positions of the
+     * players units, including its own. If followers constructs this message
+     * it will contain the positions of the follower unit positions.
+     *
+     * @param fromLeader boolean if the user constructing the message is the leader
+     * @return the new L3 update message
+     */
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
         ArrayList<UserSkeletonsDTO> entities;
         int msgCount = lobbyHandler.getMsgCount();
@@ -213,11 +323,19 @@ public class ModelManager {
                 objectHandler.getCollectedIds(),
                 remainingTime,
                 currentScoreHolderId,
+                new UserScoreDTO(player.id, currentPoints),
                 objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
     }
 
+    /**
+     * Function for constructing a new L2 update message. This
+     * update message includes only object information about
+     * the game, no game state.
+     *
+     * @return the new L2 update message
+     */
     public L2UpdateDTO constructL2Message() {
         return new L2UpdateDTO(
                 player.id,
@@ -228,6 +346,14 @@ public class ModelManager {
         );
     }
 
+    /**
+     * Function for constructing a new L1 update message. This
+     * update message contains complete information of the
+     * players units.
+     *
+     * @param targetId ID of which the unit is attacking
+     * @return the new L1 update message
+     */
     public L1UpdateDTO constructL1Message(long targetId) {
         ArrayList<UnitDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
@@ -250,47 +376,16 @@ public class ModelManager {
         );
     }
 
-    private void sendL3Update() {
-        comHandler.sendL3Update(constructL3Message(iAmLeader()), iAmLeader());
-    }
-
-    private void sendL2Update() {
-        comHandler.sendL2Update(constructL2Message());
-    }
-
-    private void sendL1Update(L1UpdateDTO update) {
-        if (comHandler.getNrL1Clients() > 0) {
-            comHandler.sendL1Update(update);
-        }
-    }
-
-    public void receiveL3Update(L3UpdateDTO update) {
-
-        if (!iAmLeader()) {
-            lobbyHandler.updateMsgCount(update.msgCount());
-            this.remainingTime = update.remainingTime();
-        }
-        objectHandler.updateUnitPositions(update.entities());
-        objectHandler.removeCollectables(map, update.pickedUpCollectables());
-        objectHandler.updateEnvironments(update.environments());
-        this.currentScoreHolderId = update.currentScoreLeader();
-
-        updateBoundaries(update.entities());
-    }
-
-    public void receiveL2Update(L2UpdateDTO update) {
-        objectHandler.updateUnitPositions(
-                new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(update.userId(), update.entities()))));
-        objectHandler.removeCollectables(map, update.pickedUpCollectables());
-        objectHandler.updateEnvironments(update.environments());
-        updateBoundariesFromL2Message(update);
-    }
-
-    public void receiveL1Update(L1UpdateDTO update) {
-        objectHandler.updateEnemyUnits(update.entities());
-        updateBoundariesFromL1Message(update);
-    }
-
+    /**
+     * Function for checking if a number of positions are
+     * inside the specified layers bounding box. This is to
+     * be used to check if clients are to be moved between
+     * layers, i.e. L1, L2, or L3.
+     *
+     * @param positions  The positions to check.
+     * @param layerIndex The layer to check, 1 = L1, 2 = L2, otherwise returns false.
+     * @return true/false if the positions are inside the specified layer.
+     */
     private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
         ArrayList<Rectangle> myBBs = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
         ArrayList<Rectangle> externalBBs = getBBByPositions(positions);
@@ -313,18 +408,12 @@ public class ModelManager {
         return false;
     }
 
-    // A request has come in to start the game
-    public void startGameReq(StartGameRequestDTO request) {
-        //Check bounding boxes
-        objectHandler.populateWorld(request, map);
-        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
-        started = true;
-        l3Timer = new Timer();
-        startL3Timer(Constants.L3_UPDATE_TIME / 2);
-        startL2Timer(Constants.L2_UPDATE_TIME);
-        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
-    }
-
+    /**
+     * Function for leaving the game while the game is running.
+     * It will cancel all the started timers and remove all content
+     * in the object handler so that it is possible to join/create
+     * and start a new game.
+     */
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
 
@@ -334,9 +423,7 @@ public class ModelManager {
 
         comHandler.removePlayerUnits();
         objectHandler.clearSelectedUnitIds();
-        objectHandler.getMyUnits().clear();
-        objectHandler.getEnvironments().clear();
-        objectHandler.getCollectables().clear();
+        objectHandler.clearGameObjects();
         lobbyHandler.leaveLobby();
         started = false;
     }
@@ -358,7 +445,7 @@ public class ModelManager {
         for (GameEvent event : events) {
             switch (event.getType()) {
                 case NEW_ROUND:
-                    //Create logiko
+                    //Create logic
                     break;
                 case LOGG:
                     break;

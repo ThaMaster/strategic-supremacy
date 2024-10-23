@@ -180,24 +180,23 @@ public class ObjectHandler {
             startGameRequest.addCollectable(
                     new CollectableDTO(collectable.getId(),
                             collectable.getPosition(),
-                            collectable.getReward().getType().label,
+                            collectable.getType().label,
                             collectable.getReward()));
         }
 
-        for (User user : users) {
-            long userId = user.id;
-            if (userId == this.user.id) {
-            }
+        for (int uIndex = 0; uIndex < users.size(); uIndex++) {
+            long userId = users.get(uIndex).id;
 
-            Position basePos = basePositions.get(0);
-            Position goldMinePos = map.generateGoldMinePosition(basePos);
-            long goldMineId = spawnGoldMine(map, goldMinePos, 100, null);
             //Spawning base
-            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, DtoType.BASE.label, 0));
+            Position basePos = basePositions.get(uIndex);
+            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, EnvironmentType.BASE.label, 0));
             long baseId = spawnBase(map, basePos, null);
 
             //Spawning goldmine
-            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, DtoType.GOLDMINE.label, 0));
+            Position goldMinePos = map.generateGoldMinePosition(basePos);
+            long goldMineId = spawnGoldMine(map, goldMinePos, 100, null);
+            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, EnvironmentType.GOLDMINE.label, 0));
+
 
             // Spawning 3 entities
             ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
@@ -213,10 +212,6 @@ public class ObjectHandler {
                 skeletons.add(entitySkeletonDTO);
             }
             startGameRequest.userSkeletons().add(new UserSkeletonsDTO(userId, skeletons));
-
-            if (!basePositions.isEmpty()) {
-                basePositions.remove(0);
-            }
         }
 
         return startGameRequest;
@@ -225,7 +220,7 @@ public class ObjectHandler {
     public void populateWorld(StartGameRequestDTO request, Map map) {
         long baseId = 1L;
         for (EnvironmentDTO env : request.environments()) {
-            DtoType type = DtoType.fromLabel(env.type());
+            EnvironmentType type = EnvironmentType.fromLabel(env.type());
             switch (type) {
                 case BASE:
                     if (env.userId() == user.id) {
@@ -243,7 +238,7 @@ public class ObjectHandler {
         }
 
         for (CollectableDTO collectable : request.collectables()) {
-            DtoType type = DtoType.fromLabel(collectable.type());
+            CollectableType type = CollectableType.fromLabel(collectable.type());
             switch (type) {
                 case GOLD:
                     spawnGold(map, collectable.position(), collectable.id());
@@ -295,7 +290,7 @@ public class ObjectHandler {
                         env.getId(),
                         -1,
                         env.getPosition(),
-                        DtoType.BASE.label,
+                        EnvironmentType.GOLDMINE.label,
                         goldmine.getRemainingResource()));
             }
         }
@@ -315,8 +310,12 @@ public class ObjectHandler {
     public void removeCollectables(Map map, ArrayList<Long> collectableIds) {
         for (Long collectableId : collectableIds) {
             if (this.collectables.containsKey(collectableId)) {
-                this.collectables.get(collectableId).pickUp(map);
-                this.collectables.remove(collectableId);
+                Collectable currentColl = collectables.get(collectableId);
+                currentColl.pickUp(map);
+                if(currentColl.getType() != CollectableType.CHEST) {
+                    this.collectables.remove(collectableId);
+                }
+                GameEvents.getInstance().addEvent(new GameEvent(currentColl.getId(), currentColl.getReward().toString(), EventType.ENEMY_PICK_UP, -1));
             }
         }
     }
@@ -324,7 +323,7 @@ public class ObjectHandler {
     public void updateEnvironments(ArrayList<EnvironmentDTO> envDTOs) {
         for (EnvironmentDTO env : envDTOs) {
             if (this.environments.containsKey(env.id())) {
-                if (DtoType.fromLabel(env.type()) == DtoType.GOLDMINE) {
+                if (EnvironmentType.fromLabel(env.type()) == EnvironmentType.GOLDMINE) {
                     GoldMine mine = (GoldMine) this.environments.get(env.id());
                     if (mine.getRemainingResource() > env.remainingResource()) {
                         mine.setResource(env.remainingResource());
@@ -466,4 +465,10 @@ public class ObjectHandler {
         }
     }
 
+    public void clearGameObjects() {
+        this.myUnits.clear();
+        this.enemyUnits.clear();
+        this.collectables.clear();
+        this.environments.clear();
+    }
 }

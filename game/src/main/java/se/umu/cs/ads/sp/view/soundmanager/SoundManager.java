@@ -142,6 +142,9 @@ public class SoundManager {
             sounds.put(SoundFX.TAKE_DMG, getClip("audio/sfx/takeDmg.wav"));
             sounds.put(SoundFX.FLAG_PICK_UP, getClip("audio/sfx/flagPickUp.wav"));
             sounds.put(SoundFX.FLAG_TO_BASE, getClip("audio/sfx/flagToBase.wav"));
+            sounds.put(SoundFX.BUFF, getClip("audio/sfx/buff.wav"));
+            sounds.put(SoundFX.OPEN_SHOP, getClip("audio/sfx/openShop.wav"));
+            sounds.put(SoundFX.PURCHASE, getClip("audio/sfx/purchase.wav"));
 
 
         } catch (NullPointerException e) {

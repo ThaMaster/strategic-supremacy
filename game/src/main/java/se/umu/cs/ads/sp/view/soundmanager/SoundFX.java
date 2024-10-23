@@ -14,4 +14,7 @@ public class SoundFX {
     public static String TAKE_DMG = "TAKE_DMG";
     public static String FLAG_PICK_UP = "FLAG_PICK_UP";
     public static String FLAG_TO_BASE = "FLAG_TO_BASE";
+    public static String BUFF = "BUFF";
+    public static String PURCHASE = "PURCHASE";
+    public static String OPEN_SHOP = "OPEN_SHOP";
 }

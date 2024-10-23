@@ -16,6 +16,7 @@ import se.umu.cs.ads.sp.utils.Position;
 import se.umu.cs.ads.sp.utils.Utils;
 import se.umu.cs.ads.sp.utils.enums.Direction;
 import se.umu.cs.ads.sp.utils.enums.EventColor;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.view.animation.generalanimations.TextAnimation;
 import se.umu.cs.ads.sp.view.objects.ObjectView;
 import se.umu.cs.ads.sp.view.objects.collectables.ChestView;
@@ -492,16 +493,47 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     SoundManager.getInstance().play(SoundFX.TAKE_DMG);
                     break;
                 case FLAG_TO_BASE:
-                    SoundManager.getInstance().play(SoundFX.FLAG_TO_BASE);
-                    addTextEvent(event, 15, EventColor.SUCCESS);
+                    if (gController.isMyUnit(event.getEventAuthor())) {
+                        SoundManager.getInstance().play(SoundFX.FLAG_TO_BASE);
+                        addTextEvent(event, 15, EventColor.SUCCESS);
+                    }
                     break;
                 default:
                     //This is default case, it's a collectable we have stored
-                    addCollectableEvent(event);
+                    handleCollectableEvent(event);
                     break;
             }
         }
         GameEvents.getInstance().clearHistory();
+    }
+
+    public void handleCollectableEvent(GameEvent event) {
+        if (event.getType() == EventType.ENEMY_PICK_UP) {
+            if (collectables.containsKey(event.getId())) {
+                CollectableView collectableView = collectables.get(event.getId());
+                collectableView.pickup();
+            }
+            return;
+        }
+
+        if (collectables.containsKey(event.getId())) {
+            CollectableView collectableView = collectables.get(event.getId());
+            if (collectableView instanceof ChestView chest) {
+                SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
+                gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
+                chest.pickup();
+            }
+        } else {
+            switch (event.getType()) {
+                case BUFF_PICK_UP -> SoundManager.getInstance().play(SoundFX.BUFF);
+                case GOLD_PICK_UP -> SoundManager.getInstance().play(SoundFX.GOLD);
+                case FLAG_PICK_UP -> SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
+            }
+        }
+        // Only show gold text when my units is the author
+        if (gController.isMyUnit(event.getEventAuthor())) {
+            addTextEvent(event, 25, EventColor.SUCCESS);
+        }
     }
 
     private void addTextEvent(GameEvent event, int size, EventColor color) {
@@ -513,25 +545,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         this.add(textAnim);
         this.revalidate();
         this.repaint();
-    }
-
-    public void addCollectableEvent(GameEvent event) {
-
-        if (collectables.containsKey(event.getId())) {
-            CollectableView collectableView = collectables.get(event.getId());
-            if (collectableView instanceof ChestView chest) {
-                SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
-                gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
-                collectables.get(event.getId());
-                chest.pickup();
-            }
-        } else {
-            switch (event.getType()) {
-                case GOLD_PICK_UP -> SoundManager.getInstance().play(SoundFX.GOLD);
-                case FLAG_PICK_UP -> SoundManager.getInstance().play(SoundFX.FLAG_PICK_UP);
-            }
-        }
-        addTextEvent(event, 25, EventColor.SUCCESS);
     }
 
     @Override
