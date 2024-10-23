@@ -53,18 +53,18 @@ public class LobbyHandler {
         return lobby;
     }
 
-    public void setNewLeader(long userId){
-        for(User user : lobby.users){
-            if(user.id == userId){
+    public void setNewLeader(long userId) {
+        for (User user : lobby.users) {
+            if (user.id == userId) {
                 lobby.leader = user;
             }
         }
-        if(!raft.iAmLeader()){
+        if (!raft.iAmLeader()) {
             raft.newLeaderElected();
         }
     }
 
-    public Raft getRaft(){
+    public Raft getRaft() {
         return raft;
     }
 

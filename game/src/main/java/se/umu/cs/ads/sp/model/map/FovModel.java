@@ -6,16 +6,16 @@ import se.umu.cs.ads.sp.utils.Position;
 
 import java.util.ArrayList;
 
-public class FowModel {
+public class FovModel {
 
     private ArrayList<PlayerUnit> units;
     private final int fowRange = Constants.FIELD_OF_VIEW_RADIUS;
 
-    public FowModel(ArrayList<PlayerUnit> units) {
+    public FovModel(ArrayList<PlayerUnit> units) {
         this.units = units;
     }
 
-    public boolean isInFow(Position posToCheck) {
+    public boolean isInFov(Position posToCheck) {
         for (PlayerUnit unit : units) {
             if (Position.distance(unit.getPosition(), posToCheck) < fowRange) {
                 return true;
