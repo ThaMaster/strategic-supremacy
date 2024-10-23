@@ -4,6 +4,7 @@ import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -50,6 +51,7 @@ public class AudioPanel extends JPanel {
     private JPanel createVolumePanel(String labelText, JSlider slider, ChangeListener checkBoxListener) {
         JPanel volumePanel = new JPanel();
         volumePanel.setLayout(new BoxLayout(volumePanel, BoxLayout.PAGE_AXIS));
+        volumePanel.setBorder(new LineBorder(Color.BLACK, 2, true));
 
         // Label Panel
         JPanel labelPanel = new JPanel(new FlowLayout());

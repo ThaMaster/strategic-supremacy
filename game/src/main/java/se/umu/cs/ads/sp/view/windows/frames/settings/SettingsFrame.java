@@ -1,14 +1,14 @@
 package se.umu.cs.ads.sp.view.windows.frames.settings;
 
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
+import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.MainFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.panels.AudioPanel;
 import se.umu.cs.ads.sp.view.windows.frames.settings.panels.ControlPanel;
 import se.umu.cs.ads.sp.view.windows.frames.settings.panels.GeneralPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class SettingsFrame extends JFrame {
 
@@ -18,16 +18,20 @@ public class SettingsFrame extends JFrame {
     private ControlPanel controlPanel;
     private AudioPanel audioPanel;
 
-    public SettingsFrame() {
+    private MainFrame mainFrame;
+
+    public SettingsFrame(MainFrame mainFrame) {
         this.setTitle("Game Settings");
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        this.mainFrame = mainFrame;
         // Create a tabbed pane
         JTabbedPane tabbedPane = new JTabbedPane();
 
         applyButton = new JButton("Apply");
-        this.generalPanel = new GeneralPanel(applyButton);
+
+        this.generalPanel = new GeneralPanel(applyButton, UtilView.isFullscreenSupported());
         this.controlPanel = new ControlPanel(applyButton);
         this.audioPanel = new AudioPanel(applyButton);
 
@@ -70,7 +74,19 @@ public class SettingsFrame extends JFrame {
     }
 
     public void applyGeneralSettings() {
-
+        if (generalPanel.isFullscreen()) {
+            UtilView.FULLSCREEN = true;
+            // Get the default graphics environment
+            GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
+            // Get the current display mode
+            DisplayMode displayMode = graphicsDevice.getDisplayMode();
+            UtilView.changeScreenSize(displayMode.getWidth(), displayMode.getHeight());
+        } else {
+            UtilView.FULLSCREEN = false;
+            String[] numbers = generalPanel.getResolution().split("x");
+            UtilView.changeScreenSize(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
+        }
     }
 
     public void applyControlSettings() {

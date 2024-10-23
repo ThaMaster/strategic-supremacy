@@ -403,6 +403,10 @@ public class ModelManager {
      * @return true/false if the positions are inside the specified layer.
      */
     private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
+        if (objectHandler.getMyUnits().isEmpty()) {
+            return false;
+        }
+
         ArrayList<Rectangle> myBBs = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
         ArrayList<Rectangle> externalBBs = getBBByPositions(positions);
         int index = layerIndex - 1;

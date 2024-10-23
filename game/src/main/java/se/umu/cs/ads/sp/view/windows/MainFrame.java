@@ -41,7 +41,7 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setTitle("Strategic Supremacy");
         createLobbyFrame = new CreateLobbyFrame();
-        settingsFrame = new SettingsFrame();
+        settingsFrame = new SettingsFrame(this);
         quitFrame = new QuitGameFrame();
 
         // Helps with performance
