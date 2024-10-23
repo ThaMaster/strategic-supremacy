@@ -9,11 +9,14 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.GameServiceGrpc;
+import proto.candidateLeaderResponse;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.*;
+import se.umu.cs.ads.sp.model.lobby.Raft;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class GameClient {
@@ -23,6 +26,7 @@ public class GameClient {
 
     private String ip;
     private int port;
+    private String username;
 
     public GameClient() {
         super();
@@ -36,13 +40,23 @@ public class GameClient {
         return port;
     }
 
-    public void create(String ip, int port) {
+    public void create(String ip, int port, String username) {
         this.ip = ip;
         this.port = port;
+        this.username = username;
         channel = ManagedChannelBuilder.forAddress(ip, port)
                 .usePlaintext()
                 .build();
         stub = GameServiceGrpc.newFutureStub(channel);
+    }
+    public String getIp(){
+        return ip;
+    }
+    public int getPort(){
+        return port;
+    }
+    public String getUsername(){
+        return username;
     }
 
     @Override
@@ -174,6 +188,46 @@ public class GameClient {
                 System.out.println("\t" + t.getMessage());
             }
 
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void requestVote(Raft raft, LeaderRequestDto request){
+        System.out.println("[Client] Requesting a vote for leader election...");
+        ListenableFuture<candidateLeaderResponse> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .requestVote(GrpcUtil.toGrpcLeaderRequest(request));
+        Futures.addCallback(future, new FutureCallback<candidateLeaderResponse>() {
+
+            @Override
+            public void onSuccess(@Nullable candidateLeaderResponse candidateLeaderResponse) {
+                assert candidateLeaderResponse != null;
+                raft.receiveVote(candidateLeaderResponse.getAcknowledgement());
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                System.out.println("\tFailed to receive a vote from "+ip+":"+port);
+                System.out.println("\t" + throwable.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void notifyNewLeader(proto.userId user){
+        System.out.println("[Client] Requesting a vote for leader election...");
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .notifyNewLeader(user);
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty empty) {
+                System.out.println("\t Successfully notified about new leader");
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                System.out.println("\tFailed to receive a vote from "+ip+":"+port);
+                System.out.println("\t" + throwable.getMessage());
+            }
         }, MoreExecutors.directExecutor());
     }
 

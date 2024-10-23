@@ -1,6 +1,11 @@
 package se.umu.cs.ads.sp.model.lobby;
 
+import se.umu.cs.ads.sp.events.GameEvent;
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
+import se.umu.cs.ads.sp.utils.AppSettings;
+import se.umu.cs.ads.sp.utils.Utils;
+import se.umu.cs.ads.sp.utils.enums.EventType;
 import se.umu.cs.ads.sp.utils.enums.LobbyClientState;
 
 public class Raft {
@@ -11,6 +16,7 @@ public class Raft {
     LobbyHandler lobbyHandler;
     private int numClients;
     private int receivedVotes;
+    private ComHandler comHandler;
 
     public Raft(LobbyHandler lobbyHandler, LobbyClientState state){
         this.lobbyHandler = lobbyHandler;
@@ -18,6 +24,9 @@ public class Raft {
         resetVotes();
     }
 
+    public void setComHandler(ComHandler comHandler){
+        this.comHandler = comHandler;
+    }
 
     public void updateMsgCount(int msgCount){
         this.msgCount = msgCount;
@@ -30,9 +39,12 @@ public class Raft {
     public int getMsgCount(){
         return msgCount;
     }
-    public void initiateLeaderElection(ComHandler comhandler){
+    public void initiateLeaderElection(){
         state = LobbyClientState.CANDIDATE;
-        receivedVotes = 0;
+        receivedVotes = 1;
+        numVotes++;
+        numClients = lobbyHandler.getLobby().currentPlayers;
+        comHandler.requestVote(this);
     }
 
     private void resetVotes(){
@@ -40,6 +52,8 @@ public class Raft {
         receivedVotes = 0;
         if(lobbyHandler.getLobby() != null){
             numClients = lobbyHandler.getLobby().currentPlayers;
+        }else{
+            numClients = 0;
         }
     }
 
@@ -48,9 +62,12 @@ public class Raft {
         if(approved){
             numVotes++;
             if(numVotes <= numClients){
-                //Got majority of the votes, i am now the leader
+                //Got a majority of the votes, I am now the leader
                 state = LobbyClientState.LEADER;
-                //Send out i am now the new leader
+                if(AppSettings.DEBUG){
+                    GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "I have become the new game leader", EventType.LOGG, lobbyHandler.getLobby().id));
+                }
+                comHandler.notifyNewLeader();
             }
         }
         else if(receivedVotes <= numClients/2){
@@ -60,15 +77,22 @@ public class Raft {
         }
     }
 
-    public boolean approveNewLeader(int msgCount){
-        //if(state == LobbyClientState.LEADER){
-            // Maybe return false?
-        //}
-        if(state == LobbyClientState.CANDIDATE){
-            return this.msgCount < msgCount;
+    public void newLeaderElected(){
+        if(AppSettings.DEBUG){
+            GameEvents.getInstance().addEvent(new GameEvent(Utils.generateId(), "New leader has been elected", EventType.LOGG, lobbyHandler.getLobby().id));
         }
-        else{
-            //I am a follower or a leader
+        state = LobbyClientState.CANDIDATE;
+    }
+
+    public boolean leaderElectionStarted(){
+        return state == LobbyClientState.CANDIDATE;
+    }
+
+    public boolean approveNewLeader(int msgCount){
+        if(state == LobbyClientState.LEADER){
+            return false;
+        }
+        else {
             return this.msgCount <= msgCount;
         }
     }

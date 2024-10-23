@@ -53,6 +53,15 @@ public class LobbyHandler {
         return lobby;
     }
 
+    public void setNewLeader(User user){
+        raft.newLeaderElected();
+        lobby.leader = user;
+    }
+
+    public Raft getRaft(){
+        return raft;
+    }
+
     public Lobby getLobby() {
         return lobby;
     }
@@ -62,7 +71,7 @@ public class LobbyHandler {
     }
 
     public void removePlayer(long playerId) {
-        ArrayList<User> users = lobby.users;
+        ArrayList<User> users = this.lobby.users;
         int userIndex = -1;
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).id == playerId) {
@@ -71,7 +80,7 @@ public class LobbyHandler {
             }
         }
         if (userIndex != -1) {
-            lobby.users.remove(userIndex);
+            this.lobby.users.remove(userIndex);
         }
     }
 

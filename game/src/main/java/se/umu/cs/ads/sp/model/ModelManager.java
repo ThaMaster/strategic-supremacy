@@ -2,11 +2,13 @@ package se.umu.cs.ads.sp.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.lobby.LobbyHandler;
+import se.umu.cs.ads.sp.model.lobby.Raft;
 import se.umu.cs.ads.sp.model.map.FowModel;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
@@ -210,9 +212,10 @@ public class ModelManager {
             public void run() {
                 if (comHandler.leaderIsAlive()) {
                     sendL3Update();
-                } else if (!iAmLeader()) { //Should not need to check this probably
+                }
+                else if(iAmNotLeader() && !lobbyHandler.getRaft().leaderElectionStarted()){
                     System.out.println("START LEADER ELECTION");
-                    lobbyHandler.initiateLeaderElection();
+                    lobbyHandler.getRaft().initiateLeaderElection();
                 }
             }
         }, 0, updateTime);
@@ -311,10 +314,11 @@ public class ModelManager {
      */
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
         ArrayList<UserSkeletonsDTO> entities;
-        int msgCount = lobbyHandler.getMsgCount();
+        L3UpdateDTO dto;
+        int msgCount = lobbyHandler.getRaft().getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
-            msgCount = lobbyHandler.incMsgCount();
+            msgCount = lobbyHandler.getRaft().incMsgCount();
         } else {
             entities = new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(player.id, objectHandler.getMyUnitsToEntitySkeletons())));
         }
@@ -346,6 +350,39 @@ public class ModelManager {
                 objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
+    public void receiveL3Update(L3UpdateDTO update) {
+
+        //Todo do not update units or stuff if the author of the message is within l2 or l1
+        if(iAmNotLeader()){
+            lobbyHandler.getRaft().updateMsgCount(update.msgCount());
+        }
+        objectHandler.updateUnitPositions(update.entities());
+        objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.updateEnvironments(update.environments());
+        if(iAmNotLeader()){
+            this.remainingTime = update.remainingTime();
+        }
+        this.currentScoreHolderId = update.currentScoreLeader();
+    }
+
+    private boolean iAmNotLeader(){
+        return lobbyHandler.getLobby().leader.id != player.id;
+    }
+
+    // A request has come in to start the game
+    public void startGameReq(StartGameRequestDTO request) {
+        //Check bounding boxes
+        objectHandler.populateWorld(request, map);
+        this.fow = new FowModel(new ArrayList<>(objectHandler.getMyUnits().values()));
+        started = true;
+        l3Timer = new Timer();
+        startL3Timer(Constants.L3_UPDATE_TIME / 2);
+        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+        lobbyHandler.getRaft().setComHandler(comHandler);
+    }
+
+    public Raft getRaft(){
+        return lobbyHandler.getRaft();
     }
 
     /**
@@ -466,8 +503,8 @@ public class ModelManager {
                         unit = objectHandler.getEnemyUnits().get(event.getId());
                     }
                     if (unit.hasFlag()) {
-                        objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
-                        unit.setHasFlag(false, null);
+                        long id = objectHandler.spawnFlag(map, unit.getPosition());
+                        unit.setHasFlag(false);
                     }
                     break;
                 case ATTACK:
@@ -604,5 +641,17 @@ public class ModelManager {
 
     public boolean iAmLeader() {
         return lobbyHandler.getLobby() != null && lobbyHandler.getLobby().leader.id == player.id;
+    }
+
+    public void setNewLeader(User user){
+        l3Timer.cancel();
+        l3Timer = new Timer();
+        lobbyHandler.setNewLeader(user);
+        long updateTime = Constants.L3_UPDATE_TIME;
+        System.out.println("\tNew game leader elected");
+        if(iAmNotLeader()){
+            updateTime /= 2;
+        }
+        startL3Timer(updateTime);
     }
 }

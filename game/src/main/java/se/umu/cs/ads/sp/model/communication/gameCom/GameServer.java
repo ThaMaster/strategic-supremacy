@@ -87,6 +87,22 @@ public class GameServer {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
+
+        @Override
+        public void requestVote(candidateLeaderRequest request, StreamObserver<candidateLeaderResponse> responseObserver) {
+            boolean acknowledgement = comHandler.requestVoteRequest(request.getMsgCount());
+            candidateLeaderResponse.Builder response =  candidateLeaderResponse.newBuilder().
+                        setAcknowledgement(acknowledgement);
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
+        public void notifyNewLeader(userId request, StreamObserver<Empty> responseObserver) {
+            comHandler.newLeaderReceived(GrpcUtil.fromGrpcUserId(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
     }
 
     private void stop() {

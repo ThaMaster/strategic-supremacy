@@ -4,9 +4,9 @@ import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.L1UpdateDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L2UpdateDTO;
 import se.umu.cs.ads.sp.model.communication.dto.L3UpdateDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
@@ -197,11 +197,20 @@ public class ComHandler {
 
     public boolean requestVote() {
         //for(GameClient client : l3Clients){
+    public void requestVote(Raft raft){
+        long playerId = modelManager.getPlayer().id;
+        LeaderRequestDto dto = new LeaderRequestDto(raft.getMsgCount(), playerId);
 
+        for(GameClient client : l3Clients.values()){
+            client.requestVote(raft, dto);
+        }
         // }
         return true;
     }
 
+    public boolean requestVoteRequest(int msgCount){
+        return modelManager.getRaft().approveNewLeader(msgCount);
+    }
     public void voteReceived() {
     }
 
@@ -255,6 +264,19 @@ public class ComHandler {
         l1Clients.put(userId, newClient);
     }
 
+    public void notifyNewLeader(){
+        long playerId = modelManager.getPlayer().id;
+        for(GameClient client : l3Clients.values()){
+            client.notifyNewLeader(GrpcUtil.toGrpcUserId(playerId));
+        }
+        modelManager.setNewLeader(modelManager.getPlayer());
+        timeSinceL3Update = System.currentTimeMillis();
+    }
+
+    public void newLeaderReceived(Long userId){
+        GameClient user = l3Clients.get(userId);
+        modelManager.setNewLeader(new User(user.getUsername(), user.getIp(), user.getPort()));
+        timeSinceL3Update = System.currentTimeMillis();
     public int getNrL1Clients() {
         return l1Clients.size();
     }

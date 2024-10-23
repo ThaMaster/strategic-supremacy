@@ -109,11 +109,15 @@ message DetailedLobbyInfo {
 
 message candidateLeaderRequest {
   int32 msgCount = 1;
-  int32 userId = 2;
+  int64 userId = 2;
 }
 
 message candidateLeaderResponse {
-  int32 acknowledgement = 1;
+  bool acknowledgement = 1;
+}
+
+message userId {
+  int64 userId = 1;
 }
 
 service GameService {
@@ -124,4 +128,5 @@ service GameService {
   rpc l2Update (L2Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
   rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
+  rpc notifyNewLeader(userId) returns (google.protobuf.Empty);
 }

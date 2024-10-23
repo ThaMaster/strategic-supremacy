@@ -33,6 +33,7 @@ public class GrpcUtil {
     public static proto.EntitySkeleton toGrpcEntitySkeleton(EntitySkeletonDTO skeleton) {
         return proto.EntitySkeleton.newBuilder()
                 .setId(skeleton.id())
+                .setUserId(skeleton.userId())
                 .setUnitType(skeleton.unitType())
                 .setPosition(toGrpcPosition(skeleton.position().getX(), skeleton.position().getY()))
                 .build();
