@@ -17,4 +17,5 @@ public class SoundFX {
     public static String BUFF = "BUFF";
     public static String PURCHASE = "PURCHASE";
     public static String OPEN_SHOP = "OPEN_SHOP";
+    public static String MINE_DEPLETED = "MINE_DEPLETED";
 }

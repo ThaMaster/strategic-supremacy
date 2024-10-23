@@ -479,6 +479,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 case MINE_DEPLETED:
                     GoldMineView goldMine = (GoldMineView) environments.get(event.getId());
                     goldMine.setDepleted(true);
+                    if (gController.isMyUnit(event.getEventAuthor())) {
+                        SoundManager.getInstance().play(SoundFX.MINE_DEPLETED);
+                    }
                     break;
                 case MINING:
                     break;
@@ -519,11 +522,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         if (collectables.containsKey(event.getId())) {
             CollectableView collectableView = collectables.get(event.getId());
             if (collectableView instanceof ChestView chest) {
-                SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
+                if (gController.isMyUnit(event.getEventAuthor())) {
+                    SoundManager.getInstance().play(SoundFX.OPEN_CHEST);
+                }
                 gController.updateStat(event.getEventAuthor(), Reward.parseReward(event.getEvent()));
                 chest.pickup();
             }
-        } else {
+        } else if (gController.isMyUnit(event.getEventAuthor())) {
             switch (event.getType()) {
                 case BUFF_PICK_UP -> SoundManager.getInstance().play(SoundFX.BUFF);
                 case GOLD_PICK_UP -> SoundManager.getInstance().play(SoundFX.GOLD);

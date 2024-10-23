@@ -145,7 +145,7 @@ public class SoundManager {
             sounds.put(SoundFX.BUFF, getClip("audio/sfx/buff.wav"));
             sounds.put(SoundFX.OPEN_SHOP, getClip("audio/sfx/openShop.wav"));
             sounds.put(SoundFX.PURCHASE, getClip("audio/sfx/purchase.wav"));
-
+            sounds.put(SoundFX.MINE_DEPLETED, getClip("audio/sfx/mineDepleted.wav"));
 
         } catch (NullPointerException e) {
             System.out.println("Could not load audio file");
