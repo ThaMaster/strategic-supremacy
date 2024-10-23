@@ -153,7 +153,9 @@ public class ModelManager {
     }
 
     public void loadMap(String mapName) {
-        map.loadMap("maps/" + mapName + ".txt");
+        if(map.getModelMap().isEmpty()){
+            map.loadMap("maps/" + mapName + ".txt");
+        }
     }
 
     public LobbyHandler getLobbyHandler() {
@@ -181,7 +183,6 @@ public class ModelManager {
         startL3Timer(Constants.L3_UPDATE_TIME);
         startL2Timer(Constants.L2_UPDATE_TIME);
         startRoundTimer();
-        lobbyHandler.getRaft().setComHandler(comHandler);
     }
 
     /**
@@ -200,7 +201,6 @@ public class ModelManager {
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
         startL2Timer(Constants.L2_UPDATE_TIME);
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
-        lobbyHandler.getRaft().setComHandler(comHandler);
     }
 
     /**
@@ -241,7 +241,9 @@ public class ModelManager {
     }
 
     private void sendL2Update() {
-        comHandler.sendL2Update(constructL2Message());
+        if(comHandler.getNrL2Clients() > 0){
+            comHandler.sendL2Update(constructL2Message());
+        }
     }
 
     private void sendL1Update(L1UpdateDTO update) {
@@ -566,10 +568,16 @@ public class ModelManager {
             }
             ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
             // Check l1, then l2, otherwise just move user to l3
+
             if (isInsideLayer(skeletonPos, 1)) {
+                System.out.println("Checking inside layer 1" + Thread.currentThread());
                 comHandler.moveUserToL1(skeletons.userId());
+                System.out.println("\tChecking inside layer 1 after" + Thread.currentThread());
+
             } else if (isInsideLayer(skeletonPos, 2)) {
+                System.out.println("Checking inside layer 2" + Thread.currentThread());
                 comHandler.moveUserToL2(skeletons.userId());
+                System.out.println("\tChecking inside layer 2 after" + Thread.currentThread());
             } else {
                 comHandler.moveUserToL3(skeletons.userId());
             }

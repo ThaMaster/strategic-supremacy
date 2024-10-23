@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp;
 
+import se.umu.cs.ads.sp.controller.AiController;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.utils.AppSettings;
 
@@ -17,8 +18,6 @@ public class Main {
                 System.err.println(e.getMessage());
             }
         };
-
         SwingUtilities.invokeLater(startApp);
-
     }
 }

@@ -60,12 +60,15 @@ public class GameClient {
     }
 
     public void destroy() {
-        // Shut down the channel.
+        channel.shutdown();
         try {
-            channel.shutdown();
-            while (!channel.awaitTermination(2000, TimeUnit.MILLISECONDS)) ;
+            // Wait for the channel to terminate
+            if (!channel.awaitTermination(2, TimeUnit.SECONDS)) {
+                channel.shutdownNow(); // Force shutdown if not terminated
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            channel.shutdownNow(); // Force shutdown on interruption
+            Thread.currentThread().interrupt(); // Restore interrupted status
         }
     }
 
@@ -97,7 +100,8 @@ public class GameClient {
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
-            public void onSuccess(@Nullable Empty result) {}
+            public void onSuccess(@Nullable Empty result) {
+            }
 
             @Override
             public void onFailure(Throwable t) {

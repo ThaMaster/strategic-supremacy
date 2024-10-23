@@ -22,9 +22,26 @@ public class AiController implements Runnable {
     public AiController(long lobbyId) {
         user = new User(Utils.generateRandomString(10), Utils.getLocalIP(), Utils.getFreePort());
         modelManager = new ModelManager(user);
-
+        System.out.println("Ai port: " + user.port);
         initTimers();
         joinLobby(lobbyId);
+    }
+
+
+
+    @Override
+    public void run() {
+        while(true){
+            try {
+                Thread.sleep(1000);
+                if(modelManager.hasGameStarted()){
+                    Thread.sleep(1000);
+                    moveRandomUnits();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void initTimers() {
@@ -42,7 +59,11 @@ public class AiController implements Runnable {
             if (modelManager.hasGameStarted()) {
                 // TODO: If game has started, start updating the game!
                 updateLobbyTimer.stop();
+                updateTimer.start();
             }
+        });
+        updateTimer = new Timer(1000/60, e -> {
+            update();
         });
     }
 
@@ -51,14 +72,9 @@ public class AiController implements Runnable {
         updateLobbyTimer.start();
     }
 
-    private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
-        modelManager.getLobbyHandler().createLobby(lobbyName, maxPlayers, selectedMap);
+    public void update(){
+        modelManager.update();
     }
-
-    @Override
-    public void run() {
-    }
-
 
     private void moveRandomUnits() {
         int unitsToMove = Utils.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size());

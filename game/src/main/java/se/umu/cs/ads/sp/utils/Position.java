@@ -40,4 +40,8 @@ public class Position {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    public boolean equals(Position newPos) {
+        return x == newPos.getX() && y == newPos.getY();
+    }
 }

@@ -26,7 +26,6 @@ public abstract class Entity extends GameObject {
     protected Map map;
     protected Position destination;
     private boolean selected = false;
-
     private long userId;
 
     public Entity(String entityType, Position startPos, Map map) {
@@ -56,7 +55,8 @@ public abstract class Entity extends GameObject {
 
     public void move() {
         // Check if the speed is greater than the distance left
-        map.removeInhabitant(this, position);
+        Position currentMapPos = map.getMapIndexPos(position);
+
         if (Position.distance(this.position, destination) <= (baseSpeed + speedBuff)) {
             position = destination;
             collisionBox.setLocation(destination);
@@ -76,13 +76,18 @@ public abstract class Entity extends GameObject {
         // Check for collisions
         int row = newY / Constants.TILE_WIDTH;
         int col = newX / Constants.TILE_HEIGHT;
+
         if (map.getModelMap().get(row).get(col).hasCollision()) {
             state = EntityState.IDLE;
-            map.setInhabitant(this, position);
             return;
         }
+        Position newPos = new Position(newX, newY);
 
-        position = new Position(newX, newY);
+        if(!map.getMapIndexPos(newPos).equals(currentMapPos)){
+            map.removeInhabitant(this, position);
+            map.setInhabitant(this, newPos);
+        }
+        position = newPos;
         collisionBox.setLocation(position);
     }
 

@@ -18,15 +18,12 @@ public class Raft {
     private int receivedVotes;
     private ComHandler comHandler;
 
-    public Raft(LobbyHandler lobbyHandler, LobbyClientState state){
+    public Raft(LobbyHandler lobbyHandler, LobbyClientState state, ComHandler comhandler){
         this.lobbyHandler = lobbyHandler;
         msgCount = 0;
         this.state = state;
         resetVotes();
-    }
-
-    public void setComHandler(ComHandler comHandler){
-        this.comHandler = comHandler;
+        this.comHandler = comhandler;
     }
 
     public void updateMsgCount(int msgCount){

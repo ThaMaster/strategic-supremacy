@@ -22,7 +22,7 @@ public class LobbyHandler {
         long id = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);
         lobby = new Lobby(id, lobbyName, maxPlayers);
         lobby.leader = modelManager.getPlayer();
-        raft = new Raft(this, LobbyClientState.LEADER);
+        raft = new Raft(this, LobbyClientState.LEADER, modelManager.getComHandler());
         lobby.users.add(modelManager.getPlayer());
         lobby.selectedMap = selectedMap;
         modelManager.loadMap(selectedMap);
@@ -47,7 +47,7 @@ public class LobbyHandler {
     }
 
     public Lobby joinLobby(long lobbyId) {
-        raft = new Raft(this, LobbyClientState.FOLLOWER);
+        raft = new Raft(this, LobbyClientState.FOLLOWER, modelManager.getComHandler());
         lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
         modelManager.loadMap(lobby.selectedMap);
         return lobby;

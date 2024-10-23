@@ -223,6 +223,10 @@ public class GameController implements ActionListener {
             mainFrame.getCreateLobbyFrame().showFrame(false);
 
             createLobby(lobbyName, maxPlayers, selectedMap);
+           /* AiController ai = new AiController(modelManager.getLobbyHandler().getLobby().id);
+            new Thread(ai).start();
+            AiController a2 = new AiController(modelManager.getLobbyHandler().getLobby().id);
+            new Thread(a2).start();*/
             updateLobbyTimer.start();
         }
     }

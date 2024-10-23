@@ -38,6 +38,7 @@ public class ComHandler {
 
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         // Make all async calls here
+        //Starta timer
         if (fromLeader) {
             for (GameClient client : l3Clients.values()) {
                 // Send l3 update to everyone
@@ -116,6 +117,7 @@ public class ComHandler {
         }
 
         if (!modelManager.hasGameStarted()) {
+            System.out.println("Starting map " + updatedLobby.selectedMap);
             modelManager.loadMap(updatedLobby.selectedMap);
             modelManager.getLobbyHandler().setLobby(updatedLobby);
         }
@@ -141,6 +143,7 @@ public class ComHandler {
 
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
+        timeSinceL3Update = System.currentTimeMillis();
     }
 
     private void sendUpdatedLobby(Lobby lobby) {
@@ -208,7 +211,9 @@ public class ComHandler {
 
     public void moveUserToL3(Long userId) {
         if (l2Clients.containsKey(userId)) {
+            System.out.println("Just before error");
             l2Clients.get(userId).destroy();
+            System.out.println("just after error");
             l2Clients.remove(userId);
         } else if (l1Clients.containsKey(userId)) {
             l1Clients.get(userId).destroy();

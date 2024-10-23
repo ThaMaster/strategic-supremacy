@@ -71,6 +71,10 @@ public class Map {
         map.get(position.getY() / Constants.TILE_HEIGHT).get(position.getX() / Constants.TILE_WIDTH).setInhabitant(object);
     }
 
+    public Position getMapIndexPos(Position position){
+        return new Position(position.getX() / Constants.TILE_WIDTH, position.getY() / Constants.TILE_HEIGHT);
+    }
+
     public ArrayList<GameObject> getInhabitants(Position position) {
         int row = position.getY() / Constants.TILE_HEIGHT;
         int col = position.getX() / Constants.TILE_WIDTH;
