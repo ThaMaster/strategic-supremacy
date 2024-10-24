@@ -80,7 +80,7 @@ public class NsServer {
 
             if (lobby.started) {
                 System.out.println("\t Lobby has already started! Denying user...");
-                StatusRuntimeException exception = Status.UNAVAILABLE
+                StatusRuntimeException exception = Status.PERMISSION_DENIED
                         .withDescription("Lobby already started, cannot accept new players.")
                         .asRuntimeException();
                 responseObserver.onError(exception);

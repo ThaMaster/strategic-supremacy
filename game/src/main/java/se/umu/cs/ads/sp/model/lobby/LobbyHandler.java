@@ -22,8 +22,15 @@ public class LobbyHandler {
     }
 
     public void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
-        long id = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);
-        lobby = new Lobby(id, lobbyName, maxPlayers);
+        long lobbyId;
+        try {
+            lobbyId = modelManager.getComHandler().createLobby(modelManager.getPlayer(), lobbyName, maxPlayers, selectedMap);
+        } catch (StatusRuntimeException e) {
+            status = e.getStatus();
+            return;
+        }
+
+        lobby = new Lobby(lobbyId, lobbyName, maxPlayers);
         lobby.leader = modelManager.getPlayer();
         raft = new Raft(this, LobbyClientState.LEADER, modelManager.getComHandler());
         lobby.users.add(modelManager.getPlayer());
@@ -46,7 +53,12 @@ public class LobbyHandler {
     }
 
     public ArrayList<Lobby> fetchLobbies() {
-        return modelManager.getComHandler().fetchLobbies();
+        try {
+            return modelManager.getComHandler().fetchLobbies();
+        } catch (StatusRuntimeException e) {
+            status = e.getStatus();
+            return null;
+        }
     }
 
     public Lobby joinLobby(long lobbyId) {
@@ -109,14 +121,23 @@ public class LobbyHandler {
 
     public String getErrorMessage() {
         String errorMsg;
-        if (status.getCode() == Status.Code.UNAVAILABLE) {
+        if (status.getCode() == Status.Code.PERMISSION_DENIED) {
             errorMsg = "Error: Lobby has already started.";
         } else if (status.getCode() == Status.Code.RESOURCE_EXHAUSTED) {
             errorMsg = "Error: Lobby is full. ";
+        } else if (status.getCode() == Status.Code.UNAVAILABLE) {
+            errorMsg = "Error: Could not connect to NamingService. \n(Maybe wrong ip/port or service not started?) ";
         } else {
-            errorMsg = "Error: An unexpected error occurred: " + status.getDescription();
+            errorMsg = "Error: An unexpected error occurred: \nCode: " + status.getCode().name() + "\nDescription: " + status.getDescription();
         }
-        status = null;
         return errorMsg;
+    }
+
+    public boolean hasErrorOccurred() {
+        return status != null;
+    }
+
+    public void clearErrors() {
+        this.status = null;
     }
 }

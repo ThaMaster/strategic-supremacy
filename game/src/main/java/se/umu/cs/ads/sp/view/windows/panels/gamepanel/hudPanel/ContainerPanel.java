@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.hudPanel;
 
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 

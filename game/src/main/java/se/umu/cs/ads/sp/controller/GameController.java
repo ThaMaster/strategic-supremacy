@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.Entity;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
 import se.umu.cs.ads.sp.util.enums.Direction;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
 
 public class GameController implements ActionListener {
 
-    private final int FPS = 60;
-
     private final Timer updateTimer;
     private final Timer gameTimer;
     private Timer updateLobbyTimer;
@@ -40,7 +39,7 @@ public class GameController implements ActionListener {
     public GameController() {
         mainFrame = new MainFrame();
         setActionListeners();
-        this.updateTimer = new Timer(1000 / FPS, this);
+        this.updateTimer = new Timer(1000 / Constants.FPS, this);
 
         this.gameTimer = new Timer(700, e -> {
             long remainingTime = modelManager.getRoundRemainingTime();
@@ -221,12 +220,9 @@ public class GameController implements ActionListener {
             String selectedMap = mainFrame.getCreateLobbyFrame().getSelectedMap();
             mainFrame.getCreateLobbyFrame().showFrame(false);
 
-            createLobby(lobbyName, maxPlayers, selectedMap);
-           /* AiController ai = new AiController(modelManager.getLobbyHandler().getLobby().id);
-            new Thread(ai).start();
-            AiController a2 = new AiController(modelManager.getLobbyHandler().getLobby().id);
-            new Thread(a2).start();*/
-            updateLobbyTimer.start();
+            if (createLobby(lobbyName, maxPlayers, selectedMap)) {
+                updateLobbyTimer.start();
+            }
         }
     }
 
@@ -274,10 +270,10 @@ public class GameController implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            updateLobbyTimer.stop();
             modelManager.getLobbyHandler().leaveLobby();
             mainFrame.switchPanel("Browse");
             fetchLobbies();
-            updateLobbyTimer.stop();
         }
     }
 
@@ -313,8 +309,16 @@ public class GameController implements ActionListener {
     }
 
     //------ALL-COMMUNICATION-FUNCTIONS------//
+
     private void fetchLobbies() {
         ArrayList<Lobby> lobbies = modelManager.getLobbyHandler().fetchLobbies();
+        if (modelManager.getLobbyHandler().hasErrorOccurred()) {
+            String errorMsg = modelManager.getLobbyHandler().getErrorMessage();
+            UtilView.displayWarningMessage(mainFrame, errorMsg);
+            modelManager.getLobbyHandler().clearErrors();
+            return;
+        }
+
         SwingUtilities.invokeLater(() -> {
             String[][] lobbyData = new String[lobbies.size()][];
             for (int i = 0; i < lobbies.size(); i++) {
@@ -329,20 +333,29 @@ public class GameController implements ActionListener {
         });
     }
 
-    private void createLobby(String lobbyName, int maxPlayers, String selectedMap) {
+    private boolean createLobby(String lobbyName, int maxPlayers, String selectedMap) {
         modelManager.getLobbyHandler().createLobby(lobbyName, maxPlayers, selectedMap);
+        if (modelManager.getLobbyHandler().hasErrorOccurred()) {
+            String errorMsg = modelManager.getLobbyHandler().getErrorMessage();
+            UtilView.displayWarningMessage(mainFrame, errorMsg);
+            modelManager.getLobbyHandler().clearErrors();
+            return false;
+        }
         SwingUtilities.invokeLater(() -> {
             updateLobby();
             mainFrame.getLobbyPanel().showStartButton(true);
             mainFrame.switchPanel("Lobby");
         });
+
+        return true;
     }
 
     private boolean joinLobby(long lobbyId) {
-        Lobby lobby = modelManager.getLobbyHandler().joinLobby(lobbyId);
-        if (lobby == null) {
+        modelManager.getLobbyHandler().joinLobby(lobbyId);
+        if (modelManager.getLobbyHandler().hasErrorOccurred()) {
             String errorMsg = modelManager.getLobbyHandler().getErrorMessage();
             UtilView.displayWarningMessage(mainFrame, errorMsg);
+            modelManager.getLobbyHandler().clearErrors();
             return false;
         }
 
@@ -431,5 +444,9 @@ public class GameController implements ActionListener {
     public void showEndFrame(boolean winner, String endText) {
         mainFrame.setEndGameContent(winner, endText);
         mainFrame.showEndGameFrame(true);
+    }
+
+    public void showDefeat(boolean bool) {
+        mainFrame.getHudPanel().showDefeatPanel(bool);
     }
 }

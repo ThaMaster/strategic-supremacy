@@ -10,7 +10,7 @@ import se.umu.cs.ads.sp.view.windows.frames.QuitGameFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
-import se.umu.cs.ads.sp.view.windows.panels.gamepanel.HUDPanel;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.hudPanel.HUDPanel;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.map.TileManager;
 import se.umu.cs.ads.sp.view.windows.panels.lobbypanel.LobbyPanel;
 import se.umu.cs.ads.sp.view.windows.panels.start.StartPanel;

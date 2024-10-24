@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.hudPanel;
 
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
@@ -6,6 +6,7 @@ import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,13 +25,15 @@ public class HUDPanel extends JPanel {
     private JLabel scoreLabel;
 
     private UpgradePanel upgradePanel;
+    private ContainerPanel selectedUnitPanel;
+    private DefeatedPanel defeatPanel;
 
     private JButton openShopButton;
 
     private ImageIcon defaultIcon;
     private ImageIcon pressedIcon;
 
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
     public HUDPanel(GamePanel gp) {
         super();
@@ -56,11 +59,11 @@ public class HUDPanel extends JPanel {
         ContainerPanel timerPanel = createHUDContainerLabel(timerLabel, UtilView.screenWidth / 2 - 65, 20, 100, 40);
         ContainerPanel scorePanel = createHUDContainerLabel(scoreLabel, 20, 20, 170, 50);
         ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 70, 170, 50);
-        ContainerPanel selectedUnitPanel = createHUDContainerLabel(selectedUnitLabel, 20, UtilView.screenHeight - 100, 310, 100);
+        selectedUnitPanel = createHUDContainerLabel(selectedUnitLabel, 20, UtilView.screenHeight - 100, 310, 100);
 
         openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80, 70, 50);
         upgradePanel = new UpgradePanel(gamePanel, 850, 550);
-
+        defeatPanel = new DefeatedPanel(400, 250);
         // Add components to HUDPanel
         this.add(timerPanel);
         this.add(moneyPanel);
@@ -68,6 +71,7 @@ public class HUDPanel extends JPanel {
         this.add(selectedUnitPanel);
         this.add(openShopButton);
         this.add(upgradePanel);
+        this.add(defeatPanel);
     }
 
     private ContainerPanel createHUDContainerLabel(JLabel label, int x, int y, int width, int height) {
@@ -131,6 +135,8 @@ public class HUDPanel extends JPanel {
         if (unitNames.size() == 1) {
             // If only one unit is selected, simply append its name
             nameBuilder.append("Selected: ").append(unitNames.get(0));
+            selectedUnitLabel.setText(nameBuilder.toString());
+            selectedUnitPanel.setVisible(true);
         } else if (!unitNames.isEmpty()) {
             nameBuilder.append("Selected: ");
 
@@ -155,13 +161,21 @@ public class HUDPanel extends JPanel {
 
             // Remove trailing comma
             nameBuilder.setLength(nameBuilder.length() - 2);
+            // Update the label with the built names string
+            selectedUnitLabel.setText(nameBuilder.toString());
+            selectedUnitPanel.setVisible(true);
+        } else {
+            selectedUnitLabel.setText(nameBuilder.toString());
+            selectedUnitPanel.setVisible(false);
         }
 
-        // Update the label with the built names string
-        selectedUnitLabel.setText(nameBuilder.toString());
+
     }
 
     public void toggleUpgradeMenu() {
+        if (defeatPanel.isVisible()) {
+            return;
+        }
         upgradePanel.setVisible(!upgradePanel.isVisible());
         if (!upgradePanel.isVisible()) {
             openShopButton.setIcon(defaultIcon);
@@ -178,5 +192,11 @@ public class HUDPanel extends JPanel {
 
     public void updateStat(long unitId, String upgradeName) {
         upgradePanel.updateStat(unitId, upgradeName);
+    }
+
+    public void showDefeatPanel(boolean bool) {
+        openShopButton.setVisible(!bool);
+        selectedUnitPanel.setVisible(!bool);
+        defeatPanel.setVisible(bool);
     }
 }

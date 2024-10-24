@@ -14,7 +14,9 @@ public class StyleConstants {
     public static final Font PLAIN_TEXT_FONT = new Font("serif", Font.PLAIN, 14);
     public static final Font TEXT_FIELD_FONT = new Font("serif", Font.PLAIN, 14);
 
+    public static final Font HUD_TITLE_TEXT = new Font("Monospaced", Font.BOLD, 30);
     public static final Font HUD_TEXT = new Font("Monospaced", Font.BOLD, 16);
+    public static final Font HUD_SMALL_TEXT = new Font("Monospaced", Font.BOLD, 10);
 
 
     // Default color definitions

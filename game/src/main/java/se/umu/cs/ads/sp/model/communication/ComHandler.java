@@ -114,7 +114,7 @@ public class ComHandler {
         //Randomize to minimize the risk of two candidates starting election at the same time
     }
 
-    public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
+    public Long createLobby(User user, String name, int maxPlayers, String selectedMap) throws StatusRuntimeException {
         return nsClient.createLobby(user, name, maxPlayers, selectedMap);
     }
 
@@ -153,7 +153,7 @@ public class ComHandler {
         return joinedLobby;
     }
 
-    public ArrayList<Lobby> fetchLobbies() {
+    public ArrayList<Lobby> fetchLobbies() throws StatusRuntimeException {
         return nsClient.fetchLobbies();
     }
 

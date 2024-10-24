@@ -28,37 +28,25 @@ public class NsClient {
     }
 
     // Blocking version of createLobby
-    public Long createLobby(User user, String name, int maxPlayers, String selectedMap) {
-        try {
-            System.out.println("[Client] Trying to create new lobby...");
-            LobbyId lobbyId = blockingStub
-                    .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers, selectedMap));
-            System.out.println("\t Created lobby with Id: " + lobbyId);
-            return NsGrpcUtil.fromGrpc(lobbyId);
-        } catch (Exception e) {
-            System.out.println("\t Failed to create new lobby.");
-            e.printStackTrace();
-            return null;
-        }
+    public Long createLobby(User user, String name, int maxPlayers, String selectedMap) throws StatusRuntimeException {
+        System.out.println("[Client] Trying to create new lobby...");
+        LobbyId lobbyId = blockingStub
+                .createLobby(NsGrpcUtil.toGrpc(user, name, maxPlayers, selectedMap));
+        System.out.println("\t Created lobby with Id: " + lobbyId);
+        return NsGrpcUtil.fromGrpc(lobbyId);
     }
 
     // Blocking version of fetchLobbies
-    public ArrayList<Lobby> fetchLobbies() {
+    public ArrayList<Lobby> fetchLobbies() throws StatusRuntimeException {
         System.out.println("[Client] Trying to fetch lobbies...");
-        try {
-            Lobbies lobbies = blockingStub
-                    .getLobbies(Empty.newBuilder().build());
-            if (lobbies == null) {
-                System.out.println("\t Could not find any lobbies.");
-                return new ArrayList<>();
-            }
-            System.out.println("\t Found lobbies.");
-            return NsGrpcUtil.fromGrpc(lobbies);
-        } catch (Exception e) {
-            System.out.println("\t Failed to fetch lobbies.");
-            e.printStackTrace();
+        Lobbies lobbies = blockingStub
+                .getLobbies(Empty.newBuilder().build());
+        if (lobbies == null) {
+            System.out.println("\t Could not find any lobbies.");
             return new ArrayList<>();
         }
+        System.out.println("\t Found lobbies.");
+        return NsGrpcUtil.fromGrpc(lobbies);
     }
 
     // Blocking version of joinLobby

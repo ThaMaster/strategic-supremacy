@@ -22,4 +22,5 @@ public class Constants {
     public static final int L1_RADIUS = FIELD_OF_VIEW_RADIUS + 50;
 
     public static final int ROUND_TIME = 150;
+    public static final int FPS = 60;
 }

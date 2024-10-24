@@ -510,7 +510,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     break;
                 case PLAYER_DEFEATED:
                     if (gController.isMe(event.getId())) {
-                        showDefeatedView();
+                        gController.showDefeat(true);
                     } else {
                         addTextEvent(event, 20, EventColor.ALERT);
                     }
@@ -590,10 +590,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             myUnitsView.add((PlayerUnitView) gameEntitiesView.get(id));
         }
         return myUnitsView;
-    }
-
-    private void showDefeatedView() {
-        // TODO: do something here!
     }
 
     private void showGameFinishedView(long winnerId, String winnerText) {

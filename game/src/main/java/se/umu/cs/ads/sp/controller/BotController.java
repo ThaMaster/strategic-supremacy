@@ -4,6 +4,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.util.AppSettings;
+import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
 
@@ -59,7 +60,7 @@ public class BotController implements Runnable {
                 gameTimer.start();
             }
         });
-        updateTimer = new Timer(1000 / 60, e -> {
+        updateTimer = new Timer(1000 / Constants.FPS, e -> {
             if (modelManager.hasGameFinished()) {
                 updateTimer.stop();
             }
@@ -77,7 +78,7 @@ public class BotController implements Runnable {
     }
 
     private void moveRandomUnits() {
-        int unitsToMove = UtilModel.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size()+1);
+        int unitsToMove = UtilModel.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size() + 1);
         for (int i = 0; i < unitsToMove; i++) {
             PlayerUnit unit = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(i);
             modelManager.setSelection(unit.getId());

@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.view.windows.panels.gamepanel;
+package se.umu.cs.ads.sp.view.windows.panels.gamepanel.hudPanel;
 
 import se.umu.cs.ads.sp.util.enums.UnitType;
 import se.umu.cs.ads.sp.util.enums.UpgradeType;
@@ -7,6 +7,7 @@ import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
 import se.umu.cs.ads.sp.view.util.UtilView;
+import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
