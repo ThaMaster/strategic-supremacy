@@ -20,10 +20,12 @@ public class GrpcUtil {
     }
 
     public static proto.Position toGrpcPosition(Position position) {
-        return proto.Position.newBuilder()
-                .setX(position.getX())
-                .setY(position.getY())
-                .build();
+        proto.Position.Builder builder = proto.Position.newBuilder();
+        if (position != null) {
+            builder.setX(position.getX())
+                    .setY(position.getY());
+        }
+        return builder.build();
     }
 
     public static Position fromGrpcPosition(proto.Position pos) {
@@ -184,11 +186,11 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static proto.userId toGrpcUserId(Long userId){
+    public static proto.userId toGrpcUserId(Long userId) {
         return proto.userId.newBuilder().setUserId(userId).build();
     }
 
-    public static proto.candidateLeaderRequest toGrpcLeaderRequest(LeaderRequestDto request){
+    public static proto.candidateLeaderRequest toGrpcLeaderRequest(LeaderRequestDto request) {
         return proto.candidateLeaderRequest.newBuilder()
                 .setMsgCount(request.msgCount())
                 .setUserId(request.userId())

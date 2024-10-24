@@ -55,6 +55,21 @@ public class PlayerUnit extends Entity {
         this.attackBox = new CollisionBox(position, attackRange, attackRange);
     }
 
+    public PlayerUnit(long id, String name, Position startPos, Map map) {
+        super(name, startPos, map);
+        miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
+        shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
+        hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
+        this.baseHp = 100;
+        this.maxHp = baseHp;
+        this.currentHp = maxHp;
+        this.baseAttack = 10;
+        this.attackBuff = 0;
+        this.attackRange = 150;
+        this.attackBox = new CollisionBox(position, attackRange, attackRange);
+        this.id = id;
+    }
+
     public void setBase(long baseId) {
         myBaseId = baseId;
     }
@@ -70,21 +85,6 @@ public class PlayerUnit extends Entity {
 
     public Long getFlagId() {
         return flagId;
-    }
-
-    public PlayerUnit(long id, String name, Position startPos, Map map) {
-        super(name, startPos, map);
-        miningCooldown = new Cooldown(3, TimeUnit.SECONDS);
-        shootCooldown = new Cooldown(1, TimeUnit.SECONDS);
-        hitCooldown = new Cooldown(250, TimeUnit.MILLISECONDS);
-        this.baseHp = 100;
-        this.maxHp = baseHp;
-        this.currentHp = maxHp;
-        this.baseAttack = 10;
-        this.attackBuff = 0;
-        this.attackRange = 150;
-        this.attackBox = new CollisionBox(position, attackRange, attackRange);
-        this.id = id;
     }
 
     @Override
@@ -132,7 +132,6 @@ public class PlayerUnit extends Entity {
                     Collectable coin = new Gold(this.position, map);
                     goldMine.harvestGold(10);
                     coin.setReward(new Reward(10, RewardType.GOLD));
-                    this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
                     GameEvents.getInstance().addEvent(new GameEvent(coin.getId(), coin.getReward().toString(), EventType.GOLD_PICK_UP, id));
@@ -177,17 +176,19 @@ public class PlayerUnit extends Entity {
 
     public void setAttackTarget(PlayerUnit target) {
         this.targetedUnit = target;
+        this.targetedUnit.setSelected(true);
         this.destination = targetedUnit.position;
         state = EntityState.ATTACKING;
     }
 
-    public long getTargetId(){
+    public long getTargetId() {
         return targetedUnit == null ? -1 : targetedUnit.getId();
     }
 
     @Override
     public void setDestination(Position newDestination) {
         if (this.state == EntityState.ATTACKING) {
+            this.targetedUnit.setSelected(false);
             this.targetedUnit = null;
         }
         super.setDestination(newDestination);
@@ -239,4 +240,6 @@ public class PlayerUnit extends Entity {
     public int getBaseAttack() {
         return baseAttack;
     }
+
+
 }

@@ -30,8 +30,8 @@ public abstract class Entity extends GameObject {
 
     public Entity(String entityType, Position startPos, Map map) {
         super(startPos, map);
+        destination = startPos;
         this.entityType = entityType;
-        position = startPos;
         state = EntityState.IDLE;
         baseSpeed = 2;
         speedBuff = 0;
@@ -83,7 +83,7 @@ public abstract class Entity extends GameObject {
         }
         Position newPos = new Position(newX, newY);
 
-        if(!map.getMapIndexPos(newPos).equals(currentMapPos)){
+        if (!map.getMapIndexPos(newPos).equals(currentMapPos)) {
             map.removeInhabitant(this, position);
             map.setInhabitant(this, newPos);
         }
@@ -110,6 +110,11 @@ public abstract class Entity extends GameObject {
     }
 
     public void setDestination(Position newDestination) {
+        if (position.equals(newDestination)) {
+            if (state != EntityState.DEAD)
+                state = EntityState.IDLE;
+            return;
+        }
         this.destination = newDestination;
         this.state = EntityState.RUNNING;
     }
@@ -152,7 +157,7 @@ public abstract class Entity extends GameObject {
 
     public void setCurrentHp(int newHp) {
         currentHp = newHp;
-        if(currentHp <= 0){
+        if (currentHp <= 0) {
             state = EntityState.DEAD;
         }
     }

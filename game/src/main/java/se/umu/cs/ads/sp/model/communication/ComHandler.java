@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.communication;
 
+import io.grpc.Context;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -191,8 +192,8 @@ public class ComHandler {
         } else if (l2Clients.containsKey(userId)) {
             l2Clients.get(userId).destroy();
             l2Clients.remove(userId);
-        } else {
         }
+
         l3Clients.get(userId).destroy();
         l3Clients.remove(userId);
     }
@@ -229,11 +230,11 @@ public class ComHandler {
             newClient = l1Clients.get(userId);
             l1Clients.remove(userId);
         } else {
-            // If in L3, need to create a new client since context causes problem
             newClient = l3Clients.get(userId);
         }
 
         l2Clients.put(userId, newClient);
+        updateInNewContext(2);
     }
 
     public void moveUserToL1(Long userId) {
@@ -248,11 +249,11 @@ public class ComHandler {
             newClient = l2Clients.get(userId);
             l2Clients.remove(userId);
         } else {
-            // If in L3, need to create a new client since context causes problem
             newClient = l3Clients.get(userId);
         }
 
         l1Clients.put(userId, newClient);
+        updateInNewContext(1);
     }
 
     public void notifyNewLeader() {
@@ -277,5 +278,26 @@ public class ComHandler {
 
     public int getNrL2Clients() {
         return l2Clients.size();
+    }
+
+    private void updateInNewContext(int layerIndex) {
+        if (layerIndex < 0 || layerIndex > 2) {
+            return;
+        }
+
+        // Create a new context and attach it (Needed because other
+        // will immediately also use this sub).
+        Context newContext = Context.current().fork();
+        Context previousContext = newContext.attach();
+        try {
+            if (layerIndex == 1) {
+                sendL1Update(modelManager.constructL1Message());
+            } else if (layerIndex == 2) {
+                sendL2Update(modelManager.constructL2Message());
+            }
+        } finally {
+            // Switch back to the previous context
+            newContext.detach(previousContext);
+        }
     }
 }

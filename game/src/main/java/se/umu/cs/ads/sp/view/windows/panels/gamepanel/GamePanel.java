@@ -477,24 +477,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     addTextEvent(event, 30, EventColor.ALERT);
                     break;
                 case MINE_DEPLETED:
-                    System.out.println("View got the mine depleted event");
-                    System.out.println(event.getEvent());
-                    if(environments.containsKey(event.getId())){
-                        System.out.println("we got the env");
-                        GoldMineView mine = (GoldMineView)environments.get(event.getId());
-                        if(!mine.isDepleted()){
-                            System.out.println("View is not depleted");
+                    if (environments.containsKey(event.getId())) {
+                        GoldMineView mine = (GoldMineView) environments.get(event.getId());
+                        if (!mine.isDepleted()) {
                             mine.setDepleted(true);
                             if (gController.isMyUnit(event.getEventAuthor())) {
                                 SoundManager.getInstance().play(SoundFX.MINE_DEPLETED);
                             }
-                        }else{
-                            System.out.println("its depelted :d");
                         }
                     }
                     break;
                 case MINING:
-                    System.out.println("Mining");
                     break;
                 case DEATH:
                     SoundManager.getInstance().play(SoundFX.DEATH);

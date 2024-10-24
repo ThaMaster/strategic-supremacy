@@ -22,14 +22,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ObjectHandler {
-    private HashMap<Long, PlayerUnit> myUnits = new HashMap<>();
-    private HashMap<Long, PlayerUnit> enemyUnits = new HashMap<>();
+    private final HashMap<Long, PlayerUnit> myUnits = new HashMap<>();
+    private final HashMap<Long, PlayerUnit> enemyUnits = new HashMap<>();
+    private final HashMap<Long, Environment> environments = new HashMap<>();
     private HashMap<Long, Collectable> collectables = new HashMap<>();
-    private HashMap<Long, Environment> environments = new HashMap<>();
-    private ArrayList<Long> selectedUnitIds = new ArrayList<>();
-    private ArrayList<Long> pickedUpCollectableIds = new ArrayList<>();
 
-    private User user;
+    private final ArrayList<Long> pickedUpCollectableIds = new ArrayList<>();
+
+    private final User user;
+
+    private ArrayList<Long> selectedUnitIds = new ArrayList<>();
 
     public ObjectHandler(User user) {
         this.user = user;
@@ -68,7 +70,7 @@ public class ObjectHandler {
 
     public void addSelectionId(long id) {
         PlayerUnit unit = myUnits.get(id);
-        if (unit.getState() != EntityState.DEAD) {
+        if (unit != null && unit.getState() != EntityState.DEAD) {
             myUnits.get(id).setSelected(true);
             this.selectedUnitIds.add(id);
         }
@@ -308,6 +310,17 @@ public class ObjectHandler {
         }
     }
 
+    public void updateUnitPositionsInL2(ArrayList<UserSkeletonsDTO> skeletons) {
+        for (UserSkeletonsDTO units : skeletons) {
+            for (EntitySkeletonDTO unit : units.entities()) {
+                if (enemyUnits.containsKey(unit.id())) {
+                    enemyUnits.get(unit.id()).setPosition(unit.position());
+                    enemyUnits.get(unit.id()).setDestination(unit.position());
+                }
+            }
+        }
+    }
+
     public void removeCollectables(Map map, ArrayList<Long> collectableIds) {
         for (Long collectableId : collectableIds) {
             if (this.collectables.containsKey(collectableId)) {
@@ -328,9 +341,7 @@ public class ObjectHandler {
                 if (envModel instanceof GoldMine goldMine) {
                     if (goldMine.getRemainingResource() > env.remainingResource()) {
                         goldMine.setResource(env.remainingResource());
-                        System.out.println("Decreasing resourece to" + goldMine.getRemainingResource());
-                        if(!goldMine.hasResourceLeft()){
-                            System.out.println("DEPLETED");
+                        if (!goldMine.hasResourceLeft()) {
                             GameEvents.getInstance().moveToHistory(new GameEvent(goldMine.getId(), "Mine depleted from objecthandler", EventType.MINE_DEPLETED, -1));
                         }
                     }

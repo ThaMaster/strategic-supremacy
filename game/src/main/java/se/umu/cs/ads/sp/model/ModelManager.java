@@ -81,7 +81,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            sendL1Update(constructL1Message());
+            sendL1Update();
             return true;
         }
 
@@ -95,7 +95,7 @@ public class ModelManager {
                 } while (!isWalkable(offsetPosition));
             }
 
-            sendL1Update(constructL1Message());
+            sendL1Update();
             return true;
         }
         return false;
@@ -231,12 +231,8 @@ public class ModelManager {
             @Override
             public void run() {
                 sendL2Update();
-                sendL1Update(constructL1Message(
-
-                ));
             }
         }, 0, updateTime);
-
     }
 
     private void sendL3Update() {
@@ -249,7 +245,8 @@ public class ModelManager {
         }
     }
 
-    private void sendL1Update(L1UpdateDTO update) {
+    private void sendL1Update() {
+        L1UpdateDTO update = constructL1Message();
         if (comHandler.getNrL1Clients() > 0) {
             comHandler.sendL1Update(update);
         }
@@ -259,11 +256,8 @@ public class ModelManager {
      * Function for handling an incoming L3 update. Both the followers
      * and the leader will run this function so it has to handle the
      * content differently depending on which state the leader is in.
-     *
-     * @param update The L3 update message.
      */
     public void receiveL3Update(L3UpdateDTO update) {
-
         if (iAmLeader()) {
             // Leader gets update from follower
             if (update.scoreInfo().score() > currentScoreHolderScore) {
@@ -288,11 +282,9 @@ public class ModelManager {
      * Function for handling an incoming L2 update. Both the followers
      * and the leader will run this function, but they should all handle
      * L2 updates the same.
-     *
-     * @param update The L2 update message.
      */
     public void receiveL2Update(L2UpdateDTO update) {
-        objectHandler.updateUnitPositions(
+        objectHandler.updateUnitPositionsInL2(
                 new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(update.userId(), update.entities()))));
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.updateEnvironments(update.environments());
@@ -323,7 +315,6 @@ public class ModelManager {
      */
     public L3UpdateDTO constructL3Message(boolean fromLeader) {
         ArrayList<UserSkeletonsDTO> entities;
-        L3UpdateDTO dto;
         int msgCount = lobbyHandler.getRaft().getMsgCount();
         if (fromLeader) {
             entities = objectHandler.getAllEntitySkeletons();
@@ -375,7 +366,7 @@ public class ModelManager {
     public L1UpdateDTO constructL1Message() {
         ArrayList<UnitDTO> unitUpdates = new ArrayList<>();
         for (PlayerUnit unit : objectHandler.getMyUnits().values()) {
-            unitUpdates.add(new UnitDTO(
+            UnitDTO dto = new UnitDTO(
                     unit.getId(),
                     unit.getTargetId(),
                     unit.getEntityType(),
@@ -384,8 +375,9 @@ public class ModelManager {
                     unit.getMaxHp(),
                     unit.getCurrentHp(),
                     unit.getSpeedBuff(),
-                    unit.getAttackBuff())
+                    unit.getAttackBuff()
             );
+            unitUpdates.add(dto);
         }
         return new L1UpdateDTO(
                 player.id,
@@ -489,9 +481,6 @@ public class ModelManager {
                         objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
                         unit.setHasFlag(false, null);
                     }
-                    break;
-                case MINE_DEPLETED:
-                    System.out.println("Model manager got mine depleted event");
                     break;
                 case ATTACK:
                     break;

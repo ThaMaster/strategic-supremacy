@@ -19,5 +19,9 @@ public enum EventType {
     ATTACK,
     DEATH,
 
-    PLAYER_LEFT
+    // Communication events
+    PLAYER_LEFT,
+    PLAYER_TO_L1,
+    PLAYER_TO_L2,
+    PLAYER_TO_L3
 }
