@@ -38,6 +38,11 @@ public class MainFrame extends JFrame {
     private BrowsePanel browsePanel;
 
     public MainFrame() {
+        if(UtilView.DARK_MODE) {
+            UtilView.setDarkMode();
+        } else {
+            UtilView.setLightMode();
+        }
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setTitle("Strategic Supremacy");
         createLobbyFrame = new CreateLobbyFrame();

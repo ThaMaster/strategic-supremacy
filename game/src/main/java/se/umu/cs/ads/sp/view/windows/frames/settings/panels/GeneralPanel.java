@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.view.windows.frames.settings.panels;
 
+import se.umu.cs.ads.sp.view.util.UtilView;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -9,6 +11,7 @@ public class GeneralPanel extends JPanel {
     private JButton applyButton;
     private JCheckBox fullscreenCheckBox;
     private JComboBox<String> resolutionComboBox;
+    private JCheckBox darkModeCheckBox;
 
     public GeneralPanel(JButton applyButton, boolean fullscreenSupported) {
         this.applyButton = applyButton;
@@ -43,14 +46,20 @@ public class GeneralPanel extends JPanel {
         resolutionComboBox.addActionListener(e -> {
             applyButton.setEnabled(true);
         });
-        gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         this.add(resolutionComboBox, gbc);
 
-        // Add apply button
+        darkModeCheckBox = new JCheckBox("Enable Dark Mode");
+        darkModeCheckBox.setSelected(UtilView.DARK_MODE);
+        darkModeCheckBox.addActionListener(e -> {
+            applyButton.setEnabled(true);
+            UtilView.DARK_MODE = darkModeCheckBox.isSelected();
+        });
         gbc.gridx = 0;
-        gbc.gridy = 3;
-        this.add(applyButton, gbc);
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        this.add(darkModeCheckBox, gbc);
     }
 
     public String getResolution() {

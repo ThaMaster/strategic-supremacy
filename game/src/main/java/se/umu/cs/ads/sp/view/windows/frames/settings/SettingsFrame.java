@@ -87,6 +87,13 @@ public class SettingsFrame extends JFrame {
             String[] numbers = generalPanel.getResolution().split("x");
             UtilView.changeScreenSize(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
         }
+
+        if (UtilView.DARK_MODE) {
+            UtilView.setDarkMode();
+        } else {
+            UtilView.setLightMode();
+        }
+        SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
     public void applyControlSettings() {
