@@ -63,7 +63,7 @@ public class HUDPanel extends JPanel {
 
         openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80);
         upgradePanel = new UpgradePanel(gamePanel, 900, 550);
-        defeatPanel = new DefeatedPanel(400, 250);
+        defeatPanel = new DefeatedPanel(450, 250);
         // Add components to HUDPanel
         this.add(timerPanel);
         this.add(moneyPanel);

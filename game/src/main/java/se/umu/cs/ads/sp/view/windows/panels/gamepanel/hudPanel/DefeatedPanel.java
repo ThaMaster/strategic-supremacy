@@ -18,7 +18,7 @@ public class DefeatedPanel extends JPanel {
         containerImage = ImageLoader.loadImage("/sprites/hud/containers/woodenContainer.png");
 
         // Create the "YOU ARE DEAD" label
-        JLabel gameOverLabel = new JLabel("YOU ARE DEAD");
+        JLabel gameOverLabel = new JLabel("YOU ARE DEFEATED");
         gameOverLabel.setFont(StyleConstants.HUD_TITLE_TEXT);
         gameOverLabel.setForeground(Color.RED.darker());
         gameOverLabel.setAlignmentX(CENTER_ALIGNMENT);
