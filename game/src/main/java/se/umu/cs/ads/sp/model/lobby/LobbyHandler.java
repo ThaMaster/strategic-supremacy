@@ -13,7 +13,6 @@ public class LobbyHandler {
     private final ModelManager modelManager;
     private Raft raft;
 
-
     public LobbyHandler(ModelManager modelManager) {
         this.modelManager = modelManager;
     }

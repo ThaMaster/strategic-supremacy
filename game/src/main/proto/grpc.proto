@@ -127,6 +127,7 @@ service GameService {
   rpc l1Update (L1Message) returns (google.protobuf.Empty);
   rpc l2Update (L2Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
+  rpc defeatUpdate (userId) returns (google.protobuf.Empty);
   rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
   rpc notifyNewLeader(userId) returns (google.protobuf.Empty);
 }

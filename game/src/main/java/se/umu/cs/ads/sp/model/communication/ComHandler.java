@@ -36,6 +36,16 @@ public class ComHandler {
         server.start();
     }
 
+    public void sendDefeatUpdate(long userId) {
+        for (GameClient client : l3Clients.values()) {
+            client.sendDefeatUpdate(userId);
+        }
+    }
+
+    public void handleReceiveDefeatUpdate(long userId) {
+        modelManager.receiveDefeatUpdate(userId);
+    }
+
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         // Make all async calls here
         //Starta timer

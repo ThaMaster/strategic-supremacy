@@ -407,4 +407,8 @@ public class GameController implements ActionListener {
     public boolean isMyUnit(long id) {
         return modelManager.getObjectHandler().getMyUnitIds().contains(id);
     }
+
+    public boolean isMe(long id) {
+        return modelManager.getPlayer().id == id;
+    }
 }

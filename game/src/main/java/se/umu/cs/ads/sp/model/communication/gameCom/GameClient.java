@@ -91,6 +91,24 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
+    public void sendDefeatUpdate(long userId) {
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .defeatUpdate(GrpcUtil.toGrpcUserId(userId));
+
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("\t Failed to send defeat update to client " + ip + ":" + port);
+                System.out.println("\t" + t.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     public void sendL3Message(L3UpdateDTO msg) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)

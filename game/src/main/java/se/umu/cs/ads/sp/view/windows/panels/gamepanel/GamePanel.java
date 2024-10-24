@@ -508,6 +508,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 case PLAYER_LEFT:
                     addTextEvent(event, 20, EventColor.WARNING);
                     break;
+                case PLAYER_DEFEATED:
+                    if (gController.isMe(event.getId())) {
+                        showDefeatedView();
+                    } else {
+                        addTextEvent(event, 20, EventColor.ALERT);
+                    }
+                    break;
                 default:
                     //This is default case, it's a collectable we have stored
                     handleCollectableEvent(event);
@@ -580,5 +587,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             myUnitsView.add((PlayerUnitView) gameEntitiesView.get(id));
         }
         return myUnitsView;
+    }
+
+    private void showDefeatedView() {
+        // TODO: do something here!
     }
 }

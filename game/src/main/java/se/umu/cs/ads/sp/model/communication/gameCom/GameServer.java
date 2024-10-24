@@ -54,6 +54,14 @@ public class GameServer {
         }
 
         @Override
+        public void defeatUpdate(userId request, StreamObserver<Empty> responseObserver) {
+            System.out.println("[Server] A user has been defeated.");
+            comHandler.handleReceiveDefeatUpdate(request.getUserId());
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
         public void l3Update(L3Message request, StreamObserver<Empty> responseObserver) {
             comHandler.handleReceiveL3Msg(GrpcUtil.fromGrpcL3Message(request));
             responseObserver.onNext(Empty.newBuilder().build());

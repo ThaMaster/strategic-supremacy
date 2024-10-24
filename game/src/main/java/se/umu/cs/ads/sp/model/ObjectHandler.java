@@ -33,18 +33,22 @@ public class ObjectHandler {
 
     private ArrayList<Long> selectedUnitIds = new ArrayList<>();
 
+    private boolean myUnitsDead = false;
+
     public ObjectHandler(User user) {
         this.user = user;
     }
 
     public void update(Map map) {
-        for (PlayerUnit unit : myUnits.values()) {
-            unit.update();
-            if (unit.getState() == EntityState.DEAD && unit.hasFlag()) {
-                spawnFlag(map, unit.getPosition(), unit.getFlagId());
-                unit.setHasFlag(false, null);
+        if (!myUnitsDead) {
+            for (PlayerUnit unit : myUnits.values()) {
+                unit.update();
+                if (unit.getState() == EntityState.DEAD && unit.hasFlag()) {
+                    spawnFlag(map, unit.getPosition(), unit.getFlagId());
+                    unit.setHasFlag(false, null);
+                }
+                checkCollectables(unit);
             }
-            checkCollectables(unit);
         }
 
         for (PlayerUnit entity : enemyUnits.values()) {
@@ -424,6 +428,7 @@ public class ObjectHandler {
         unit.setBase(baseId);
 
         if (this.user.id == unitOwnerId) {
+            myUnitsDead = false;
             myUnits.put(unit.getId(), unit);
         } else {
             enemyUnits.put(unit.getId(), unit);
@@ -487,5 +492,19 @@ public class ObjectHandler {
         this.enemyUnits.clear();
         this.collectables.clear();
         this.environments.clear();
+    }
+
+    public boolean checkDefeated() {
+        for (PlayerUnit unit : myUnits.values()) {
+            if (unit.getState() != EntityState.DEAD) {
+                return false;
+            }
+        }
+        myUnitsDead = true;
+        return true;
+    }
+
+    public boolean isMyUnitsDead() {
+        return myUnitsDead;
     }
 }

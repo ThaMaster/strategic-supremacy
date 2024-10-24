@@ -16,6 +16,7 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
+import se.umu.cs.ads.sp.util.enums.EntityState;
 import se.umu.cs.ads.sp.util.enums.EventType;
 
 import java.awt.*;
@@ -46,6 +47,9 @@ public class ModelManager {
     private int currentGold = 180;
     private int currentPoints;
 
+    private int defeatedPlayers = 0;
+    private boolean isDefeated;
+
     public ModelManager(User player) {
         map = new Map();
         this.player = player;
@@ -68,7 +72,11 @@ public class ModelManager {
         // Update all entities in game, including my units.
         objectHandler.update(map);
         fov.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
+        if (!objectHandler.isMyUnitsDead() && objectHandler.checkDefeated()) {
+            sendDefeatUpdate();
+        }
         collectEvents();
+
     }
 
     public ObjectHandler getObjectHandler() {
@@ -149,7 +157,8 @@ public class ModelManager {
     private boolean hitUnit(Position position, GameObject object) {
         return object instanceof PlayerUnit unit &&
                 unit.getCollisionBox().contains(position) &&
-                !objectHandler.getMyUnits().containsValue(unit);
+                !objectHandler.getMyUnits().containsValue(unit) &&
+                unit.getState() != EntityState.DEAD;
     }
 
     public void loadMap(String mapName) {
@@ -233,6 +242,21 @@ public class ModelManager {
                 sendL2Update();
             }
         }, 0, updateTime);
+    }
+
+    private void sendDefeatUpdate() {
+        if (iAmLeader()) {
+            defeatedPlayers++;
+        }
+        comHandler.sendDefeatUpdate(player.id);
+        GameEvents.getInstance().addEvent(new GameEvent(player.id, " You have been defeated!", EventType.PLAYER_DEFEATED, -1));
+    }
+
+    public void receiveDefeatUpdate(long userId) {
+        if (iAmLeader()) {
+            defeatedPlayers++;
+        }
+        GameEvents.getInstance().addEvent(new GameEvent(userId, lobbyHandler.getPlayer(userId).username + " has been defeated!", EventType.PLAYER_DEFEATED, -1));
     }
 
     private void sendL3Update() {
@@ -350,10 +374,6 @@ public class ModelManager {
                 objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
-    }
-
-    public Raft getRaft() {
-        return lobbyHandler.getRaft();
     }
 
     /**
@@ -511,10 +531,6 @@ public class ModelManager {
         GameEvents.getInstance().clearEvents();
     }
 
-    public long getRoundRemainingTime() {
-        return remainingTime;
-    }
-
     private void startRoundTimer() {
         this.gameTimer = new Timer();
         this.gameTimer.schedule(new TimerTask() {
@@ -527,6 +543,14 @@ public class ModelManager {
                 }
             }
         }, 0, 1000);
+    }
+
+    public long getRoundRemainingTime() {
+        return remainingTime;
+    }
+
+    public Raft getRaft() {
+        return lobbyHandler.getRaft();
     }
 
     private boolean eventCreatedByMyUnit(long eventId) {
