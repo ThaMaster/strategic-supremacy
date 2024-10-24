@@ -64,19 +64,15 @@ public class NsClient {
     // Blocking version of joinLobby
     public Lobby joinLobby(Long lobbyId, User user) throws StatusRuntimeException {
         System.out.println("[Client] Trying to join lobby with id: " + lobbyId);
-        try {
-            DetailedLobbyInfo detailedLobbyInfo = blockingStub
-                    .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
-            if (detailedLobbyInfo == null) {
-                System.out.println("\t No lobby found with given id.");
-                return null;
-            }
-            System.out.println("\t Joined the lobby.");
-            return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
-        } catch (StatusRuntimeException e) {
-            System.out.println("\t Failed to join lobby (Lobby is already full).");
+        DetailedLobbyInfo detailedLobbyInfo = blockingStub
+                .joinLobby(NsGrpcUtil.toGrpcJoin(lobbyId, user));
+        if (detailedLobbyInfo == null) {
+            System.out.println("\t No lobby found with given id.");
             return null;
         }
+        System.out.println("\t Joined the lobby.");
+        return NsGrpcUtil.fromGrpcDetailedLobby(detailedLobbyInfo);
+
     }
 
     // Blocking version of leaveLobby
@@ -93,5 +89,17 @@ public class NsClient {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void startLobby(Long lobbyId) {
+        try {
+            System.out.println("[Client] Leaving lobby with id: " + lobbyId);
+            blockingStub.startLobby(LobbyId.newBuilder().setId(lobbyId).build());
+            System.out.println("\t Left the lobby.");
+
+        } catch (Exception e) {
+            System.out.println("\t Failed to start lobby.");
+            e.printStackTrace();
+        }
     }
 }

@@ -55,17 +55,12 @@ public class NsServer {
             User leader = NsGrpcUtil.fromGrpc(request.getLobbyCreator());
             Lobby lobby = new Lobby(leader, request.getLobbyName(), request.getMaxPlayers());
             lobby.selectedMap = request.getSelectedMap();
+            lobby.started = false;
             lobbies.put(lobby.id, lobby);
 
             System.out.println("[Server] New lobby created, responding with id: " + lobby.id);
             responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.id));
             responseObserver.onCompleted();
-        }
-
-        @Override
-        public void deleteLobby(LobbyId request, StreamObserver<Empty> responseObserver) {
-            super.deleteLobby(request, responseObserver);
-            // Kick all players from the lobby and remove lobby
         }
 
         @Override
@@ -82,6 +77,16 @@ public class NsServer {
             Lobby lobby = lobbies.get(NsGrpcUtil.fromGrpc(request.getId()));
             User joiningUser = NsGrpcUtil.fromGrpc(request.getUser());
             System.out.println("[Server] User " + joiningUser.id + " joining lobby " + NsGrpcUtil.fromGrpc(request.getId()) + "...");
+
+            if (lobby.started) {
+                System.out.println("\t Lobby has already started! Denying user...");
+                StatusRuntimeException exception = Status.UNAVAILABLE
+                        .withDescription("Lobby already started, cannot accept new players.")
+                        .asRuntimeException();
+                responseObserver.onError(exception);
+                return;
+            }
+
             if (lobby.currentPlayers >= lobby.maxPlayers) {
                 System.out.println("\t Lobby is full! Denying user...");
                 StatusRuntimeException exception = Status.RESOURCE_EXHAUSTED
@@ -123,7 +128,14 @@ public class NsServer {
             }
             responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.leader));
             responseObserver.onCompleted();
+        }
 
+        @Override
+        public void startLobby(LobbyId request, StreamObserver<Empty> responseObserver) {
+            Lobby lobby = lobbies.get(request.getId());
+            lobby.started = true;
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
         }
     }
 }

@@ -25,11 +25,11 @@ public class GameController implements ActionListener {
 
     private final int FPS = 60;
 
-    private Timer updateTimer;
-    private Timer gameTimer;
+    private final Timer updateTimer;
+    private final Timer gameTimer;
     private Timer updateLobbyTimer;
 
-    private MainFrame mainFrame;
+    private final MainFrame mainFrame;
 
     private ModelManager modelManager;
     private TileManager tileManager;
@@ -65,10 +65,6 @@ public class GameController implements ActionListener {
         initializeView();
         updateTimer.start();
         gameTimer.start();
-    }
-
-    public ModelManager getModelManager() {
-        return this.modelManager;
     }
 
     //We have started the game
@@ -267,8 +263,10 @@ public class GameController implements ActionListener {
             // Get the id of the lobby and join the lobby.
             int selectedRow = mainFrame.getBrowseTable().getSelectedRow();
             String lobbyId = (String) mainFrame.getBrowseTable().getValueAt(selectedRow, 0);
-            joinLobby(Long.parseLong(lobbyId));
-            updateLobbyTimer.start();
+            if (joinLobby(Long.parseLong(lobbyId))) {
+                updateLobbyTimer.start();
+
+            }
         }
     }
 
@@ -323,7 +321,8 @@ public class GameController implements ActionListener {
                 lobbyData[i] = new String[]{
                         String.valueOf(lobbies.get(i).id),
                         lobbies.get(i).name,
-                        (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers)
+                        (lobbies.get(i).currentPlayers) + "/" + (lobbies.get(i).maxPlayers),
+                        String.valueOf(lobbies.get(i).started)
                 };
             }
             mainFrame.setBrowsePanelData(lobbyData);
@@ -339,11 +338,12 @@ public class GameController implements ActionListener {
         });
     }
 
-    private void joinLobby(long lobbyId) {
+    private boolean joinLobby(long lobbyId) {
         Lobby lobby = modelManager.getLobbyHandler().joinLobby(lobbyId);
         if (lobby == null) {
-            UtilView.displayWarningMessage(mainFrame, "Failed to join lobby! (Lobby is already full)");
-            return;
+            String errorMsg = modelManager.getLobbyHandler().getErrorMessage();
+            UtilView.displayWarningMessage(mainFrame, errorMsg);
+            return false;
         }
 
         SwingUtilities.invokeLater(() -> {
@@ -351,6 +351,7 @@ public class GameController implements ActionListener {
             mainFrame.getLobbyPanel().showStartButton(false);
             mainFrame.switchPanel("Lobby");
         });
+        return true;
     }
 
     //---------------------------------------//

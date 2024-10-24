@@ -48,6 +48,7 @@ public class NsGrpcUtil {
                 .setLobbyName(lobby.name)
                 .setNrPlayers(lobby.currentPlayers)
                 .setMaxPlayers(lobby.maxPlayers)
+                .setStarted(lobby.started)
                 .build();
     }
 
@@ -73,6 +74,7 @@ public class NsGrpcUtil {
     public static Lobby fromGrpc(nsProto.LobbyInfo request) {
         Lobby lobby = new Lobby(fromGrpc(request.getId()), request.getLobbyName(), request.getMaxPlayers());
         lobby.currentPlayers = request.getNrPlayers();
+        lobby.started = request.getStarted();
         return lobby;
     }
 

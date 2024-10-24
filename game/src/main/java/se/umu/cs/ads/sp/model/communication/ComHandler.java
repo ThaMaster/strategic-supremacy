@@ -1,6 +1,7 @@
 package se.umu.cs.ads.sp.model.communication;
 
 import io.grpc.Context;
+import io.grpc.StatusRuntimeException;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -144,7 +145,7 @@ public class ComHandler {
         }
     }
 
-    public Lobby joinLobby(Long lobbyId, User user) {
+    public Lobby joinLobby(Long lobbyId, User user) throws StatusRuntimeException {
         Lobby joinedLobby = nsClient.joinLobby(lobbyId, user);
         if (joinedLobby != null) {
             sendUpdatedLobby(joinedLobby);
@@ -165,6 +166,10 @@ public class ComHandler {
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
         timeSinceL3Update = System.currentTimeMillis();
+    }
+
+    public void markLobbyStarted(long lobbyId) {
+        nsClient.startLobby(lobbyId);
     }
 
     private void sendUpdatedLobby(Lobby lobby) {

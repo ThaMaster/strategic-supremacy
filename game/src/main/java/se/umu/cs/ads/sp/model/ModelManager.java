@@ -178,7 +178,9 @@ public class ModelManager {
      * in the lobby. It will
      */
     public void startGame() {
+
         System.out.println("[Client] Sending out start request to lobby...");
+        comHandler.markLobbyStarted(lobbyHandler.getLobby().id);
         StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
         for (User user : lobbyHandler.getLobby().users) {
             if (user.id != player.id) {
@@ -198,8 +200,8 @@ public class ModelManager {
     }
 
     /**
-     * This function is run when the leader has broadcast to
-     * all clients in the lobby to start the game. It will
+     * This function is run on all users except the leader
+     * where they start the game. It will
      * start the L3 timer with a shorter interval than the leader
      * to keep the leaders information more correct.
      *

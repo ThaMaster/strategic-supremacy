@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.model.lobby;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.ModelManager;
@@ -12,6 +14,8 @@ public class LobbyHandler {
     private Lobby lobby;
     private final ModelManager modelManager;
     private Raft raft;
+
+    private Status status;
 
     public LobbyHandler(ModelManager modelManager) {
         this.modelManager = modelManager;
@@ -47,7 +51,12 @@ public class LobbyHandler {
 
     public Lobby joinLobby(long lobbyId) {
         raft = new Raft(this, LobbyClientState.FOLLOWER, modelManager.getComHandler());
-        lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
+        try {
+            lobby = modelManager.getComHandler().joinLobby(lobbyId, modelManager.getPlayer());
+        } catch (StatusRuntimeException e) {
+            status = e.getStatus();
+            return null;
+        }
         modelManager.loadMap(lobby.selectedMap);
         return lobby;
     }
@@ -98,4 +107,16 @@ public class LobbyHandler {
         return null;
     }
 
+    public String getErrorMessage() {
+        String errorMsg;
+        if (status.getCode() == Status.Code.UNAVAILABLE) {
+            errorMsg = "Error: Lobby has already started.";
+        } else if (status.getCode() == Status.Code.RESOURCE_EXHAUSTED) {
+            errorMsg = "Error: Lobby is full. ";
+        } else {
+            errorMsg = "Error: An unexpected error occurred: " + status.getDescription();
+        }
+        status = null;
+        return errorMsg;
+    }
 }

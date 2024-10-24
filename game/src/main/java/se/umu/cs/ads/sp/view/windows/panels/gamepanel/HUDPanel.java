@@ -54,8 +54,8 @@ public class HUDPanel extends JPanel {
         selectedUnitLabel = new JLabel("");
 
         ContainerPanel timerPanel = createHUDContainerLabel(timerLabel, UtilView.screenWidth / 2 - 65, 20, 100, 40);
-        ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 20, 170, 50);
-        ContainerPanel scorePanel = createHUDContainerLabel(scoreLabel, 20, 70, 170, 50);
+        ContainerPanel scorePanel = createHUDContainerLabel(scoreLabel, 20, 20, 170, 50);
+        ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 70, 170, 50);
         ContainerPanel selectedUnitPanel = createHUDContainerLabel(selectedUnitLabel, 20, UtilView.screenHeight - 100, 310, 100);
 
         openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80, 70, 50);

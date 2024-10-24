@@ -15,6 +15,8 @@ public class Lobby {
     public int currentPlayers;
     public String selectedMap;
 
+    public boolean started;
+
     public Lobby(Long id, String name, int maxPlayers) {
         this.id = id;
         this.name = name;

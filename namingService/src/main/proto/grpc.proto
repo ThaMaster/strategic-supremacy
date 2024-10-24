@@ -24,6 +24,7 @@ message LobbyInfo {
   string lobbyName = 3;
   int32 nrPlayers = 4;
   int32 maxPlayers = 5;
+  bool started = 6;
 }
 
 message NewLobby {
@@ -57,8 +58,8 @@ message DetailedLobbyInfo {
 }
 
 service GrpcNamingService {
+  rpc startLobby (LobbyId) returns (google.protobuf.Empty);
   rpc createLobby (NewLobby) returns (LobbyId);
-  rpc deleteLobby (LobbyId) returns (google.protobuf.Empty);
   rpc getLobbies (google.protobuf.Empty) returns (Lobbies);
   rpc joinLobby(JoinRequest) returns (DetailedLobbyInfo);
   rpc leaveLobby(LeaveRequest) returns (User);
