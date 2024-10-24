@@ -2,12 +2,9 @@
 cd ../namingService || exit
 mvn clean install
 
-rm target/NamingService-1.0.jar
-mv target/NamingService-1.0-shaded.jar target/NamingService.jar
-
 # Install the naming service to repository
 mvn install:install-file \
--Dfile=./target/NamingService.jar \
+-Dfile=./target/NamingService-1.0-shaded.jar \
 -DgroupId=se.umu.cs.ads.ns \
 -DartifactId=NamingService \
 -Dversion=1.0 \
@@ -16,12 +13,10 @@ mvn install:install-file \
 # Compile the game
 cd ../game || exit
 mvn clean install
-rm target/StrategicSupremacy-1.0.jar
-mv target/StrategicSupremacy-1.0-shaded.jar target/StrategicSupremacy.jar
 
 cd ../scripts || exit
 # Start the server in another terminal
-gnome-terminal -- java -jar ../namingService/target/NamingService.jar
+gnome-terminal -- java -jar ../namingService/target/NamingService-1.0-shaded.jar
 
 # Start the game
-java -jar ../game/target/StrategicSupremacy.jar
+java -jar ../game/target/StrategicSupremacy-1.0-shaded.jar

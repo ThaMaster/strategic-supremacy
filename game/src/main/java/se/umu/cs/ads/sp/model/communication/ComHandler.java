@@ -46,6 +46,17 @@ public class ComHandler {
         modelManager.receiveDefeatUpdate(userId);
     }
 
+    public void sendEndGameMessage(UserScoreDTO userScore) {
+        System.out.println("[Client] Sending message to end the game...");
+        for (GameClient client : l3Clients.values()) {
+            client.sendEndGameMessage(userScore);
+        }
+    }
+
+    public void handleReceiveEndGameMessage(UserScoreDTO userScore) {
+        modelManager.receiveEndGameMessage(userScore);
+    }
+
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         // Make all async calls here
         //Starta timer
@@ -175,8 +186,7 @@ public class ComHandler {
         }
     }
 
-    // TODO: Concurrent modification error!
-    public void removePlayerUnits() {
+    public synchronized void removePlayerUnits() {
         if (modelManager.getObjectHandler().getMyUnits().isEmpty()) {
             return;
         }

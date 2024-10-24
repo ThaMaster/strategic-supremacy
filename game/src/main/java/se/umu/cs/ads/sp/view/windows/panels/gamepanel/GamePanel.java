@@ -515,6 +515,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                         addTextEvent(event, 20, EventColor.ALERT);
                     }
                     break;
+                case GAME_FINISHED:
+                    showGameFinishedView(event.getId(), event.getEvent());
+                    break;
                 default:
                     //This is default case, it's a collectable we have stored
                     handleCollectableEvent(event);
@@ -591,5 +594,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     private void showDefeatedView() {
         // TODO: do something here!
+    }
+
+    private void showGameFinishedView(long winnerId, String winnerText) {
+        gController.showEndFrame(gController.isMe(winnerId), winnerText);
     }
 }

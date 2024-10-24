@@ -21,5 +21,6 @@ public enum EventType {
 
     // Communication events
     PLAYER_LEFT,
-    PLAYER_DEFEATED
+    PLAYER_DEFEATED,
+    GAME_FINISHED
 }

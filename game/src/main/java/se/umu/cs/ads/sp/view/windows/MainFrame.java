@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.dialogs.AboutDialog;
 import se.umu.cs.ads.sp.view.windows.dialogs.HelpDialog;
 import se.umu.cs.ads.sp.view.windows.frames.CreateLobbyFrame;
+import se.umu.cs.ads.sp.view.windows.frames.GameEndFrame;
 import se.umu.cs.ads.sp.view.windows.frames.QuitGameFrame;
 import se.umu.cs.ads.sp.view.windows.frames.settings.SettingsFrame;
 import se.umu.cs.ads.sp.view.windows.panels.browsepanel.BrowsePanel;
@@ -24,6 +25,7 @@ public class MainFrame extends JFrame {
     private CreateLobbyFrame createLobbyFrame;
     private SettingsFrame settingsFrame;
     private QuitGameFrame quitFrame;
+    private GameEndFrame gameEndFrame;
     private JLabel playerLabel;
     private JMenuBar menuBar;
 
@@ -38,7 +40,7 @@ public class MainFrame extends JFrame {
     private BrowsePanel browsePanel;
 
     public MainFrame() {
-        if(UtilView.DARK_MODE) {
+        if (UtilView.DARK_MODE) {
             UtilView.setDarkMode();
         } else {
             UtilView.setLightMode();
@@ -48,6 +50,7 @@ public class MainFrame extends JFrame {
         createLobbyFrame = new CreateLobbyFrame();
         settingsFrame = new SettingsFrame(this);
         quitFrame = new QuitGameFrame();
+        gameEndFrame = new GameEndFrame();
 
         // Helps with performance
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
@@ -217,6 +220,14 @@ public class MainFrame extends JFrame {
         return quitFrame;
     }
 
+    public void setEndGameContent(boolean winner, String endText) {
+        gameEndFrame.setContent(winner, endText);
+    }
+
+    public void showEndGameFrame(boolean bool) {
+        gameEndFrame.showFrame(bool);
+    }
+
     //----------------------------------------
     public void setEnterButtonListener(ActionListener actionListener) {
         this.startPanel.getEnterButton().addActionListener(actionListener);
@@ -246,6 +257,11 @@ public class MainFrame extends JFrame {
 
     public void setQuitButtonListener(ActionListener actionListener) {
         this.quitFrame.getQuitButton().addActionListener(actionListener);
+    }
+
+    public void setFinishGameListener(ActionListener actionListener) {
+        this.gameEndFrame.getQuitButton().addActionListener(actionListener);
+        this.gameEndFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     }
 
     //----------------------------------------

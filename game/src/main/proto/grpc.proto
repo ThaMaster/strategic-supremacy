@@ -130,4 +130,5 @@ service GameService {
   rpc defeatUpdate (userId) returns (google.protobuf.Empty);
   rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
   rpc notifyNewLeader(userId) returns (google.protobuf.Empty);
+  rpc endGameMessage (UserScore) returns (google.protobuf.Empty);
 }

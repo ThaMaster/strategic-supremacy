@@ -38,8 +38,7 @@ public class ModelManager {
     private Timer l2Timer;
 
     private Timer gameTimer;
-    private long remainingTime = 150;
-    private boolean started = false;
+    private long remainingTime = Constants.ROUND_TIME;
 
     private long currentScoreHolderId;
     private int currentScoreHolderScore;
@@ -48,7 +47,9 @@ public class ModelManager {
     private int currentPoints;
 
     private int defeatedPlayers = 0;
-    private boolean isDefeated;
+
+    private boolean started = false;
+    private boolean finished = false;
 
     public ModelManager(User player) {
         map = new Map();
@@ -188,10 +189,12 @@ public class ModelManager {
         this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
-        started = true;
         startL3Timer(Constants.L3_UPDATE_TIME);
-        startL2Timer(Constants.L2_UPDATE_TIME);
+        startL2Timer();
         startRoundTimer();
+
+        started = true;
+        finished = false;
     }
 
     /**
@@ -204,12 +207,16 @@ public class ModelManager {
      */
     public void startGameReq(StartGameRequestDTO request) {
         objectHandler.populateWorld(request, map);
+
         this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
-        started = true;
+        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+
         l3Timer = new Timer();
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
-        startL2Timer(Constants.L2_UPDATE_TIME);
-        currentScoreHolderId = lobbyHandler.getLobby().leader.id;
+        startL2Timer();
+
+        started = true;
+        finished = false;
     }
 
     /**
@@ -234,19 +241,24 @@ public class ModelManager {
         }, 0, updateTime);
     }
 
-    private void startL2Timer(long updateTime) {
+    private void startL2Timer() {
         l2Timer = new Timer();
         l2Timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 sendL2Update();
             }
-        }, 0, updateTime);
+        }, 0, Constants.L2_UPDATE_TIME);
     }
 
     private void sendDefeatUpdate() {
         if (iAmLeader()) {
             defeatedPlayers++;
+            if (defeatedPlayers == lobbyHandler.getLobby().currentPlayers - 1) {
+                // TODO: Send out next round!
+                sendEndGameMessage();
+                handleEndGame(currentScoreHolderId, currentScoreHolderScore);
+            }
         }
         comHandler.sendDefeatUpdate(player.id);
         GameEvents.getInstance().addEvent(new GameEvent(player.id, " You have been defeated!", EventType.PLAYER_DEFEATED, -1));
@@ -255,8 +267,31 @@ public class ModelManager {
     public void receiveDefeatUpdate(long userId) {
         if (iAmLeader()) {
             defeatedPlayers++;
+            if (defeatedPlayers == lobbyHandler.getLobby().currentPlayers - 1) {
+                // TODO: Send out next round!
+                sendEndGameMessage();
+                handleEndGame(currentScoreHolderId, currentScoreHolderScore);
+            }
         }
         GameEvents.getInstance().addEvent(new GameEvent(userId, lobbyHandler.getPlayer(userId).username + " has been defeated!", EventType.PLAYER_DEFEATED, -1));
+    }
+
+    public void sendEndGameMessage() {
+        comHandler.sendEndGameMessage(new UserScoreDTO(currentScoreHolderId, currentScoreHolderScore));
+    }
+
+    public void receiveEndGameMessage(UserScoreDTO message) {
+        handleEndGame(message.userId(), message.score());
+    }
+
+    private void handleEndGame(long userId, int score) {
+        if (gameTimer != null) gameTimer.cancel();
+        if (l3Timer != null) l3Timer.cancel();
+        if (l2Timer != null) l2Timer.cancel();
+
+        // TODO: Maybe remove all clients also?
+        finished = true;
+        GameEvents.getInstance().addEvent(new GameEvent(userId, lobbyHandler.getPlayer(userId).username + " won the game with " + score + " points!", EventType.GAME_FINISHED, -1));
     }
 
     private void sendL3Update() {
@@ -477,10 +512,6 @@ public class ModelManager {
         return new UserSkeletonsDTO(player.id, skeletons);
     }
 
-    public boolean hasGameStarted() {
-        return started;
-    }
-
     private void collectEvents() {
         ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
         for (GameEvent event : events) {
@@ -539,6 +570,7 @@ public class ModelManager {
                 if (remainingTime > 0) {
                     remainingTime--;
                 } else {
+
                     gameTimer.cancel();
                 }
             }
@@ -639,10 +671,6 @@ public class ModelManager {
         return bbs;
     }
 
-    public boolean iAmLeader() {
-        return lobbyHandler.getLobby() != null && lobbyHandler.getRaft().iAmLeader();
-    }
-
     public void setNewLeader(long userId) {
         if (l3Timer != null) l3Timer.cancel();
         l3Timer = new Timer();
@@ -652,5 +680,17 @@ public class ModelManager {
             updateTime /= 2;
         }
         startL3Timer(updateTime);
+    }
+
+    public boolean iAmLeader() {
+        return lobbyHandler.getLobby() != null && lobbyHandler.getRaft().iAmLeader();
+    }
+
+    public boolean hasGameStarted() {
+        return started;
+    }
+
+    public boolean hasGameFinished() {
+        return finished;
     }
 }

@@ -107,13 +107,6 @@ public class CreateLobbyFrame extends JFrame {
     }
 
     public void showFrame(boolean bool) {
-        if(UtilView.DARK_MODE) {
-            UtilView.setDarkMode();
-        } else {
-            UtilView.setLightMode();
-        }
-        this.revalidate();
-        this.repaint();
         this.setVisible(bool);
     }
 }

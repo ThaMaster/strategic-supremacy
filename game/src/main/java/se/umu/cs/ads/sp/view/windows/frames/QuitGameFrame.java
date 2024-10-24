@@ -19,6 +19,7 @@ public class QuitGameFrame extends JFrame {
 
         JLabel textLabel = new JLabel("Do you want to quit the game?");
         textLabel.setFont(StyleConstants.PLAIN_TEXT_FONT);
+        textLabel.setHorizontalAlignment(JLabel.CENTER);
 
         centerPanel.add(textLabel);
         centerPanel.setBorder(StyleConstants.DEFAULT_EMPTY_BORDER);
@@ -49,11 +50,6 @@ public class QuitGameFrame extends JFrame {
     }
 
     public void showFrame(boolean bool) {
-        if(UtilView.DARK_MODE) {
-            UtilView.setDarkMode();
-        } else {
-            UtilView.setLightMode();
-        }
         this.setVisible(bool);
     }
 }

@@ -1,7 +1,6 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.BotHandler;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.util.AppSettings;
@@ -13,16 +12,15 @@ import java.util.ArrayList;
 
 public class BotController implements Runnable {
 
-    private ModelManager modelManager;
-    private User user;
+    private final ModelManager modelManager;
 
     private Timer updateLobbyTimer;
     private Timer updateTimer;
     private Timer gameTimer;
 
     public BotController(long lobbyId) {
-        user = new User(UtilModel.generateRandomString(10), UtilModel.getLocalIP(), UtilModel.getFreePort());
-        modelManager = new ModelManager(user);
+        User botUser = new User(UtilModel.generateRandomString(10), UtilModel.getLocalIP(), UtilModel.getFreePort());
+        modelManager = new ModelManager(botUser);
         initTimers();
         if (lobbyId == -1) {
             joinLobby(modelManager.getLobbyHandler().fetchLobbies().get(0).id);
@@ -47,25 +45,24 @@ public class BotController implements Runnable {
     }
 
     private void initTimers() {
-        // TODO: Should the AIs have these timers or should the model handle next round, starting the game, and
-        // TODO: update the game by itself?
 
         gameTimer = new Timer(700, e -> {
             long remainingTime = modelManager.getRoundRemainingTime();
-            if (remainingTime <= 0) {
-                // TODO: next round stuff
+            if (remainingTime <= 0 && modelManager.iAmLeader()) {
             }
         });
 
         updateLobbyTimer = new Timer(500, e -> {
             if (modelManager.hasGameStarted()) {
-                // TODO: If game has started, start updating the game!
                 updateLobbyTimer.stop();
                 updateTimer.start();
                 gameTimer.start();
             }
         });
         updateTimer = new Timer(1000 / 60, e -> {
+            if (modelManager.hasGameFinished()) {
+                updateTimer.stop();
+            }
             update();
         });
     }
@@ -80,7 +77,7 @@ public class BotController implements Runnable {
     }
 
     private void moveRandomUnits() {
-        int unitsToMove = UtilModel.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size());
+        int unitsToMove = UtilModel.getRandomInt(0, modelManager.getObjectHandler().getMyUnits().values().size()+1);
         for (int i = 0; i < unitsToMove; i++) {
             PlayerUnit unit = new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()).get(i);
             modelManager.setSelection(unit.getId());
@@ -92,11 +89,12 @@ public class BotController implements Runnable {
         Position newPosition;
         int offset = 100;
         do {
-            newPosition = new Position(UtilModel.getRandomInt(pos.getX()-offset, pos.getX() + offset), UtilModel.getRandomInt(pos.getY() - offset, pos.getY() + offset));
+            newPosition = new Position(UtilModel.getRandomInt(pos.getX() - offset, pos.getX() + offset), UtilModel.getRandomInt(pos.getY() - offset, pos.getY() + offset));
             offset += 100;
         } while (!modelManager.isWalkable(newPosition) && !modelManager.isInFov(newPosition));
         return newPosition;
     }
+
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java AiController <lobbyId>");

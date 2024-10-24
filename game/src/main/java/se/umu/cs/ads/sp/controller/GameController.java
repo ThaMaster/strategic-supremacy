@@ -96,6 +96,9 @@ public class GameController implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (modelManager.hasGameFinished()) {
+            updateTimer.stop();
+        }
         update();
         render();
     }
@@ -197,6 +200,7 @@ public class GameController implements ActionListener {
         mainFrame.setLeaveButtonListener(new LeaveButtonListener());
         mainFrame.setCreateLobbyListener(new CreateButtonListener());
         mainFrame.setQuitButtonListener(new QuitButtonListener());
+        mainFrame.setFinishGameListener(new FinishGameListener());
         mainFrame.getBrowseTable().getSelectionModel().addListSelectionListener(e -> {
             // If I do not have this if, it will fire an event when pressing and releasing the mouse
             if (!e.getValueIsAdjusting()) {
@@ -294,6 +298,17 @@ public class GameController implements ActionListener {
             updateTimer.stop();
             modelManager.leaveOngoingGame();
             mainFrame.getQuitFrame().showFrame(false);
+            mainFrame.switchPanel("Browse");
+            fetchLobbies();
+        }
+    }
+
+    public class FinishGameListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            modelManager.leaveOngoingGame();
+            mainFrame.showEndGameFrame(false);
             mainFrame.switchPanel("Browse");
             fetchLobbies();
         }
@@ -410,5 +425,10 @@ public class GameController implements ActionListener {
 
     public boolean isMe(long id) {
         return modelManager.getPlayer().id == id;
+    }
+
+    public void showEndFrame(boolean winner, String endText) {
+        mainFrame.setEndGameContent(winner, endText);
+        mainFrame.showEndGameFrame(true);
     }
 }

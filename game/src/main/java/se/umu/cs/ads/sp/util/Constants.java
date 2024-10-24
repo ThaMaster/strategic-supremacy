@@ -20,4 +20,6 @@ public class Constants {
     public static final int FIELD_OF_VIEW_RADIUS = 250;
     public static final int L2_RADIUS = FIELD_OF_VIEW_RADIUS * 2;
     public static final int L1_RADIUS = FIELD_OF_VIEW_RADIUS + 50;
+
+    public static final int ROUND_TIME = 150;
 }

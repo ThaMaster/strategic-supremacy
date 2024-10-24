@@ -13,5 +13,5 @@ number=$1
 for ((i=1; i<=number; i++))
 do
     # Add the command you want to run here
-    gnome-terminal -- java -jar ../game/target/StrategicSupremacy.jar
+    gnome-terminal -- java -jar ../game/target/StrategicSupremacy-1.0-shaded.jar
 done

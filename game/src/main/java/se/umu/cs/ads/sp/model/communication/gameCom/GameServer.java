@@ -108,6 +108,13 @@ public class GameServer {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
+
+        @Override
+        public void endGameMessage(UserScore request, StreamObserver<Empty> responseObserver) {
+            comHandler.handleReceiveEndGameMessage(GrpcUtil.fromGrpcUserScore(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
     }
 
     private void stop() {

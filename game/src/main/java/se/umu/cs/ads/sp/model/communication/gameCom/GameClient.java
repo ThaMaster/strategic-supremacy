@@ -58,19 +58,6 @@ public class GameClient {
         return ip + ":" + port;
     }
 
-    public void destroy() {
-        channel.shutdown();
-        try {
-            // Wait for the channel to terminate
-            if (!channel.awaitTermination(2, TimeUnit.SECONDS)) {
-                channel.shutdownNow(); // Force shutdown if not terminated
-            }
-        } catch (InterruptedException e) {
-            channel.shutdownNow(); // Force shutdown on interruption
-            Thread.currentThread().interrupt(); // Restore interrupted status
-        }
-    }
-
     public void startGame(StartGameRequestDTO req) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -242,12 +229,33 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void shutdown() {
+    public void sendEndGameMessage(UserScoreDTO message) {
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .endGameMessage(GrpcUtil.toGrpcUserScore(message));
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty empty) {
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                System.out.println("\tFailed to receive a vote from " + ip + ":" + port);
+                System.out.println("\t" + throwable.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void destroy() {
         channel.shutdown();
         try {
-            while (!channel.awaitTermination(2000, TimeUnit.MILLISECONDS)) ;
+            // Wait for the channel to terminate
+            if (!channel.awaitTermination(2, TimeUnit.SECONDS)) {
+                channel.shutdownNow(); // Force shutdown if not terminated
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            channel.shutdownNow(); // Force shutdown on interruption
+            Thread.currentThread().interrupt(); // Restore interrupted status
         }
     }
 }
