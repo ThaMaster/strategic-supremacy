@@ -18,5 +18,4 @@ public record StartGameRequestDTO(
     public void addSkeleton(UserSkeletonsDTO skeletons) {
         userSkeletons.add(skeletons);
     }
-
 }

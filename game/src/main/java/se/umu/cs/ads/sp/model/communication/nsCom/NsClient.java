@@ -81,9 +81,9 @@ public class NsClient {
 
     public void startLobby(Long lobbyId) {
         try {
-            System.out.println("[Client] Leaving lobby with id: " + lobbyId);
+            System.out.println("[Client] Starting lobby with id: " + lobbyId);
             blockingStub.startLobby(LobbyId.newBuilder().setId(lobbyId).build());
-            System.out.println("\t Left the lobby.");
+            System.out.println("\t Lobby live.");
 
         } catch (Exception e) {
             System.out.println("\t Failed to start lobby.");

@@ -1,6 +1,5 @@
 package se.umu.cs.ads.sp.model.map;
 
-import se.umu.cs.ads.sp.model.components.CollisionBox;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Chest;
 import se.umu.cs.ads.sp.model.objects.collectables.Collectable;
@@ -29,16 +28,14 @@ public class Map {
 
     public Map() {
         this.map = new ArrayList<>();
-        initTiles();
-    }
-
-    public void initTiles() {
-        // Create all tiles needed.
     }
 
     public void loadMap(String file) {
         try {
             InputStream is = getClass().getResourceAsStream("/" + file);
+            if (is == null) {
+                return;
+            }
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             int row = 0;
@@ -62,8 +59,7 @@ public class Map {
             this.cols = maxCol;
 
         } catch (IOException e) {
-            System.out.println("ERROR");
-            e.printStackTrace();
+            System.out.println("Error: Unexpected problem when loading map with name: " + file);
         }
     }
 
@@ -71,7 +67,7 @@ public class Map {
         map.get(position.getY() / Constants.TILE_HEIGHT).get(position.getX() / Constants.TILE_WIDTH).setInhabitant(object);
     }
 
-    public Position getMapIndexPos(Position position){
+    public Position getMapIndexPos(Position position) {
         return new Position(position.getX() / Constants.TILE_WIDTH, position.getY() / Constants.TILE_HEIGHT);
     }
 
@@ -89,46 +85,10 @@ public class Map {
         return new ArrayList<>();
     }
 
-    /**
-     * Function for getting all the inhabitants from a whole collision box and not just the corners.
-     *
-     * @param cBox The collision box to check.
-     * @return the inhabitants
-     */
-    public ArrayList<GameObject> getInhabitants(CollisionBox cBox) {
-        ArrayList<GameObject> inhabitants = new ArrayList<>();
-        ArrayList<Position> corners = cBox.getCorners();
-        Position topLeft = corners.get(0);
-        Position topRight = corners.get(1);
-        Position bottomLeft = corners.get(2);
-
-        int col = topLeft.getX() / Constants.TILE_WIDTH;
-        int colEnd = topRight.getX() / Constants.TILE_WIDTH;
-        int row = topLeft.getY() / Constants.TILE_HEIGHT;
-        int rowEnd = bottomLeft.getY() / Constants.TILE_HEIGHT;
-
-        for (int y = row - 1; y >= 0 && y < rowEnd && y < map.size(); y++) {
-            for (int x = col - 1; x >= 0 && x < colEnd && x < map.get(y).size(); x++) {
-                inhabitants.addAll(map.get(y).get(x).getInhabitants());
-            }
-        }
-        return inhabitants;
-    }
-
     public void removeInhabitant(GameObject inhabitant, Position position) {
         int row = position.getY() / Constants.TILE_WIDTH;
         int col = position.getX() / Constants.TILE_HEIGHT;
         map.get(row).get(col).removeInhabitant(inhabitant.getId());
-    }
-
-    /**
-     * Implement in Milestone 3
-     */
-    public void generateMap() {
-        // Generation logic
-
-        // Then load the map
-        // loadMap();
     }
 
     public ArrayList<ArrayList<TileModel>> getModelMap() {
@@ -261,5 +221,13 @@ public class Map {
             return !getModelMap().get(row).get(col).hasCollision();
         }
         return false;
+    }
+
+    public void clearMap() {
+        for (ArrayList<TileModel> tileModels : map) {
+            for (TileModel tileModel : tileModels) {
+                tileModel.clearInhabitants();
+            }
+        }
     }
 }

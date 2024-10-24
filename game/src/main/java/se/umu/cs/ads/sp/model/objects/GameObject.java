@@ -20,7 +20,7 @@ public abstract class GameObject {
         this.spawn(map);
     }
 
-    private void spawn(Map map) {
+    protected void spawn(Map map) {
         map.setInhabitant(this, position);
     }
 

@@ -51,7 +51,7 @@ public class HUDPanel extends JPanel {
      */
     private void initHUDComponents() {
         // Player stats section (top left corner)
-        timerLabel = new JLabel("01:00");
+        timerLabel = new JLabel("");
         moneyLabel = new JLabel("Money: $0");
         scoreLabel = new JLabel("Score: 0");
         selectedUnitLabel = new JLabel("");
@@ -61,8 +61,8 @@ public class HUDPanel extends JPanel {
         ContainerPanel moneyPanel = createHUDContainerLabel(moneyLabel, 20, 70, 170, 50);
         selectedUnitPanel = createHUDContainerLabel(selectedUnitLabel, 20, UtilView.screenHeight - 100, 310, 100);
 
-        openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80, 70, 50);
-        upgradePanel = new UpgradePanel(gamePanel, 850, 550);
+        openShopButton = createHUDShopButton(UtilView.screenWidth / 2 - 35, UtilView.screenHeight - 80);
+        upgradePanel = new UpgradePanel(gamePanel, 900, 550);
         defeatPanel = new DefeatedPanel(400, 250);
         // Add components to HUDPanel
         this.add(timerPanel);
@@ -85,18 +85,18 @@ public class HUDPanel extends JPanel {
         return cPanel;
     }
 
-    private JButton createHUDShopButton(int x, int y, int width, int height) {
+    private JButton createHUDShopButton(int x, int y) {
         Image defaultImage = Objects.requireNonNull(
                         ImageLoader.loadImage("/sprites/hud/buttons/shopButton.png"))
-                .getScaledInstance(width, height, Image.SCALE_FAST);
+                .getScaledInstance(70, 50, Image.SCALE_FAST);
         Image pressedImage = Objects.requireNonNull(
                         ImageLoader.loadImage("/sprites/hud/buttons/shopButtonPressed.png"))
-                .getScaledInstance(width, height, Image.SCALE_FAST);
+                .getScaledInstance(70, 50, Image.SCALE_FAST);
 
         defaultIcon = new ImageIcon(defaultImage);
         pressedIcon = new ImageIcon(pressedImage);
         JButton button = new JButton(defaultIcon);
-        button.setBounds(x, y, width, height);
+        button.setBounds(x, y, 70, 50);
 
         // Remove any default button decorations like borders
         button.setBorderPainted(false);

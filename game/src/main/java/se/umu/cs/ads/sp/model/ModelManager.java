@@ -27,7 +27,7 @@ import java.util.TimerTask;
 
 public class ModelManager {
 
-    private final Map map;
+    private Map map;
     private final ObjectHandler objectHandler;
     private final LobbyHandler lobbyHandler;
     private final ComHandler comHandler;
@@ -50,6 +50,8 @@ public class ModelManager {
 
     private boolean started = false;
     private boolean finished = false;
+
+    private int currentRound = 0;
 
     public ModelManager(User player) {
         map = new Map();
@@ -181,7 +183,7 @@ public class ModelManager {
 
         System.out.println("[Client] Sending out start request to lobby...");
         comHandler.markLobbyStarted(lobbyHandler.getLobby().id);
-        StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users, this);
+        StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users);
         for (User user : lobbyHandler.getLobby().users) {
             if (user.id != player.id) {
                 comHandler.sendStartGameRequest(req, user);
@@ -208,7 +210,7 @@ public class ModelManager {
      * @param request Incoming start game request
      */
     public void startGameReq(StartGameRequestDTO request) {
-        objectHandler.populateWorld(request, map);
+        objectHandler.populateWorld(request, map, false);
 
         this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
@@ -254,32 +256,52 @@ public class ModelManager {
     }
 
     private void sendDefeatUpdate() {
+        GameEvents.getInstance().addEvent(new GameEvent(player.id, " You have been defeated!", EventType.PLAYER_DEFEATED, -1));
+        comHandler.sendDefeatUpdate(player.id);
+
+        defeatedPlayers++;
         if (iAmLeader()) {
-            defeatedPlayers++;
             if (defeatedPlayers == lobbyHandler.getLobby().currentPlayers - 1) {
-                // TODO: Send out next round!
-                sendEndGameMessage();
-                handleEndGame(currentScoreHolderId, currentScoreHolderScore);
+                this.remainingTime = 10;
             }
         }
-        comHandler.sendDefeatUpdate(player.id);
-        GameEvents.getInstance().addEvent(new GameEvent(player.id, " You have been defeated!", EventType.PLAYER_DEFEATED, -1));
     }
 
     public void receiveDefeatUpdate(long userId) {
+        GameEvents.getInstance().addEvent(new GameEvent(userId, lobbyHandler.getPlayer(userId).username + " has been defeated!", EventType.PLAYER_DEFEATED, -1));
+        defeatedPlayers++;
         if (iAmLeader()) {
-            defeatedPlayers++;
             if (defeatedPlayers == lobbyHandler.getLobby().currentPlayers - 1) {
-                // TODO: Send out next round!
-                sendEndGameMessage();
-                handleEndGame(currentScoreHolderId, currentScoreHolderScore);
+                this.remainingTime = 10;
             }
         }
-        GameEvents.getInstance().addEvent(new GameEvent(userId, lobbyHandler.getPlayer(userId).username + " has been defeated!", EventType.PLAYER_DEFEATED, -1));
+    }
+
+    public void sendNextRoundRequest() {
+        map.clearMap();
+        StartGameRequestDTO request = objectHandler.generateNextRound(map, lobbyHandler.getLobby().users);
+        comHandler.sendNextRound(request);
+        fov.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
+        startRoundTimer();
+        GameEvents.getInstance().addEvent(new GameEvent(player.id, "Next Round!", EventType.NEW_ROUND, -1));
+        defeatedPlayers = 0;
+        currentRound++;
+        comHandler.resetClients();
+    }
+
+    public void receiveNextRound(StartGameRequestDTO request) {
+        map.clearMap();
+        objectHandler.populateWorld(request, map, true);
+        fov.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
+        GameEvents.getInstance().addEvent(new GameEvent(player.id, "Next Round!", EventType.NEW_ROUND, -1));
+        defeatedPlayers = 0;
+        currentRound++;
+        comHandler.resetClients();
     }
 
     public void sendEndGameMessage() {
         comHandler.sendEndGameMessage(new UserScoreDTO(currentScoreHolderId, currentScoreHolderScore));
+        handleEndGame(currentScoreHolderId, currentScoreHolderScore);
     }
 
     public void receiveEndGameMessage(UserScoreDTO message) {
@@ -525,10 +547,14 @@ public class ModelManager {
                     break;
                 case DEATH:
                     PlayerUnit unit;
-                    if (objectHandler.getMyUnitIds().contains(event.getId())) {
-                        unit = objectHandler.getMyUnits().get(event.getId());
+                    if (objectHandler.getMyUnits().containsKey(event.getId())) {
+                        this.currentPoints++;
+                        this.currentGold += 10;
+                    }
+                    if (objectHandler.getMyUnitIds().contains(event.getEventAuthor())) {
+                        unit = objectHandler.getMyUnits().get(event.getEventAuthor());
                     } else {
-                        unit = objectHandler.getEnemyUnits().get(event.getId());
+                        unit = objectHandler.getEnemyUnits().get(event.getEventAuthor());
                     }
                     if (unit.hasFlag()) {
                         objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
@@ -565,6 +591,7 @@ public class ModelManager {
     }
 
     private void startRoundTimer() {
+        this.remainingTime = Constants.ROUND_TIME;
         this.gameTimer = new Timer();
         this.gameTimer.schedule(new TimerTask() {
             @Override
@@ -572,8 +599,14 @@ public class ModelManager {
                 if (remainingTime > 0) {
                     remainingTime--;
                 } else {
-
-                    gameTimer.cancel();
+                    if (iAmLeader()) {
+                        if (currentRound == 2) {
+                            sendEndGameMessage();
+                        } else {
+                            sendNextRoundRequest();
+                        }
+                        gameTimer.cancel();
+                    }
                 }
             }
         }, 0, 1000);

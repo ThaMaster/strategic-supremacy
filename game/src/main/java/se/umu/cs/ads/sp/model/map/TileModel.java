@@ -58,4 +58,8 @@ public class TileModel {
             inhabitants.add(inhabitant);
         }
     }
+
+    public void clearInhabitants() {
+        this.inhabitants.clear();
+    }
 }

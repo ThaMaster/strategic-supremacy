@@ -20,7 +20,6 @@ public class ComHandler {
 
     private final NsClient nsClient;
     private final ModelManager modelManager;
-    private final GameServer server;
     private final ConcurrentHashMap<Long, GameClient> l3Clients;
     private final ConcurrentHashMap<Long, GameClient> l2Clients;
     private final ConcurrentHashMap<Long, GameClient> l1Clients;
@@ -33,8 +32,7 @@ public class ComHandler {
 
         nsClient = new NsClient();
         this.modelManager = modelManager;
-        server = new GameServer(port, this);
-        server.start();
+        new GameServer(port, this).start();
     }
 
     public void sendDefeatUpdate(long userId) {
@@ -58,12 +56,19 @@ public class ComHandler {
         modelManager.receiveEndGameMessage(userScore);
     }
 
+    public void sendNextRound(StartGameRequestDTO request) {
+        for (GameClient client : l3Clients.values()) {
+            client.sendNextRoundRequest(request);
+        }
+    }
+
+    public void handleReceiveNextRound(StartGameRequestDTO request) {
+        modelManager.receiveNextRound(request);
+    }
+
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
-        // Make all async calls here
-        //Starta timer
         if (fromLeader) {
             for (GameClient client : l3Clients.values()) {
-                // Send l3 update to everyone
                 client.sendL3Message(message);
             }
         } else {
@@ -292,7 +297,6 @@ public class ComHandler {
     }
 
     public void newLeaderReceived(Long userId) {
-        System.out.println("Gamecom -> received new leader");
         modelManager.setNewLeader(userId);
         timeSinceL3Update = System.currentTimeMillis();
     }
@@ -324,5 +328,10 @@ public class ComHandler {
             // Switch back to the previous context
             newContext.detach(previousContext);
         }
+    }
+
+    public void resetClients() {
+        l1Clients.clear();
+        l2Clients.clear();
     }
 }

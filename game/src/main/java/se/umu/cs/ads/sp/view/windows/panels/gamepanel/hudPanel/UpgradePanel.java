@@ -6,6 +6,7 @@ import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.soundmanager.SoundFX;
 import se.umu.cs.ads.sp.view.soundmanager.SoundManager;
 import se.umu.cs.ads.sp.view.util.ImageLoader;
+import se.umu.cs.ads.sp.view.util.StyleConstants;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.panels.gamepanel.GamePanel;
 
@@ -31,7 +32,7 @@ public class UpgradePanel extends JPanel {
     private ImageIcon defaultIcon;
     private ImageIcon pressedIcon;
     private ImageIcon disabledIcon;
-    
+
     private int money = 0; // Initial money, you can modify this externally
 
     public UpgradePanel(GamePanel gp, int width, int height) {
@@ -102,8 +103,11 @@ public class UpgradePanel extends JPanel {
             typeGbc.gridx = 0;
             typeGbc.gridy = 0;
             typeGbc.gridwidth = myUnits.size();  // Span the label across all unit columns
+            typeGbc.insets = new Insets(0,0,3, 0);
             JLabel upgradeLabel = new JLabel(upgradeType.label);
             upgradeTypePanel.add(upgradeLabel, typeGbc);
+            upgradeLabel.setFont(StyleConstants.HUD_TEXT);
+            upgradeLabel.setForeground(Color.BLACK);
 
             // Add upgrade rows for each unit in this type panel
             for (int t = 0; t < myUnits.size(); t++) {
@@ -143,10 +147,12 @@ public class UpgradePanel extends JPanel {
 
         // Upgrade amount label (number of upgrades)
         JLabel currentLevelLabel = new JLabel("Level: 1");
+        currentLevelLabel.setForeground(Color.BLACK);
+        currentLevelLabel.setFont(StyleConstants.HUD_TEXT);
         gbc.gridx = 0; // First column
         gbc.gridy = 0; // First row
         gbc.weightx = 0; // Don't allow the number label to grow
-        gbc.insets = new Insets(0, 15, 0, 0); // Add padding around components
+        gbc.insets = new Insets(0, 5, 0, 0); // Add padding around components
         upgradeRowPanel.add(currentLevelLabel, gbc);
 
         // Stat panel to display the current stat and upgrade amount
@@ -156,6 +162,8 @@ public class UpgradePanel extends JPanel {
 
         // Adding current stat label
         JLabel currentStatLabel = new JLabel(String.valueOf(currentStat));
+        currentStatLabel.setForeground(Color.BLACK);
+        currentStatLabel.setFont(StyleConstants.HUD_TEXT);
         gbc.gridx = 0; // First column
         gbc.gridy = 0; // First row in the stat panel
         gbc.weightx = 0; // Allow it to grow
@@ -163,6 +171,8 @@ public class UpgradePanel extends JPanel {
         statPanel.add(currentStatLabel, gbc);
 
         JLabel arrowLabel = new JLabel("->");
+        arrowLabel.setForeground(Color.BLACK);
+        arrowLabel.setFont(StyleConstants.HUD_TEXT);
         gbc.gridx = 1; // First column
         gbc.gridy = 0; // First row in the stat panel
         gbc.weightx = 0; // Allow it to grow
@@ -170,6 +180,8 @@ public class UpgradePanel extends JPanel {
 
         // Adding upgrade amount label
         JLabel upgradedStatLabel = new JLabel(String.valueOf(currentStat + upgradeAmount));
+        upgradedStatLabel.setForeground(Color.BLACK);
+        upgradedStatLabel.setFont(StyleConstants.HUD_TEXT);
         upgradedStatLabel.setForeground(Color.GREEN.darker().darker());
         gbc.gridx = 2;
         gbc.gridy = 0;
@@ -182,7 +194,7 @@ public class UpgradePanel extends JPanel {
         gbc.gridx = 1; // Second column in the upgrade row
         gbc.gridy = 0; // First row
         gbc.weightx = 1; // Allow the stat panel to grow
-        gbc.insets = new Insets(0, 0, 0, 15); // Add padding around components
+        gbc.insets = new Insets(0, 0, 0, 5); // Add padding around components
         upgradeRowPanel.add(statPanel, gbc);
 
         // Create and configure the buy button
@@ -193,6 +205,8 @@ public class UpgradePanel extends JPanel {
         pricePanel.setOpaque(false);
 
         JLabel priceLabelText = new JLabel("Price:");
+        priceLabelText.setForeground(Color.BLACK);
+        priceLabelText.setFont(StyleConstants.HUD_TEXT);
         // Set constraints for the "Price:" label
         gbc.gridx = 0; // Third column for "Price:" label
         gbc.gridy = 0; // First row
@@ -201,6 +215,8 @@ public class UpgradePanel extends JPanel {
         pricePanel.add(priceLabelText, gbc);
 
         JLabel currentPriceLabel = new JLabel("$" + initialPrice);
+        currentPriceLabel.setForeground(Color.BLACK);
+        currentPriceLabel.setFont(StyleConstants.HUD_TEXT);
         // Set constraints for the "Price:" label
         gbc.gridx = 1; // Third column for "Price:" label
         gbc.gridy = 0; // First row
@@ -210,7 +226,7 @@ public class UpgradePanel extends JPanel {
         gbc.gridx = 0; // Second column in the upgrade row
         gbc.gridy = 1; // First row
         gbc.weightx = 0; // Allow the stat panel to grow
-        gbc.insets = new Insets(0, 15, 0, 15); // Add padding around components
+        gbc.insets = new Insets(0, 5, 0, 5); // Add padding around components
         upgradeRowPanel.add(pricePanel, gbc);
 
         buyButton.addActionListener(new BuyButtonListener(currentStat,
@@ -225,7 +241,7 @@ public class UpgradePanel extends JPanel {
         gbc.gridx = 1; // Fourth column for buy button
         gbc.gridy = 1;
         gbc.weightx = 0; // Don't allow the button to grow
-        gbc.insets = new Insets(0, 0, 0, 15); // Add padding around components
+        gbc.insets = new Insets(0, 0, 0, 5); // Add padding around components
         upgradeRowPanel.add(buyButton, gbc);
 
         return upgradeRowPanel;

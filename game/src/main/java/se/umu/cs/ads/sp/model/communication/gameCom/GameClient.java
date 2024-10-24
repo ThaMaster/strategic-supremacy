@@ -8,8 +8,8 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import proto.CandidateLeaderResponse;
 import proto.GameServiceGrpc;
-import proto.candidateLeaderResponse;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
@@ -191,13 +191,13 @@ public class GameClient {
 
     public void requestVote(Raft raft, LeaderRequestDto request) {
         System.out.println("[Client] Requesting a vote for leader election...");
-        ListenableFuture<candidateLeaderResponse> future = stub
+        ListenableFuture<CandidateLeaderResponse> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .requestVote(GrpcUtil.toGrpcLeaderRequest(request));
-        Futures.addCallback(future, new FutureCallback<candidateLeaderResponse>() {
+        Futures.addCallback(future, new FutureCallback<CandidateLeaderResponse>() {
 
             @Override
-            public void onSuccess(@Nullable candidateLeaderResponse candidateLeaderResponse) {
+            public void onSuccess(@Nullable CandidateLeaderResponse candidateLeaderResponse) {
                 assert candidateLeaderResponse != null;
                 raft.receiveVote(candidateLeaderResponse.getAcknowledgement());
             }
@@ -210,7 +210,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void notifyNewLeader(proto.userId user) {
+    public void notifyNewLeader(proto.UserId user) {
         System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -224,6 +224,23 @@ public class GameClient {
             @Override
             public void onFailure(Throwable throwable) {
                 System.out.println("\tFailed to receive a vote from " + ip + ":" + port);
+                System.out.println("\t" + throwable.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    public void sendNextRoundRequest(StartGameRequestDTO message) {
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .nextRound(GrpcUtil.toGrpcStartGameReq(message));
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty empty) {
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                System.out.println("\tFailed to send next round request to " + ip + ":" + port);
                 System.out.println("\t" + throwable.getMessage());
             }
         }, MoreExecutors.directExecutor());

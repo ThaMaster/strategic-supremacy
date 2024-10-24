@@ -204,8 +204,8 @@ public class PlayerUnit extends Entity {
     }
 
     public void attack() {
-        GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit attacking", EventType.ATTACK, id));
-        targetedUnit.takeDamage(baseAttack + attackBuff);
+        GameEvents.getInstance().addEvent(new GameEvent(targetedUnit.id, "Unit attacking", EventType.ATTACK, id));
+        targetedUnit.takeDamage(baseAttack + attackBuff, id);
     }
 
     private void startMining() {
@@ -241,5 +241,20 @@ public class PlayerUnit extends Entity {
         return baseAttack;
     }
 
-
+    public void reset(Position newPosition) {
+        collected.clear();
+        state = EntityState.IDLE;
+        currentHp = maxHp;
+        hasFlag = false;
+        flagId = null;
+        if (targetedUnit != null) {
+            targetedUnit.setSelected(false);
+            targetedUnit = null;
+        }
+        setSelected(false);
+        position = newPosition;
+        collisionBox.setLocation(newPosition);
+        destination = newPosition;
+        spawn(map);
+    }
 }

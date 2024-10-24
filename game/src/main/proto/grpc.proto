@@ -107,28 +107,29 @@ message DetailedLobbyInfo {
   string selectedMap = 6;
 }
 
-message candidateLeaderRequest {
+message CandidateLeaderRequest {
   int32 msgCount = 1;
   int64 userId = 2;
 }
 
-message candidateLeaderResponse {
+message CandidateLeaderResponse {
   bool acknowledgement = 1;
 }
 
-message userId {
+message UserId {
   int64 userId = 1;
 }
 
 service GameService {
   rpc removePlayerUnits (UserSkeletons) returns (google.protobuf.Empty);
-  rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
   rpc l1Update (L1Message) returns (google.protobuf.Empty);
   rpc l2Update (L2Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
-  rpc defeatUpdate (userId) returns (google.protobuf.Empty);
-  rpc requestVote(candidateLeaderRequest) returns (candidateLeaderResponse);
-  rpc notifyNewLeader(userId) returns (google.protobuf.Empty);
+  rpc defeatUpdate (UserId) returns (google.protobuf.Empty);
+  rpc requestVote(CandidateLeaderRequest) returns (CandidateLeaderResponse);
+  rpc notifyNewLeader(UserId) returns (google.protobuf.Empty);
+  rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
+  rpc nextRound (StartGameRequest) returns (google.protobuf.Empty);
   rpc endGameMessage (UserScore) returns (google.protobuf.Empty);
 }

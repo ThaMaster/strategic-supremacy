@@ -471,7 +471,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         for (GameEvent event : events) {
             switch (event.getType()) {
                 case NEW_ROUND:
-                    addTextEvent(event, 15, EventColor.ALERT);
+                    gController.initRound();
                     break;
                 case LOGG:
                     addTextEvent(event, 30, EventColor.ALERT);
@@ -491,7 +491,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     break;
                 case DEATH:
                     SoundManager.getInstance().play(SoundFX.DEATH);
-                    addTextEvent(event, 15, EventColor.ALERT);
+                    if (gController.isMyUnit(event.getId())) {
+                        gController.updateHudInfo();
+                    }
+                    if ( gController.isMe(event.getEventAuthor())) {
+                        addTextEvent(event, 15, EventColor.ALERT);
+                    }
                     break;
                 case ATTACK:
                     SoundManager.getInstance().play(SoundFX.ATTACK);

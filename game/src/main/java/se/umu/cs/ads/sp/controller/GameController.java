@@ -9,6 +9,7 @@ import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
 import se.umu.cs.ads.sp.util.enums.Direction;
+import se.umu.cs.ads.sp.util.enums.UpgradeType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
@@ -43,9 +44,7 @@ public class GameController implements ActionListener {
 
         this.gameTimer = new Timer(700, e -> {
             long remainingTime = modelManager.getRoundRemainingTime();
-            if (remainingTime <= 0) {
-                //Todo next round stuff
-            } else {
+            if (remainingTime >= 0) {
                 updateHudTimer((int) remainingTime);
             }
         });
@@ -410,9 +409,13 @@ public class GameController implements ActionListener {
         mainFrame.getHudPanel().updateTimer(remainingTime / 60, remainingTime % 60);
     }
 
-    private void updateHudInfo() {
+    public void updateHudInfo() {
         mainFrame.getHudPanel().updateMoney(modelManager.getCurrentGold());
         mainFrame.getHudPanel().updateScore(modelManager.getCurrentPoints());
+        for (long unit : modelManager.getObjectHandler().getMyUnitIds())
+            for (UpgradeType type : UpgradeType.values()) {
+                updateStat(unit, type.label);
+            }
     }
 
     public void buyUpgrade(long unitId, String type, int amount, int cost) {
@@ -448,5 +451,13 @@ public class GameController implements ActionListener {
 
     public void showDefeat(boolean bool) {
         mainFrame.getHudPanel().showDefeatPanel(bool);
+    }
+
+    public void initRound() {
+        mainFrame.getGamePanel().setEntities(modelManager.getObjectHandler().getMyUnits(),
+                modelManager.getObjectHandler().getEnemyUnits());
+        mainFrame.getGamePanel().setCollectables(modelManager.getObjectHandler().getCollectables());
+        mainFrame.getGamePanel().setEnvironments(modelManager.getObjectHandler().getEnvironments());
+        showDefeat(false);
     }
 }

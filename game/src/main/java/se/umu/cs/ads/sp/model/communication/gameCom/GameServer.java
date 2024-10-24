@@ -8,6 +8,7 @@ import proto.*;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
+import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class GameServer {
         }
 
         @Override
-        public void defeatUpdate(userId request, StreamObserver<Empty> responseObserver) {
+        public void defeatUpdate(UserId request, StreamObserver<Empty> responseObserver) {
             System.out.println("[Server] A user has been defeated.");
             comHandler.handleReceiveDefeatUpdate(request.getUserId());
             responseObserver.onNext(Empty.newBuilder().build());
@@ -94,17 +95,24 @@ public class GameServer {
         }
 
         @Override
-        public void requestVote(candidateLeaderRequest request, StreamObserver<candidateLeaderResponse> responseObserver) {
+        public void requestVote(CandidateLeaderRequest request, StreamObserver<CandidateLeaderResponse> responseObserver) {
             boolean acknowledgement = comHandler.requestVoteRequest(request.getMsgCount());
-            candidateLeaderResponse.Builder response = candidateLeaderResponse.newBuilder().
+            CandidateLeaderResponse.Builder response = CandidateLeaderResponse.newBuilder().
                     setAcknowledgement(acknowledgement);
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         }
 
         @Override
-        public void notifyNewLeader(userId request, StreamObserver<Empty> responseObserver) {
+        public void notifyNewLeader(UserId request, StreamObserver<Empty> responseObserver) {
             comHandler.newLeaderReceived(request.getUserId());
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
+        public void nextRound(StartGameRequest request, StreamObserver<Empty> responseObserver) {
+            comHandler.handleReceiveNextRound(GrpcUtil.fromGrpcStartGameReq(request));
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }

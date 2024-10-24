@@ -186,12 +186,12 @@ public class GrpcUtil {
         return builder.build();
     }
 
-    public static proto.userId toGrpcUserId(Long userId) {
-        return proto.userId.newBuilder().setUserId(userId).build();
+    public static proto.UserId toGrpcUserId(Long userId) {
+        return proto.UserId.newBuilder().setUserId(userId).build();
     }
 
-    public static proto.candidateLeaderRequest toGrpcLeaderRequest(LeaderRequestDto request) {
-        return proto.candidateLeaderRequest.newBuilder()
+    public static proto.CandidateLeaderRequest toGrpcLeaderRequest(LeaderRequestDto request) {
+        return proto.CandidateLeaderRequest.newBuilder()
                 .setMsgCount(request.msgCount())
                 .setUserId(request.userId())
                 .build();

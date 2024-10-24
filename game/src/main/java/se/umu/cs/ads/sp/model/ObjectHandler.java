@@ -122,13 +122,12 @@ public class ObjectHandler {
             if (playerUnit.getState() == EntityState.DEAD) {
                 continue;
             }
-            if (collected instanceof Chest chest) {
+            if (collected instanceof Chest) {
                 if (collected.getReward().getType().equals(RewardType.GOLD)) {
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.GOLD_PICK_UP, playerUnit.getId()));
                 } else if (collected.getReward().getType().equals(RewardType.POINT)) {
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.POINT_PICK_UP, playerUnit.getId()));
                 } else {
-                    //Chest contains a BUFF, parse it
                     GameEvents.getInstance().addEvent(new GameEvent(collected.getId(), collected.getReward().toString(), EventType.BUFF_PICK_UP, playerUnit.getId()));
                     upgradeUnit(playerUnit.getId(), Reward.parseReward(collected.getReward().toString()), Reward.parseQuantity(collected.getReward().toString()));
                 }
@@ -171,13 +170,67 @@ public class ObjectHandler {
         return environments;
     }
 
-    public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
+    public StartGameRequestDTO generateNextRound(Map map, ArrayList<User> users) {
+        myUnitsDead = false;
+        this.collectables.clear();
+        this.environments.clear();
+
+        StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
+        Flag flag = new Flag(map.getFlagPosition(basePositions), map);
+        flag.setReward(new Reward(1, RewardType.FLAG));
+        collectables = map.generateCollectables();
+        collectables.put(flag.getId(), flag);
+
+        for (Collectable collectable : collectables.values()) {
+            startGameRequest.addCollectable(
+                    new CollectableDTO(collectable.getId(),
+                            collectable.getPosition(),
+                            collectable.getType().label,
+                            collectable.getReward()));
+        }
+
+        for (int uIndex = 0; uIndex < users.size(); uIndex++) {
+            long userId = users.get(uIndex).id;
+
+            //Spawning base
+            Position basePos = basePositions.get(uIndex);
+            startGameRequest.environments().add(new EnvironmentDTO(Util.generateId(), userId, basePos, EnvironmentType.BASE.label, 0));
+            long baseId = spawnBase(map, basePos, null);
+
+            //Spawning goldmine
+            Position goldMinePos = map.generateGoldMinePosition(basePos);
+            int goldReserve = 100;
+            long goldMineId = spawnGoldMine(map, goldMinePos, goldReserve, null);
+            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, EnvironmentType.GOLDMINE.label, goldReserve));
+
+            // Spawning 3 entities
+            ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
+            ArrayList<PlayerUnit> usersUnits = getPlayerUnits(userId);
+            for (PlayerUnit unit : usersUnits) {
+                Position offsetPosition;
+                do {
+                    offsetPosition = new Position((basePos.getX() + UtilModel.getRandomInt(-30, 30)),
+                            (basePos.getY() + UtilModel.getRandomInt(-30, 30)));
+                } while (!map.isWalkable(offsetPosition));
+
+                unit.reset(offsetPosition);
+                unit.setBase(baseId);
+                skeletons.add(new EntitySkeletonDTO(unit.getId(), unit.getEntityType(), unit.getPosition()));
+            }
+            startGameRequest.userSkeletons().add(new UserSkeletonsDTO(userId, skeletons));
+        }
+
+        return startGameRequest;
+    }
+
+    public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users) {
+        myUnitsDead = false;
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
         ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
         Flag flag = new Flag(map.getFlagPosition(basePositions), map);
         flag.setReward(new Reward(1, RewardType.FLAG));
-
 
         collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
@@ -204,7 +257,6 @@ public class ObjectHandler {
             long goldMineId = spawnGoldMine(map, goldMinePos, goldReserve, null);
             startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, EnvironmentType.GOLDMINE.label, goldReserve));
 
-
             // Spawning 3 entities
             ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
@@ -212,7 +264,7 @@ public class ObjectHandler {
                 do {
                     offsetPosition = new Position((basePos.getX() + UtilModel.getRandomInt(-30, 30)),
                             (basePos.getY() + UtilModel.getRandomInt(-30, 30)));
-                } while (!modelManager.isWalkable(offsetPosition));
+                } while (!map.isWalkable(offsetPosition));
 
                 EntitySkeletonDTO entitySkeletonDTO = new EntitySkeletonDTO(UtilModel.generateId(), UnitType.GUNNER.label, offsetPosition);
                 spawnUnit(map, entitySkeletonDTO.id(), entitySkeletonDTO.unitType(), offsetPosition, userId, baseId);
@@ -224,7 +276,10 @@ public class ObjectHandler {
         return startGameRequest;
     }
 
-    public void populateWorld(StartGameRequestDTO request, Map map) {
+    public void populateWorld(StartGameRequestDTO request, Map map, boolean nextRound) {
+        myUnitsDead = false;
+        this.collectables.clear();
+        this.environments.clear();
         long baseId = 1L;
         for (EnvironmentDTO env : request.environments()) {
             EnvironmentType type = EnvironmentType.fromLabel(env.type());
@@ -263,8 +318,15 @@ public class ObjectHandler {
 
         for (UserSkeletonsDTO skeletons : request.userSkeletons()) {
             for (EntitySkeletonDTO skeleton : skeletons.entities()) {
-                spawnUnit(map, skeleton.id(), skeleton.unitType(), skeleton.position(), skeletons.userId(), baseId);
+                if (nextRound) {
+                    PlayerUnit unit = myUnits.containsKey(skeleton.id()) ? myUnits.get(skeleton.id()) : enemyUnits.get(skeleton.id());
+                    unit.reset(skeleton.position());
+                    unit.setBase(baseId);
+                } else {
+                    spawnUnit(map, skeleton.id(), skeleton.unitType(), skeleton.position(), skeletons.userId(), baseId);
+                }
             }
+
         }
     }
 
@@ -506,5 +568,15 @@ public class ObjectHandler {
 
     public boolean isMyUnitsDead() {
         return myUnitsDead;
+    }
+
+    public ArrayList<PlayerUnit> getPlayerUnits(long userId) {
+        ArrayList<PlayerUnit> units;
+        if (userId == user.id) {
+            units = new ArrayList<>(myUnits.values().stream().filter(unit -> unit.getUserId() == userId).toList());
+        } else {
+            units = new ArrayList<>(enemyUnits.values().stream().filter(unit -> unit.getUserId() == userId).toList());
+        }
+        return units;
     }
 }

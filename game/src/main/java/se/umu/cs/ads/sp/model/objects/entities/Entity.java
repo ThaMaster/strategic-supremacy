@@ -123,16 +123,16 @@ public abstract class Entity extends GameObject {
         return entityType;
     }
 
-    public void takeDamage(int damage) {
+    public void takeDamage(int damage, long attacker) {
         this.state = EntityState.TAKING_DAMAGE;
         this.currentHp -= damage;
         hitCooldown.start();
         if (currentHp <= 0) {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit died!", EventType.DEATH, id));
+            GameEvents.getInstance().addEvent(new GameEvent(attacker, "Unit died!", EventType.DEATH, id));
             this.state = EntityState.DEAD;
             this.destroy(map);
         } else {
-            GameEvents.getInstance().addEvent(new GameEvent(this.id, "Unit took damage!", EventType.TAKE_DMG, id));
+            GameEvents.getInstance().addEvent(new GameEvent(attacker, "Unit took damage!", EventType.TAKE_DMG, id));
         }
     }
 
