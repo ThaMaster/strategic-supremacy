@@ -20,6 +20,10 @@ public class GoldMineView extends EnvironmentView {
         this.animator.pause();
     }
 
+    public boolean isDepleted(){
+        return depleted;
+    }
+
     @Override
     protected void initAnimator() {
         this.animator.addAnimation(
@@ -27,20 +31,26 @@ public class GoldMineView extends EnvironmentView {
                         "default",
                         ImageLoader.loadImages("/sprites/environment/goldPile", "goldPile", 1),
                         7));
+        this.animator.addAnimation(
+                new Animation(
+                        "depleted",
+                        ImageLoader.loadImages("/sprites/environment/goldPile", "goldPileDepleted", 1),
+                        7));
     }
 
     @Override
     public void draw(Graphics2D g2d) {
-        if (!depleted) {
-            Position screenPos = Camera.worldToScreen(position);
-            animator.draw(g2d, new Position(screenPos.getX(), screenPos.getY()));
-            if (AppSettings.DEBUG) {
-                drawCollisionBox(g2d);
-            }
+        Position screenPos = Camera.worldToScreen(position);
+        animator.draw(g2d, new Position(screenPos.getX(), screenPos.getY()));
+        if (AppSettings.DEBUG) {
+            drawCollisionBox(g2d);
         }
     }
 
     public void setDepleted(boolean bool) {
+        if(bool){
+            animator.changeAnimation("depleted");
+        }
         this.depleted = bool;
     }
 }

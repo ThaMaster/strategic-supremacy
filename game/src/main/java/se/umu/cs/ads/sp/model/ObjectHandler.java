@@ -168,10 +168,10 @@ public class ObjectHandler {
     public StartGameRequestDTO initializeWorld(Map map, ArrayList<User> users, ModelManager modelManager) {
         StartGameRequestDTO startGameRequest = new StartGameRequestDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
-        Flag flag = new Flag(map.getFlagPosition(), map);
+        ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
+        Flag flag = new Flag(map.getFlagPosition(basePositions), map);
         flag.setReward(new Reward(1, RewardType.FLAG));
 
-        ArrayList<Position> basePositions = map.generateSpawnPoints(users.size());
 
         collectables = map.generateCollectables();
         collectables.put(flag.getId(), flag);
@@ -194,8 +194,9 @@ public class ObjectHandler {
 
             //Spawning goldmine
             Position goldMinePos = map.generateGoldMinePosition(basePos);
-            long goldMineId = spawnGoldMine(map, goldMinePos, 100, null);
-            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, EnvironmentType.GOLDMINE.label, 0));
+            int goldReserve = 100;
+            long goldMineId = spawnGoldMine(map, goldMinePos, goldReserve, null);
+            startGameRequest.environments().add(new EnvironmentDTO(goldMineId, userId, goldMinePos, EnvironmentType.GOLDMINE.label, goldReserve));
 
 
             // Spawning 3 entities
@@ -327,6 +328,11 @@ public class ObjectHandler {
                 if (envModel instanceof GoldMine goldMine) {
                     if (goldMine.getRemainingResource() > env.remainingResource()) {
                         goldMine.setResource(env.remainingResource());
+                        System.out.println("Decreasing resourece to" + goldMine.getRemainingResource());
+                        if(!goldMine.hasResourceLeft()){
+                            System.out.println("DEPLETED");
+                            GameEvents.getInstance().moveToHistory(new GameEvent(goldMine.getId(), "Mine depleted from objecthandler", EventType.MINE_DEPLETED, -1));
+                        }
                     }
                 }
             }
@@ -370,7 +376,7 @@ public class ObjectHandler {
     private long spawnGoldMine(Map map, Position position, int goldReserve, Long id) {
         GoldMine goldMine;
         if (id != null) {
-            goldMine = new GoldMine(position, map, goldReserve);
+            goldMine = new GoldMine(position, map, goldReserve, id);
         } else {
             goldMine = new GoldMine(position, map, goldReserve);
         }

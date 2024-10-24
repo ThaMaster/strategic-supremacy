@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class GameEvents {
 
-    private static ThreadLocal<GameEvents> instance;
+    private static GameEvents instance;
     private ArrayList<GameEvent> events;
     private ArrayList<GameEvent> history;
 
@@ -27,9 +27,9 @@ public class GameEvents {
 
     public static synchronized GameEvents getInstance(){
         if(instance == null){
-            instance = ThreadLocal.withInitial(GameEvents::new);//new GameEvents();
+            instance = new GameEvents();//new GameEvents();
         }
-        return instance.get();
+        return instance;
     }
 
     public ArrayList<GameEvent> getHistory(){

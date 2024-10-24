@@ -225,7 +225,7 @@ public class ComHandler {
 
         GameClient newClient;
         if (l1Clients.containsKey(userId)) {
-            // Check if the client is in L1
+            //Check if the client is in L1
             newClient = l1Clients.get(userId);
             l1Clients.remove(userId);
         } else {

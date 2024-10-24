@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.objects.environment;
 
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.util.Position;
 
@@ -23,7 +24,7 @@ public class GoldMine extends Environment {
     }
 
     public boolean hasResourceLeft() {
-        return goldReserve >= 0;
+        return goldReserve > 0;
     }
 
     public int getRemainingResource() {

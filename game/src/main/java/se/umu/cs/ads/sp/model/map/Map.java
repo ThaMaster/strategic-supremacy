@@ -200,18 +200,8 @@ public class Map {
         return collectables;
     }
 
-    public Position getFlagPosition() {
-        Position flagPosition = new Position((cols / 2) * Constants.TILE_HEIGHT, (rows / 2) * Constants.TILE_WIDTH);
-        if (isWalkable(flagPosition)) {
-            return flagPosition;
-        }
-        Position offsetPos;
-        do {
-            offsetPos = new Position(
-                    flagPosition.getX() + UtilModel.getRandomInt(-10, 10),
-                    flagPosition.getY() + UtilModel.getRandomInt(-10, 10));
-        } while (!isWalkable(offsetPos));
-        return offsetPos;
+    public Position getFlagPosition(ArrayList<Position> basePosition) {
+        return getMaxMinDistanceSpawn(basePosition);
     }
 
     // Get a random walkable tile

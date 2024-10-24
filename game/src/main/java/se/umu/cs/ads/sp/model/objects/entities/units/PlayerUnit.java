@@ -130,8 +130,8 @@ public class PlayerUnit extends Entity {
                     return;
                 } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
-                    goldMine.harvestGold(20);
-                    coin.setReward(new Reward(1, RewardType.GOLD));
+                    goldMine.harvestGold(10);
+                    coin.setReward(new Reward(10, RewardType.GOLD));
                     this.collected.add(coin);
                     coin.destroy(map); //Remove the coin from the map after adding it to collected, so it cant get picked up
                     miningCooldown.reset();
@@ -179,6 +179,10 @@ public class PlayerUnit extends Entity {
         this.targetedUnit = target;
         this.destination = targetedUnit.position;
         state = EntityState.ATTACKING;
+    }
+
+    public long getTargetId(){
+        return targetedUnit == null ? -1 : targetedUnit.getId();
     }
 
     @Override

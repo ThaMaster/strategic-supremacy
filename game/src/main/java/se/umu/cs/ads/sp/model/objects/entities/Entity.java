@@ -152,6 +152,9 @@ public abstract class Entity extends GameObject {
 
     public void setCurrentHp(int newHp) {
         currentHp = newHp;
+        if(currentHp <= 0){
+            state = EntityState.DEAD;
+        }
     }
 
     public int getBaseHp() {

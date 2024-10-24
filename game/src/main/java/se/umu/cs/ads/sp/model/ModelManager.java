@@ -81,7 +81,7 @@ public class ModelManager {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            sendL1Update(constructL1Message(targetId));
+            sendL1Update(constructL1Message());
             return true;
         }
 
@@ -95,7 +95,7 @@ public class ModelManager {
                 } while (!isWalkable(offsetPosition));
             }
 
-            sendL1Update(constructL1Message(-1));
+            sendL1Update(constructL1Message());
             return true;
         }
         return false;
@@ -231,6 +231,9 @@ public class ModelManager {
             @Override
             public void run() {
                 sendL2Update();
+                sendL1Update(constructL1Message(
+
+                ));
             }
         }, 0, updateTime);
 
@@ -367,15 +370,14 @@ public class ModelManager {
      * update message contains complete information of the
      * players units.
      *
-     * @param targetId ID of which the unit is attacking
      * @return the new L1 update message
      */
-    public L1UpdateDTO constructL1Message(long targetId) {
+    public L1UpdateDTO constructL1Message() {
         ArrayList<UnitDTO> unitUpdates = new ArrayList<>();
-        for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
+        for (PlayerUnit unit : objectHandler.getMyUnits().values()) {
             unitUpdates.add(new UnitDTO(
                     unit.getId(),
-                    targetId,
+                    unit.getTargetId(),
                     unit.getEntityType(),
                     unit.getPosition(),
                     unit.getDestination(),
@@ -488,6 +490,9 @@ public class ModelManager {
                         unit.setHasFlag(false, null);
                     }
                     break;
+                case MINE_DEPLETED:
+                    System.out.println("Model manager got mine depleted event");
+                    break;
                 case ATTACK:
                     break;
                 case TAKE_DMG:
@@ -575,7 +580,6 @@ public class ModelManager {
 
             if (isInsideLayer(skeletonPos, 1)) {
                 comHandler.moveUserToL1(skeletons.userId());
-
             } else if (isInsideLayer(skeletonPos, 2)) {
                 comHandler.moveUserToL2(skeletons.userId());
             } else {
