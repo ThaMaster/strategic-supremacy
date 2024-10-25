@@ -84,6 +84,9 @@ public class PlayerUnit extends Entity {
     }
 
     public Long getFlagId() {
+        if(flagId == null) {
+            return -1L;
+        }
         return flagId;
     }
 

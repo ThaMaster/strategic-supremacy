@@ -15,13 +15,14 @@ message Position {
 message PlayerUnit {
   int64 unitId = 1;
   int64 targetUnitId = 2;
-  string unitType = 3;
-  Position position = 4;
-  Position destination = 5;
-  int32 maxHp = 6;
-  int32 currentHp = 7;
-  int32 speedBuff = 8;
-  int32 attackBuff = 9;
+  int64 flagId = 3;
+  string unitType = 4;
+  Position position = 5;
+  Position destination = 6;
+  int32 maxHp = 7;
+  int32 currentHp = 8;
+  int32 speedBuff = 9;
+  int32 attackBuff = 10;
 }
 
 message EntitySkeleton {
@@ -71,19 +72,21 @@ message L2Message {
   int64 userId = 1;
   repeated EntitySkeleton entities = 2;
   repeated int64 pickedUpCollectables = 3;
-  repeated Environment environments = 4;
-  int32 severity = 5;
+  repeated Collectable spawnedCollectables = 4;
+  repeated Environment environments = 5;
+  int32 severity = 6;
 }
 
 message L3Message {
   int32 messageCount = 1;
   repeated UserSkeletons entities = 2;
   repeated int64 pickedUpCollectables = 3;
-  int64 remainingTime = 4;
-  int64 currentScoreLeader = 5;
-  UserScore userScore = 6;
-  repeated Environment environments = 7;
-  int32 severity = 8;
+  repeated Collectable spawnedCollectables = 4;
+  int64 remainingTime = 5;
+  int64 currentScoreLeader = 6;
+  UserScore userScore = 7;
+  repeated Environment environments = 8;
+  int32 severity = 9;
 }
 
 message UserScore {

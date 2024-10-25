@@ -28,6 +28,7 @@ public class ObjectHandler {
     private HashMap<Long, Collectable> collectables = new HashMap<>();
 
     private final ArrayList<Long> pickedUpCollectableIds = new ArrayList<>();
+    private final ArrayList<Long> spawnedCollectables = new ArrayList<>();
 
     private final User user;
 
@@ -45,6 +46,7 @@ public class ObjectHandler {
                 unit.update();
                 if (unit.getState() == EntityState.DEAD && unit.hasFlag()) {
                     spawnFlag(map, unit.getPosition(), unit.getFlagId());
+                    spawnedCollectables.add(unit.getFlagId());
                     unit.setHasFlag(false, null);
                 }
                 checkCollectables(unit);
@@ -334,6 +336,20 @@ public class ObjectHandler {
         return pickedUpCollectableIds;
     }
 
+    public ArrayList<CollectableDTO> getSpawnedCollectables() {
+        ArrayList<CollectableDTO> spawnedCollectables = new ArrayList<>();
+        for (Collectable collectable : collectables.values()) {
+            if (pickedUpCollectableIds.contains(collectable.getId())) {
+                spawnedCollectables.add(new CollectableDTO(
+                        collectable.getId(),
+                        collectable.getPosition(),
+                        collectable.getType().label,
+                        collectable.getReward()));
+            }
+        }
+        return spawnedCollectables;
+    }
+
     public ArrayList<UserSkeletonsDTO> getAllEntitySkeletons() {
         HashMap<Long, UserSkeletonsDTO> skeletons = new HashMap<>();
         ArrayList<PlayerUnit> allUnits = new ArrayList<>();
@@ -383,6 +399,14 @@ public class ObjectHandler {
                     enemyUnits.get(unit.id()).setPosition(unit.position());
                     enemyUnits.get(unit.id()).setDestination(unit.position());
                 }
+            }
+        }
+    }
+
+    public void spawnCollectables(Map map, ArrayList<CollectableDTO> collectableDTOS) {
+        for (CollectableDTO collectable : collectableDTOS) {
+            if (CollectableType.fromLabel(collectable.type()) == CollectableType.FLAG) {
+                spawnFlag(map, collectable.position(), collectable.id());
             }
         }
     }
@@ -510,7 +534,11 @@ public class ObjectHandler {
             } else {
                 enemyUnit.setDestination(update.destination());
             }
-
+            if (update.flagId() != -1) {
+                enemyUnit.setHasFlag(true, update.flagId());
+            } else {
+                enemyUnit.setHasFlag(false, null);
+            }
             enemyUnit.setMaxHp(update.maxHp());
             enemyUnit.setCurrentHp(update.currentHp());
             enemyUnit.setSpeedBuff(update.speedBuff());

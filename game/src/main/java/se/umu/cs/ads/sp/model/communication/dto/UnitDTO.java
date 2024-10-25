@@ -5,6 +5,7 @@ import se.umu.cs.ads.sp.util.Position;
 public record UnitDTO(
         long unitId,
         long targetUnitId,
+        long flagId,
         String unitType,
         Position position,
         Position destination,

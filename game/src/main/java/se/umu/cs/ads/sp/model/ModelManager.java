@@ -27,7 +27,7 @@ import java.util.TimerTask;
 
 public class ModelManager {
 
-    private Map map;
+    private final Map map;
     private final ObjectHandler objectHandler;
     private final LobbyHandler lobbyHandler;
     private final ComHandler comHandler;
@@ -355,6 +355,7 @@ public class ModelManager {
         }
         objectHandler.updateUnitPositions(update.entities());
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.spawnCollectables(map, update.spawnedCollectables());
         objectHandler.updateEnvironments(update.environments());
         this.currentScoreHolderId = update.currentScoreLeader();
 
@@ -370,6 +371,7 @@ public class ModelManager {
         objectHandler.updateUnitPositionsInL2(
                 new ArrayList<>(Collections.singletonList(new UserSkeletonsDTO(update.userId(), update.entities()))));
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
+        objectHandler.spawnCollectables(map, update.spawnedCollectables());
         objectHandler.updateEnvironments(update.environments());
         updateBoundariesFromL2Message(update);
     }
@@ -410,6 +412,7 @@ public class ModelManager {
                 msgCount,
                 entities,
                 objectHandler.getCollectedIds(),
+                objectHandler.getSpawnedCollectables(),
                 remainingTime,
                 currentScoreHolderId,
                 new UserScoreDTO(player.id, currentPoints),
@@ -430,6 +433,7 @@ public class ModelManager {
                 player.id,
                 objectHandler.getMyUnitsToEntitySkeletons(),
                 objectHandler.getCollectedIds(),
+                objectHandler.getSpawnedCollectables(),
                 objectHandler.getAllEnvironmentsDTO(),
                 Constants.LOW_SEVERITY
         );
@@ -448,6 +452,7 @@ public class ModelManager {
             UnitDTO dto = new UnitDTO(
                     unit.getId(),
                     unit.getTargetId(),
+                    unit.getFlagId(),
                     unit.getEntityType(),
                     unit.getPosition(),
                     unit.getDestination(),

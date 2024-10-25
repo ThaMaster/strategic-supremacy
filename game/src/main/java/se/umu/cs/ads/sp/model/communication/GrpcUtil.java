@@ -201,6 +201,7 @@ public class GrpcUtil {
         return proto.PlayerUnit.newBuilder()
                 .setUnitId(unit.unitId())
                 .setTargetUnitId(unit.targetUnitId())
+                .setFlagId(unit.flagId())
                 .setPosition(toGrpcPosition(unit.position()))
                 .setDestination(toGrpcPosition(unit.destination()))
                 .setMaxHp(unit.maxHp())
@@ -214,6 +215,7 @@ public class GrpcUtil {
         return new UnitDTO(
                 unit.getUnitId(),
                 unit.getTargetUnitId(),
+                unit.getFlagId(),
                 unit.getUnitType(),
                 fromGrpcPosition(unit.getPosition()),
                 fromGrpcPosition(unit.getDestination()),
@@ -249,6 +251,9 @@ public class GrpcUtil {
             builder.addEntities(toGrpcUserSkeletons(skeletons));
         }
 
+        for (CollectableDTO newColl : message.spawnedCollectables()) {
+            builder.addSpawnedCollectables(toGrpcCollectable(newColl));
+        }
 
         builder.setRemainingTime(message.remainingTime())
                 .setCurrentScoreLeader(message.currentScoreLeader())
@@ -262,6 +267,7 @@ public class GrpcUtil {
         ArrayList<UserSkeletonsDTO> skeletons = new ArrayList<>();
         ArrayList<EnvironmentDTO> environments = new ArrayList<>();
         ArrayList<Long> pickedUp = new ArrayList<>();
+        ArrayList<CollectableDTO> spawned = new ArrayList<>();
 
         for (int i = 0; i < message.getEntitiesCount(); i++) {
             skeletons.add(fromGrpcUserSkeletons(message.getEntities(i)));
@@ -272,11 +278,16 @@ public class GrpcUtil {
         for (int i = 0; i < message.getPickedUpCollectablesCount(); i++) {
             pickedUp.add(message.getPickedUpCollectables(i));
         }
+        for (int i = 0; i < message.getSpawnedCollectablesCount(); i++) {
+            spawned.add(fromGrpcCollectable(message.getSpawnedCollectables(i)));
+        }
+
 
         return new L3UpdateDTO(
                 message.getMessageCount(),
                 skeletons,
                 pickedUp,
+                spawned,
                 message.getRemainingTime(),
                 message.getCurrentScoreLeader(),
                 fromGrpcUserScore(message.getUserScore()),
@@ -299,6 +310,10 @@ public class GrpcUtil {
             builder.addEntities(toGrpcEntitySkeleton(skeletons));
         }
 
+        for (CollectableDTO newColl : message.spawnedCollectables()) {
+            builder.addSpawnedCollectables(toGrpcCollectable(newColl));
+        }
+
         builder.setUserId(message.userId())
                 .setSeverity(message.msgSeverity());
         return builder.build();
@@ -308,6 +323,7 @@ public class GrpcUtil {
         ArrayList<EntitySkeletonDTO> skeletons = new ArrayList<>();
         ArrayList<EnvironmentDTO> environments = new ArrayList<>();
         ArrayList<Long> pickedUp = new ArrayList<>();
+        ArrayList<CollectableDTO> spawned = new ArrayList<>();
 
         for (int i = 0; i < message.getEntitiesCount(); i++) {
             skeletons.add(fromGrpcSkeleton(message.getEntities(i)));
@@ -321,10 +337,15 @@ public class GrpcUtil {
             pickedUp.add(message.getPickedUpCollectables(i));
         }
 
+        for (int i = 0; i < message.getSpawnedCollectablesCount(); i++) {
+            spawned.add(fromGrpcCollectable(message.getSpawnedCollectables(i)));
+        }
+
         return new L2UpdateDTO(
                 message.getUserId(),
                 skeletons,
                 pickedUp,
+                spawned,
                 environments,
                 message.getSeverity()
         );

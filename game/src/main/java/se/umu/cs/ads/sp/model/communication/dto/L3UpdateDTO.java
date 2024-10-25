@@ -6,6 +6,7 @@ public record L3UpdateDTO(
         int msgCount,
         ArrayList<UserSkeletonsDTO> entities,
         ArrayList<Long> pickedUpCollectables,
+        ArrayList<CollectableDTO> spawnedCollectables,
         Long remainingTime,
         Long currentScoreLeader,
         UserScoreDTO scoreInfo,
