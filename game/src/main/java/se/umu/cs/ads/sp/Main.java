@@ -1,10 +1,10 @@
 package se.umu.cs.ads.sp;
 
-import se.umu.cs.ads.sp.PerformanceTest.PerformanceTest;
+import se.umu.cs.ads.sp.Performance.PerformanceLogger;
+import se.umu.cs.ads.sp.Performance.PerformanceTest;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.ArgParser;
-import se.umu.cs.ads.sp.PerformanceTest.PerformanceLogger;
 
 import javax.swing.*;
 
