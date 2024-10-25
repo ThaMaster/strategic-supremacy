@@ -8,7 +8,7 @@ public class AppSettings {
     public static String NAMING_SERVICE_IP = "130.239.42.246";
     public static int NAMING_SERVICE_PORT = 58727;
     public static boolean DEBUG = false;
-
+    public static boolean RUN_PERFORMANCE_TEST = false;
     public static void SetGameConfig() {
         InputStream settingsUrl = AppSettings.class.getClassLoader().getResourceAsStream("AppSettings.cfg");
 

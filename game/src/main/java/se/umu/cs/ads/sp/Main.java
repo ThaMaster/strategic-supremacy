@@ -22,7 +22,6 @@ public class Main {
         boolean startGameController = false;
 
         if (parser.hasFlag("-d") || parser.hasFlag("--debug")) {
-            System.out.println("DEBUG");
             AppSettings.DEBUG = true;
         }
 

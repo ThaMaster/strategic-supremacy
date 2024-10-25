@@ -218,6 +218,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 break;
             case KeyEvent.VK_B:
                 gController.toggleShopWindow();
+            case KeyEvent.VK_SPACE:
+                ArrayList<Long> selectedUnits = gController.getSelectedUnits();
+                if(selectedUnits.size() > 0){
+                    Position pos = this.gameEntitiesView.get(selectedUnits.get(0)).getPosition();
+                    Camera.setPosition(pos);
+                }
             default:
                 break;
         }
