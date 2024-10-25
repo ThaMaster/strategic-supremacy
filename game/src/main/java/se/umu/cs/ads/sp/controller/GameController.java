@@ -9,7 +9,6 @@ import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
 import se.umu.cs.ads.sp.util.enums.Direction;
-import se.umu.cs.ads.sp.util.enums.UpgradeType;
 import se.umu.cs.ads.sp.view.objects.entities.units.PlayerUnitView;
 import se.umu.cs.ads.sp.view.util.UtilView;
 import se.umu.cs.ads.sp.view.windows.MainFrame;
@@ -412,10 +411,6 @@ public class GameController implements ActionListener {
     public void updateHudInfo() {
         mainFrame.getHudPanel().updateMoney(modelManager.getCurrentGold());
         mainFrame.getHudPanel().updateScore(modelManager.getCurrentPoints());
-        for (long unit : modelManager.getObjectHandler().getMyUnitIds())
-            for (UpgradeType type : UpgradeType.values()) {
-                updateStat(unit, type.label);
-            }
     }
 
     public void buyUpgrade(long unitId, String type, int amount, int cost) {
