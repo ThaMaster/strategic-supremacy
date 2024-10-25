@@ -27,7 +27,8 @@ public class ArgParser {
                         i++;  // move to the next argument
                     } else {
                         // If it's not numeric, treat it as a flag without a value
-                        argsMap.put(arg, "true");
+                        //argsMap.put(arg, "true");
+                        argsMap.put(arg, nextArg);
                     }
                 } else {
                     // Handle flags without values (e.g. -v or --verbose)

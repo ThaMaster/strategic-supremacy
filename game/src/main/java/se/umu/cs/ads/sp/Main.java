@@ -1,8 +1,10 @@
 package se.umu.cs.ads.sp;
 
+import se.umu.cs.ads.sp.PerformanceTest.PerformanceTest;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.ArgParser;
+import se.umu.cs.ads.sp.PerformanceTest.PerformanceLogger;
 
 import javax.swing.*;
 
@@ -20,7 +22,30 @@ public class Main {
         boolean startGameController = false;
 
         if (parser.hasFlag("-d") || parser.hasFlag("--debug")) {
+            System.out.println("DEBUG");
             AppSettings.DEBUG = true;
+        }
+
+        if(parser.hasFlag(("-t"))){
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            PerformanceLogger.init(parser.getValue("-t"));
+
+            //Testing purposes
+            Long id = 1L;
+            Long id2 = 2L;
+            PerformanceLogger.newEntry(PerformanceLogger.L1_FOLLOWER, new PerformanceTest(id));
+            PerformanceLogger.newEntry(PerformanceLogger.L1_FOLLOWER, new PerformanceTest(id2));
+            try{
+                Thread.sleep(500);
+            }catch(Exception ex){
+
+            }
+            PerformanceLogger.setFinished(id);
+            PerformanceLogger.setFinished(id2);
+            PerformanceLogger.outputPerformance();
+        }else if(parser.hasFlag(("-test"))){
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            PerformanceLogger.init(parser.getValue("-t"));
         }
 
         int nrBots = 1; // DEFAULT BOTS ARE 1
@@ -34,7 +59,6 @@ public class Main {
 
         long lobbyId = -1;
         if (parser.hasFlag("-l")) {
-            System.out.println(parser.getValue("-l"));
             lobbyId = Long.parseLong(parser.getValue("-l"));
         } else if (parser.hasFlag("--lobby")) {
             lobbyId = Long.parseLong(parser.getValue("--lobby"));
@@ -64,11 +88,13 @@ public class Main {
         System.out.println("  -n, --name    <botName>       The name of the Bot.");
         System.out.println("  -i, --ip      <ipAddress>     The ip address for the Bot.");
         System.out.println("  -p, --port    <port>          The port for the Ai.");
+        System.out.println("  -t, --test    <path>          Run performance test");
         System.out.println("  -h, --help                    Show this usage information.");
         System.out.println("Notes:");
         System.out.println("  1. If bots are specified the user will not get any graphical interface.");
         System.out.println("  2. If bots are specified and no lobby id, the bots will fetch lobbies form the");
         System.out.println("     NamingService and join the first available one.");
-
+        System.out.println("  3. Path for performance test is optional, if no path is set, it will output");
+        System.out.println("     the files in the current directory");
     }
 }
