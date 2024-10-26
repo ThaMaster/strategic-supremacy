@@ -12,7 +12,7 @@ import proto.CandidateLeaderResponse;
 import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.Performance.TestLogger;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.*;

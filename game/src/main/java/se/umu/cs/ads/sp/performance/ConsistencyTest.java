@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.Performance;
+package se.umu.cs.ads.sp.performance;
 
 import java.io.IOException;
 import java.nio.file.Path;

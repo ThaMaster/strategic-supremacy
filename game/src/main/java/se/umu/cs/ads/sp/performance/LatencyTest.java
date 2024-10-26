@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.Performance;
+package se.umu.cs.ads.sp.performance;
 
 public class LatencyTest extends PerformanceTest{
     private int numClients;

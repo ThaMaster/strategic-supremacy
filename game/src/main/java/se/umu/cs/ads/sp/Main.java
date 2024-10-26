@@ -1,6 +1,6 @@
 package se.umu.cs.ads.sp;
 
-import se.umu.cs.ads.sp.Performance.TestLogger;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.ArgParser;

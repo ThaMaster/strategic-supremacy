@@ -1,4 +1,4 @@
-package se.umu.cs.ads.sp.Performance;
+package se.umu.cs.ads.sp.performance;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -23,9 +23,9 @@ public class TestLogger {
     public static String L3_FOLLOWER = "L3-Follower.txt";
 
     public static void init(String path) {
-        basePath = Paths.get("performance test");
+        basePath = Paths.get("spTests");
         if (!path.equals("true")) {
-            basePath = Paths.get(path, "performance test");
+            basePath = Paths.get(path, "spTests");
         }
 
         try {
