@@ -181,10 +181,12 @@ public class PlayerUnit extends Entity {
     }
 
     public void setAttackTarget(PlayerUnit target) {
-        this.targetedUnit = target;
         if(target == null){
+            this.targetedUnit.setSelected(false);
+            this.targetedUnit = target;
             return;
         }
+        this.targetedUnit = target;
         this.targetedUnit.setSelected(true);
         this.destination = targetedUnit.position;
         setState(EntityState.ATTACKING);
@@ -192,16 +194,6 @@ public class PlayerUnit extends Entity {
 
     public long getTargetId() {
         return targetedUnit == null ? -1 : targetedUnit.getId();
-    }
-
-    @Override
-    public void setDestination(Position newDestination) {
-        if (this.state == EntityState.ATTACKING) {
-            this.targetedUnit.setSelected(false);
-            this.targetedUnit = null;
-        }
-        super.setDestination(newDestination);
-
     }
 
     public ArrayList<Collectable> getCollected() {
