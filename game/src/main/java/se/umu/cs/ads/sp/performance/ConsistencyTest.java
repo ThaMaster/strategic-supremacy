@@ -8,8 +8,9 @@ import java.nio.file.Path;
 public class ConsistencyTest implements ITest {
 
     private int errors;
-
-    public ConsistencyTest() {
+    private Long id;
+    public ConsistencyTest(Long id) {
+        this.id = id;
         start();
     }
 
@@ -35,7 +36,7 @@ public class ConsistencyTest implements ITest {
 
     @Override
     public Long getId() {
-        return null;
+        return id;
     }
 
     public void checkData(int localData, int remoteData) {
@@ -44,6 +45,7 @@ public class ConsistencyTest implements ITest {
     public void checkData(Position localPosition, Position remotePosition) {
         if (Position.distance(localPosition, remotePosition) > TestConstants.POSITION_ERROR_MARGIN) {
             errors++;
+            System.out.println(errors);
         }
     }
 }

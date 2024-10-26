@@ -1,7 +1,6 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -92,12 +91,19 @@ public class BotController implements Runnable {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java AiController <lobbyId>");
+        if (args.length != 2) {
+            System.err.println("Usage: java AiController <lobbyId> [forceFlag]");
             System.exit(1);
         }
         AppSettings.SetGameConfig();
         long lobbyId = Long.parseLong(args[0]);
+        if (args[1].equals("-l1")) {
+            AppSettings.FORCE_L1 = true;
+        } else if (args[1].equals("-l2")) {
+            AppSettings.FORCE_L2 = true;
+        } else if (args[1].equals("-l3")) {
+            AppSettings.FORCE_L3 = true;
+        }
         BotController aiController = new BotController(lobbyId);
         Thread aiThread = new Thread(aiController);
         aiThread.start();

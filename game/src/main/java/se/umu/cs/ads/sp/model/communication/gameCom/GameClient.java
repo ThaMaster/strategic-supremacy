@@ -138,13 +138,16 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void sendL2Message(L2UpdateDTO msg) {
+    public void sendL2Message(L2UpdateDTO msg, Long perfId) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l2Update(GrpcUtil.toGrpcL2Message(msg));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
+                if(AppSettings.RUN_PERFORMANCE_TEST){
+                    TestLogger.setFinished(perfId);
+                }
             }
 
             @Override
@@ -155,7 +158,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void sendL1Message(L1UpdateDTO msg) {
+    public void sendL1Message(L1UpdateDTO msg, Long perfId) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l1Update(GrpcUtil.toGrpcL1Message(msg));
@@ -163,6 +166,9 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
+                if(AppSettings.RUN_PERFORMANCE_TEST){
+                    TestLogger.setFinished(perfId);
+                }
             }
 
             @Override

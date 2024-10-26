@@ -109,9 +109,14 @@ public class ComHandler {
         if (l2Clients.isEmpty()) {
             return;
         }
+        Long id = -1L;
+        if(AppSettings.RUN_PERFORMANCE_TEST) {
+            id = init_latency_perf_test(TestLogger.L3_LEADER);
+        }
         for (GameClient client : l2Clients.values()) {
             // Send l2 update only to those in the zone
-            client.sendL2Message(message);
+
+            client.sendL2Message(message, id);
         }
     }
 
@@ -123,9 +128,13 @@ public class ComHandler {
         if (l1Clients.isEmpty()) {
             return;
         }
+        Long id = -1L;
+        if(AppSettings.RUN_PERFORMANCE_TEST) {
+            id = init_latency_perf_test(TestLogger.L1_LEADER);
+        }
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
-            client.sendL1Message(message);
+            client.sendL1Message(message, id);
         }
     }
 

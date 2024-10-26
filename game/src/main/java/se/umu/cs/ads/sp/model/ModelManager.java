@@ -13,6 +13,7 @@ import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
@@ -186,7 +187,6 @@ public class ModelManager {
      * in the lobby. It will
      */
     public void startGame() {
-
         System.out.println("[Client] Sending out start request to lobby...");
         comHandler.markLobbyStarted(lobbyHandler.getLobby().id);
         StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users);
@@ -199,8 +199,14 @@ public class ModelManager {
         this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
-        startL3Timer(Constants.L3_UPDATE_TIME);
-        startL2Timer();
+        if (!AppSettings.FORCE_L1 && !AppSettings.FORCE_L2) {
+            startL3Timer(Constants.L3_UPDATE_TIME);
+        }
+
+        if (!AppSettings.FORCE_L1 && !AppSettings.FORCE_L3) {
+            startL2Timer();
+        }
+
         startRoundTimer();
 
         started = true;
@@ -492,16 +498,16 @@ public class ModelManager {
      * @return true/false if the positions are inside the specified layer.
      */
     private boolean isInsideLayer(ArrayList<Position> positions, int layerIndex) {
-        if (objectHandler.getMyUnits().isEmpty()) {
+
+        if (objectHandler.getMyUnits().isEmpty() || AppSettings.FORCE_L3) {
             return false;
         }
 
         Rectangle myBB = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
         Rectangle externalBB = getBBByPositions(positions);
-        int index = layerIndex - 1;
 
         // Should incomplete initialize info occur, just return false
-        if ((index != 0 && index != 1) || myBB == null || externalBB == null) {
+        if (myBB == null || externalBB == null) {
             return false;
         }
 
@@ -693,14 +699,25 @@ public class ModelManager {
             }
             ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
             // Check l1, then l2, otherwise just move user to l3
-
-            if (isInsideLayer(skeletonPos, 1)) {
+            if(AppSettings.FORCE_L1){
                 comHandler.moveUserToL1(skeletons.userId());
-            } else if (isInsideLayer(skeletonPos, 2)) {
+            }
+            else if(AppSettings.FORCE_L2){
                 comHandler.moveUserToL2(skeletons.userId());
-            } else {
+            }
+            else if(AppSettings.FORCE_L3){
                 comHandler.moveUserToL3(skeletons.userId());
             }
+            else{
+                if (isInsideLayer(skeletonPos, 1)) {
+                    comHandler.moveUserToL1(skeletons.userId());
+                } else if (isInsideLayer(skeletonPos, 2)) {
+                    comHandler.moveUserToL2(skeletons.userId());
+                } else {
+                    comHandler.moveUserToL3(skeletons.userId());
+                }
+            }
+
         }
     }
 

@@ -12,6 +12,9 @@ import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.Environment;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
+import se.umu.cs.ads.sp.performance.ConsistencyTest;
+import se.umu.cs.ads.sp.performance.TestLogger;
+import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
 import se.umu.cs.ads.sp.util.UtilModel;
@@ -36,8 +39,14 @@ public class ObjectHandler {
 
     private boolean myUnitsDead = false;
 
+    private Long consistencyTestId;
+
     public ObjectHandler(User user) {
+
         this.user = user;
+        consistencyTestId = Util.generateId();
+        ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
+        TestLogger.newEntry(TestLogger.CONSISTENCY, consistencyTest);
     }
 
     public void update(Map map) {
@@ -524,6 +533,9 @@ public class ObjectHandler {
     public void updateEnemyUnits(ArrayList<UnitDTO> updates) {
         for (UnitDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
+            if(AppSettings.RUN_PERFORMANCE_TEST){
+                ((ConsistencyTest) TestLogger.getTest(consistencyTestId)).checkData(enemyUnit.getPosition(), update.position());
+            }
             enemyUnit.setPosition(update.position());
             long targetUnit = update.targetUnitId();
             if (targetUnit != -1) {

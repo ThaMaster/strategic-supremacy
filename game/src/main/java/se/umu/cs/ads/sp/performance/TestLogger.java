@@ -8,19 +8,23 @@ import java.util.Map;
 public class TestLogger {
 
     private static Path basePath;
-    private final static String[] subDirs = {"L1", "L2", "L3", "Raft"};
-    private final static String[] files = {
-            "L1-Follower.txt", "L1-Leader.txt",
-            "L2-Follower.txt", "L2-Leader.txt",
-            "L3-Follower.txt", "L3-Leader.txt",
-            "Leader-Election.txt"
-    };
-    private static final Map<String, Path> fileMap = new HashMap<>();
-    private static Map<Long, ITest> test = new HashMap<>();
+    private final static String[] subDirs = {"L1", "L2", "L3", "Raft", "Consistency"};
     public static String L1_FOLLOWER = "L1-Follower.txt";
     public static String L1_LEADER = "L2-Follower.txt";
     public static String L3_LEADER = "L3-Leader.txt";
     public static String L3_FOLLOWER = "L3-Follower.txt";
+
+    public static String CONSISTENCY = "Consistency.txt";
+    private final static String[] files = {
+            L1_FOLLOWER, L1_LEADER,
+            "L2-Follower.txt", "L2-Leader.txt",
+            "L3-Follower.txt", L3_LEADER,
+            "Leader-Election.txt", CONSISTENCY
+    };
+    private static final Map<String, Path> fileMap = new HashMap<>();
+    private static Map<Long, ITest> test = new HashMap<>();
+
+
 
     public static void init(String path) {
         basePath = Paths.get("spTests");
@@ -66,10 +70,14 @@ public class TestLogger {
         test.get(testId).finish();
     }
 
-    public static void newEntry(String file, PerformanceTest test) {
+    public static void newEntry(String file, ITest test) {
         Path targetFile = fileMap.get(file);
         test.setTargetFile(targetFile);
         TestLogger.test.put(test.getId(), test);
+    }
+
+    public static ITest getTest(Long id){
+        return test.get(id);
     }
 
     public static void outputPerformance(){

@@ -9,6 +9,11 @@ public class AppSettings {
     public static int NAMING_SERVICE_PORT = 58727;
     public static boolean DEBUG = false;
     public static boolean RUN_PERFORMANCE_TEST = false;
+
+    public static boolean FORCE_L1 = false;
+    public static boolean FORCE_L2 = false;
+    public static boolean FORCE_L3 = false;
+
     public static void SetGameConfig() {
         InputStream settingsUrl = AppSettings.class.getClassLoader().getResourceAsStream("AppSettings.cfg");
 

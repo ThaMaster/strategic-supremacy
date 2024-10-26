@@ -24,6 +24,18 @@ public class Main {
             AppSettings.DEBUG = true;
         }
 
+        String forceFlag = "";
+        if(parser.hasFlag("-l1")){
+            AppSettings.FORCE_L1 = true;
+            forceFlag = "-l1";
+        }else if(parser.hasFlag(("-l2"))){
+            AppSettings.FORCE_L2 = true;
+            forceFlag = "-l2";
+        }else if(parser.hasFlag("-l3")){
+            AppSettings.FORCE_L3 = true;
+            forceFlag = "-l3";
+        }
+
         if(parser.hasFlag(("-t"))){
             AppSettings.RUN_PERFORMANCE_TEST = true;
             TestLogger.init(parser.getValue("-t"));
@@ -60,7 +72,7 @@ public class Main {
             };
             SwingUtilities.invokeLater(startApp);
         } else {
-            BotHandler.initBots(lobbyId, nrBots);
+            BotHandler.initBots(lobbyId, nrBots, forceFlag);
         }
     }
 
@@ -73,6 +85,9 @@ public class Main {
         System.out.println("  -i, --ip      <ipAddress>     The ip address for the Bot.");
         System.out.println("  -p, --port    <port>          The port for the Ai.");
         System.out.println("  -t, --test    <path>          Run performance test");
+        System.out.println("  -l1,                          Force clients to update using l1");
+        System.out.println("  -l2,                          Force clients to update using l2");
+        System.out.println("  -l3,                          Force clients to update using l3");
         System.out.println("  -h, --help                    Show this usage information.");
         System.out.println("Notes:");
         System.out.println("  1. If bots are specified the user will not get any graphical interface.");
