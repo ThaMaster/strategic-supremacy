@@ -92,7 +92,7 @@ public class PlayerUnit extends Entity {
 
     @Override
     public void update() {
-        if(state != EntityState.ATTACKING){
+        if(state != EntityState.ATTACKING && (state != EntityState.TAKING_DAMAGE && previousState != EntityState.ATTACKING)){
             setAttackTarget(null);
         }
         switch (state) {
@@ -185,7 +185,7 @@ public class PlayerUnit extends Entity {
                 return;
             }
             this.targetedUnit.setSelected(false);
-            this.targetedUnit = target;
+            this.targetedUnit = null;
             return;
         }
         this.targetedUnit = target;
@@ -211,8 +211,6 @@ public class PlayerUnit extends Entity {
         targetedUnit.takeDamage(baseAttack + attackBuff, id);
         if(targetedUnit.getState() == EntityState.DEAD){
             setState(EntityState.IDLE);
-            targetedUnit.setSelected(false);
-            targetedUnit = null;
         }
     }
 
