@@ -556,6 +556,11 @@ public class ModelManager {
         ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
         for (GameEvent event : events) {
             switch (event.getType()) {
+                case STATE_CHANGE:
+                    if(objectHandler.getMyUnits().containsKey(event.getEventAuthor())){
+                        //System.out.println("\t SENDING l1 UPDATE STATE CHANGE");
+                        //sendL1Update();
+                    }
                 case NEW_ROUND:
                     //Create logic
                     break;

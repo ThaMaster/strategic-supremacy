@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.objects.entities;
 
+import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
@@ -118,6 +119,7 @@ public abstract class Entity extends GameObject {
         if(state == EntityState.DEAD){
             selected = false;
         }
+        GameEvents.getInstance().addEvent(new GameEvent(Util.generateId(), "", EventType.STATE_CHANGE, this.id));
     }
 
     public Position getDestination() {

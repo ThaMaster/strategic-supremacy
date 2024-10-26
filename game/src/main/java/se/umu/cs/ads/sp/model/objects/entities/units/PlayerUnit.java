@@ -1,5 +1,6 @@
 package se.umu.cs.ads.sp.model.objects.entities.units;
 
+import se.umu.cs.ads.ns.util.Util;
 import se.umu.cs.ads.sp.events.GameEvent;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.components.CollisionBox;
@@ -92,7 +93,8 @@ public class PlayerUnit extends Entity {
 
     @Override
     public void update() {
-        if(state != EntityState.ATTACKING && (state != EntityState.TAKING_DAMAGE && previousState != EntityState.ATTACKING)){
+        if(!(state == EntityState.ATTACKING || (state == EntityState.TAKING_DAMAGE && previousState == EntityState.ATTACKING)){
+            //We are not attacking, we are not taking taking, and we were not attacking
             setAttackTarget(null);
         }
         switch (state) {
@@ -108,6 +110,7 @@ public class PlayerUnit extends Entity {
                     if ((Position.distance(position, destination) > attackRange)) {
                         inAttackRange = false;
                         attacked = false;
+                        GameEvents.getInstance().addEvent(new GameEvent(Util.generateId(), "", EventType.STATE_CHANGE, this.id));
                         move();
                     } else if (targetedUnit.getState() != EntityState.DEAD) {
                         inAttackRange = true;

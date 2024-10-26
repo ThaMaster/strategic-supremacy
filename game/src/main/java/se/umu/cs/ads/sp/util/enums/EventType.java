@@ -12,6 +12,7 @@ public enum EventType {
     FLAG_TO_BASE,
     POINT_PICK_UP,
 
+    STATE_CHANGE,
     ENEMY_PICK_UP,
 
     //Game actions
