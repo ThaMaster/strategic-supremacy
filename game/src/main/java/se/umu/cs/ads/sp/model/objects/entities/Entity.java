@@ -101,6 +101,8 @@ public abstract class Entity extends GameObject {
     public void setSelected(boolean select) {
         if (state != EntityState.DEAD) {
             selected = select;
+        }else{
+            selected = false;
         }
     }
 

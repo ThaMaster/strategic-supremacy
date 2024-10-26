@@ -111,9 +111,6 @@ public class PlayerUnit extends Entity {
                         attacked = true;
                         attack();
                         shootCooldown.reset();
-                    } else {
-                        setState(EntityState.IDLE);
-                        targetedUnit = null;
                     }
                 } else {
                     attacked = false;
@@ -210,6 +207,11 @@ public class PlayerUnit extends Entity {
     public void attack() {
         GameEvents.getInstance().addEvent(new GameEvent(targetedUnit.id, "Unit attacking", EventType.ATTACK, id));
         targetedUnit.takeDamage(baseAttack + attackBuff, id);
+        if(targetedUnit.getState() == EntityState.DEAD){
+            setState(EntityState.IDLE);
+            targetedUnit.setSelected(false);
+            targetedUnit = null;
+        }
     }
 
     private void startMining() {
