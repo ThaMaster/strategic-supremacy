@@ -353,7 +353,12 @@ public class ModelManager {
             lobbyHandler.getRaft().updateMsgCount(update.msgCount());
             this.remainingTime = update.remainingTime();
         }
-        objectHandler.updateUnitPositions(update.entities());
+        ArrayList<UserSkeletonsDTO> l3Units = new ArrayList<>(
+                update.entities().stream()
+                        .filter(e -> !comHandler.l1Clients.containsKey(e.userId()))
+                        .toList()
+        );
+        objectHandler.updateUnitPositions(l3Units);
         objectHandler.removeCollectables(map, update.pickedUpCollectables());
         objectHandler.spawnCollectables(map, update.spawnedCollectables());
         objectHandler.updateEnvironments(update.environments());

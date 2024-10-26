@@ -171,6 +171,7 @@ public class PlayerUnit extends Entity {
                     if (hasFlag && base.getId() == myBaseId) {
                         GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "+10 Points", EventType.FLAG_TO_BASE, id));
                         hasFlag = false;
+                        flagId = null;
                     }
                 }
             }

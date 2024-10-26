@@ -1,7 +1,6 @@
 package se.umu.cs.ads.sp;
 
-import se.umu.cs.ads.sp.Performance.PerformanceLogger;
-import se.umu.cs.ads.sp.Performance.PerformanceTest;
+import se.umu.cs.ads.sp.Performance.TestLogger;
 import se.umu.cs.ads.sp.controller.GameController;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.ArgParser;
@@ -27,24 +26,10 @@ public class Main {
 
         if(parser.hasFlag(("-t"))){
             AppSettings.RUN_PERFORMANCE_TEST = true;
-            PerformanceLogger.init(parser.getValue("-t"));
-
-            //Testing purposes
-            Long id = 1L;
-            Long id2 = 2L;
-            PerformanceLogger.newEntry(PerformanceLogger.L1_FOLLOWER, new PerformanceTest(id));
-            PerformanceLogger.newEntry(PerformanceLogger.L1_FOLLOWER, new PerformanceTest(id2));
-            try{
-                Thread.sleep(500);
-            }catch(Exception ex){
-
-            }
-            PerformanceLogger.setFinished(id);
-            PerformanceLogger.setFinished(id2);
-            PerformanceLogger.outputPerformance();
+            TestLogger.init(parser.getValue("-t"));
         }else if(parser.hasFlag(("-test"))){
             AppSettings.RUN_PERFORMANCE_TEST = true;
-            PerformanceLogger.init(parser.getValue("-t"));
+            TestLogger.init(parser.getValue("-t"));
         }
 
         int nrBots = 1; // DEFAULT BOTS ARE 1

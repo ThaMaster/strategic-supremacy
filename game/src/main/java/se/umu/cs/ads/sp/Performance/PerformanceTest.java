@@ -5,16 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class PerformanceTest {
+public class PerformanceTest implements ITest{
 
-    private Long id;
-    private Long startTime;
-    private Long endTime;
-    private Path targetFile;
+    protected Long id;
+    protected Long startTime;
+    protected Long endTime;
+    protected Path targetFile;
 
     public PerformanceTest(Long id){
         this.id = id;
-        startTime = System.currentTimeMillis();
     }
 
     public Long getId(){
@@ -23,6 +22,11 @@ public class PerformanceTest {
 
     public void setTargetFile(Path path){
         this.targetFile = path;
+    }
+
+    @Override
+    public void start() {
+        startTime = System.currentTimeMillis();
     }
 
     public void finish(){

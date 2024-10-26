@@ -12,9 +12,11 @@ import proto.CandidateLeaderResponse;
 import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.Performance.TestLogger;
+import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.*;
-import se.umu.cs.ads.sp.model.lobby.Raft;
+import se.umu.cs.ads.sp.util.AppSettings;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +28,7 @@ public class GameClient {
     private String ip;
     private int port;
     private String username;
+    private ModelManager modelManager;
 
     public GameClient() {
         super();
@@ -43,7 +46,7 @@ public class GameClient {
         return username;
     }
 
-    public void create(String ip, int port, String username) {
+    public void create(String ip, int port, String username, ModelManager modelManager) {
         this.ip = ip;
         this.port = port;
         this.username = username;
@@ -51,6 +54,7 @@ public class GameClient {
                 .usePlaintext()
                 .build();
         stub = GameServiceGrpc.newFutureStub(channel);
+        this.modelManager = modelManager;
     }
 
     @Override
@@ -96,14 +100,16 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void sendL3Message(L3UpdateDTO msg) {
+    public void sendL3Message(L3UpdateDTO msg, long perfId) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l3Update(GrpcUtil.toGrpcL3Message(msg));
-
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
+                if(AppSettings.RUN_PERFORMANCE_TEST){
+                    TestLogger.setFinished(perfId);
+                }
             }
 
             @Override
@@ -189,7 +195,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void requestVote(Raft raft, LeaderRequestDto request) {
+    public void requestVote(LeaderRequestDto request) {
         System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<CandidateLeaderResponse> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
@@ -199,7 +205,7 @@ public class GameClient {
             @Override
             public void onSuccess(@Nullable CandidateLeaderResponse candidateLeaderResponse) {
                 assert candidateLeaderResponse != null;
-                raft.receiveVote(candidateLeaderResponse.getAcknowledgement());
+                modelManager.getRaft().receiveVote(candidateLeaderResponse.getAcknowledgement());
             }
 
             @Override

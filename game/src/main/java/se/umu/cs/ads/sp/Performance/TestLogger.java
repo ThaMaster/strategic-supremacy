@@ -5,7 +5,7 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PerformanceLogger {
+public class TestLogger {
 
     private static Path basePath;
     private final static String[] subDirs = {"L1", "L2", "L3", "Raft"};
@@ -16,9 +16,11 @@ public class PerformanceLogger {
             "Leader-Election.txt"
     };
     private static final Map<String, Path> fileMap = new HashMap<>();
-    private static Map<Long, PerformanceTest> performanceTest = new HashMap<>();
+    private static Map<Long, ITest> test = new HashMap<>();
     public static String L1_FOLLOWER = "L1-Follower.txt";
     public static String L1_LEADER = "L2-Follower.txt";
+    public static String L3_LEADER = "L3-Leader.txt";
+    public static String L3_FOLLOWER = "L3-Follower.txt";
 
     public static void init(String path) {
         basePath = Paths.get("performance test");
@@ -61,17 +63,17 @@ public class PerformanceLogger {
     }
 
     public static void setFinished(long testId){
-        performanceTest.get(testId).finish();
+        test.get(testId).finish();
     }
 
     public static void newEntry(String file, PerformanceTest test) {
         Path targetFile = fileMap.get(file);
         test.setTargetFile(targetFile);
-        performanceTest.put(test.getId(), test);
+        TestLogger.test.put(test.getId(), test);
     }
 
     public static void outputPerformance(){
-        for(PerformanceTest perf : performanceTest.values()){
+        for(ITest perf : test.values()){
             try{
                 perf.output();
             } catch (IOException e) {

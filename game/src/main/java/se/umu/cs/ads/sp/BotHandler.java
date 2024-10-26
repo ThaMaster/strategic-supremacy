@@ -9,10 +9,18 @@ public class BotHandler {
 
     public static void initBots(long lobbyId, int nrBots) {
         ArrayList<Process> bots = new ArrayList<>();
-        try{
+        try {
             for (int i = 0; i < nrBots; i++) {
                 bots.add(startBotInstance(lobbyId));
             }
+
+            // Add a shutdown hook to destroy all processes when the JVM shuts down
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                for (Process process : bots) {
+                    process.destroy(); // Destroy each process
+                }
+            }));
+
             for (Process process : bots) {
                 try {
                     process.waitFor();
@@ -20,7 +28,7 @@ public class BotHandler {
                     e.printStackTrace();
                 }
             }
-        }catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }

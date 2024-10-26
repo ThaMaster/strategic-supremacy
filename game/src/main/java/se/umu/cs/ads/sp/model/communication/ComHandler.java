@@ -4,12 +4,15 @@ import io.grpc.Context;
 import io.grpc.StatusRuntimeException;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.ns.util.Util;
+import se.umu.cs.ads.sp.Performance.LatencyTest;
+import se.umu.cs.ads.sp.Performance.TestLogger;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
-import se.umu.cs.ads.sp.model.lobby.Raft;
+import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.UtilModel;
 
@@ -20,9 +23,9 @@ public class ComHandler {
 
     private final NsClient nsClient;
     private final ModelManager modelManager;
-    private final ConcurrentHashMap<Long, GameClient> l3Clients;
-    private final ConcurrentHashMap<Long, GameClient> l2Clients;
-    private final ConcurrentHashMap<Long, GameClient> l1Clients;
+    public final ConcurrentHashMap<Long, GameClient> l3Clients;
+    public final ConcurrentHashMap<Long, GameClient> l2Clients;
+    public final ConcurrentHashMap<Long, GameClient> l1Clients;
     private long timeSinceL3Update;
 
     public ComHandler(int port, ModelManager modelManager) {
@@ -68,14 +71,18 @@ public class ComHandler {
 
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         if (fromLeader) {
+            Long id = -1L;
+            if(AppSettings.RUN_PERFORMANCE_TEST) {
+                id = init_latency_perf_test(TestLogger.L3_LEADER);
+            }
             for (GameClient client : l3Clients.values()) {
-                client.sendL3Message(message);
+                    client.sendL3Message(message, id);
             }
         } else {
             User leader = modelManager.getLobbyHandler().getLobby().leader;
             if (l3Clients.containsKey(leader.id)) {
                 GameClient client = l3Clients.get(leader.id);
-                client.sendL3Message(message);
+                client.sendL3Message(message, -1);
             }
         }
     }
@@ -138,7 +145,7 @@ public class ComHandler {
         for (User user : updatedLobby.users) {
             if (!l3Clients.containsKey(user.id) && user.id != modelManager.getPlayer().id) {
                 GameClient client = new GameClient();
-                client.create(user.ip, user.port, user.username);
+                client.create(user.ip, user.port, user.username, modelManager);
                 l3Clients.put(user.id, client);
             }
         }
@@ -187,7 +194,7 @@ public class ComHandler {
             GameClient client;
             if (!l3Clients.containsKey(user.id)) {
                 client = new GameClient();
-                client.create(user.ip, user.port, user.username);
+                client.create(user.ip, user.port, user.username, modelManager);
                 l3Clients.put(user.id, client);
             } else {
                 client = l3Clients.get(user.id);
@@ -228,12 +235,12 @@ public class ComHandler {
         l3Clients.remove(userId);
     }
 
-    public void requestVote(Raft raft) {
+    public void requestVote() {
         long playerId = modelManager.getPlayer().id;
-        LeaderRequestDto dto = new LeaderRequestDto(raft.getMsgCount(), playerId);
+        LeaderRequestDto dto = new LeaderRequestDto(modelManager.getRaft().getMsgCount(), playerId);
 
         for (GameClient client : l3Clients.values()) {
-            client.requestVote(raft, dto);
+            client.requestVote(dto);
         }
     }
 
@@ -333,5 +340,14 @@ public class ComHandler {
     public void resetClients() {
         l1Clients.clear();
         l2Clients.clear();
+    }
+
+    //Returns the id for the performance test
+    private Long init_latency_perf_test(String type){
+        Long performanceTestId = Util.generateId();
+        LatencyTest latencyTest = new LatencyTest(performanceTestId);
+        latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1); // -1 since we dont want to count ourself
+        TestLogger.newEntry(type, latencyTest);
+        return performanceTestId;
     }
 }
