@@ -90,6 +90,9 @@ public class ModelManager {
         long targetId = checkEntityHit(newPosition);
         if (targetId != -1 && fov.isInFov(newPosition)) {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
+                if(unit.getState() == EntityState.DEAD){
+                    continue;
+                }
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
             sendL1Update();
@@ -100,6 +103,9 @@ public class ModelManager {
             // Slightly randomise the units, so they do not get the EXACT same position.
             Position offsetPosition = newPosition;
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
+                if(unit.getState() == EntityState.DEAD){
+                    continue;
+                }
                 unit.setDestination(offsetPosition);
                 do {
                     offsetPosition = new Position(newPosition.getX() + UtilModel.getRandomInt(-15, 15), newPosition.getY() + UtilModel.getRandomInt(-15, 15));

@@ -110,6 +110,9 @@ public abstract class Entity extends GameObject {
     public void setState(EntityState newState){
         previousState = EntityState.fromLabel(state.label);
         state = newState;
+        if(state == EntityState.DEAD){
+            selected = false;
+        }
     }
 
     public Position getDestination() {
@@ -117,9 +120,11 @@ public abstract class Entity extends GameObject {
     }
 
     public void setDestination(Position newDestination) {
+        if (state == EntityState.DEAD){
+            return;
+        }
         if (position.equals(newDestination)) {
-            if (state != EntityState.DEAD)
-                setState(EntityState.IDLE);
+            setState(EntityState.IDLE);
             return;
         }
         this.destination = newDestination;
