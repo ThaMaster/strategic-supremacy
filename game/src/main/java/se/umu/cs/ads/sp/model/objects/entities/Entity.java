@@ -110,6 +110,9 @@ public abstract class Entity extends GameObject {
         return state;
     }
     public void setState(EntityState newState){
+        if(newState == state){
+            return;
+        }
         previousState = EntityState.fromLabel(state.label);
         state = newState;
         if(state == EntityState.DEAD){
