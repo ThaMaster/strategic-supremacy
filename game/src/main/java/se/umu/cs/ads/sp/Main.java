@@ -1,7 +1,7 @@
 package se.umu.cs.ads.sp;
 
-import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.controller.GameController;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.ArgParser;
 
@@ -25,26 +25,37 @@ public class Main {
         }
 
         String forceFlag = "";
-        if(parser.hasFlag("-l1")){
+        if (parser.hasFlag("-l1")) {
             AppSettings.FORCE_L1 = true;
             forceFlag = "-l1";
-        }else if(parser.hasFlag(("-l2"))){
+        } else if (parser.hasFlag(("-l2"))) {
             AppSettings.FORCE_L2 = true;
             forceFlag = "-l2";
-        }else if(parser.hasFlag("-l3")){
+        } else if (parser.hasFlag("-l3")) {
             AppSettings.FORCE_L3 = true;
             forceFlag = "-l3";
         }
 
-        if(parser.hasFlag(("-t"))){
+        boolean runTests = false;
+        if (parser.hasFlag(("-t"))) {
             AppSettings.RUN_PERFORMANCE_TEST = true;
+            runTests = true;
             TestLogger.init(parser.getValue("-t"));
-        }else if(parser.hasFlag(("-test"))){
+        } else if (parser.hasFlag(("--test"))) {
             AppSettings.RUN_PERFORMANCE_TEST = true;
-            TestLogger.init(parser.getValue("-t"));
+            runTests = true;
+            TestLogger.init(parser.getValue("--test"));
         }
 
-        int nrBots = 1; // DEFAULT BOTS ARE 1
+        boolean testAll = false;
+        if (parser.hasFlag("--testAll")) {
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            runTests = true;
+            testAll = true;
+            TestLogger.init(parser.getValue("--testAll"));
+        }
+
+        int nrBots = 2; // DEFAULT BOTS ARE 2
         if (parser.hasFlag("-b")) {
             nrBots = Integer.parseInt(parser.getValue("-b"));
         } else if (parser.hasFlag("--bots")) {
@@ -60,6 +71,32 @@ public class Main {
             lobbyId = Long.parseLong(parser.getValue("--lobby"));
         }
 
+
+        boolean startLeaderBot = false;
+        if (parser.hasFlag("-a") || parser.hasFlag("--auto")) {
+            startGameController = false;
+            startLeaderBot = true;
+        }
+
+        int mapIndex = 0; // DEFAULT BEGINNER MAP
+        if (parser.hasFlag("-m")) {
+            mapIndex = Integer.parseInt(parser.getValue("-m"));
+        } else if (parser.hasFlag("--map")) {
+            mapIndex = Integer.parseInt(parser.getValue("--map"));
+        }
+
+        if (parser.hasFlag("-i")) {
+            AppSettings.NAMING_SERVICE_IP = parser.getValue("-i");
+        } else if (parser.hasFlag("--ip")) {
+            AppSettings.NAMING_SERVICE_IP = parser.getValue("--ip");
+        }
+
+        if (parser.hasFlag("-p")) {
+            AppSettings.NAMING_SERVICE_PORT = Integer.parseInt(parser.getValue("-p"));
+        } else if (parser.hasFlag("--port")) {
+            AppSettings.NAMING_SERVICE_PORT = Integer.parseInt(parser.getValue("--port"));
+        }
+
         AppSettings.PrintSettings();
 
         if (startGameController) {
@@ -71,23 +108,41 @@ public class Main {
                 }
             };
             SwingUtilities.invokeLater(startApp);
+        } else if (startLeaderBot) {
+            if (nrBots < 2) {
+                System.out.println();
+                System.out.println("Error: 2 or more bots required when starting application with leader bot!");
+                System.out.println();
+                printUsage();
+                System.exit(1);
+            }
+
+            if (mapIndex < 0 || mapIndex > 4) {
+                System.out.println();
+                System.out.println("Error: Unknown MapIndex, must be in the range of [0,4]");
+                System.out.println();
+                printUsage();
+                System.exit(1);
+            }
+
+            BotHandler.startLeaderBot(nrBots, forceFlag, mapIndex, runTests, testAll);
         } else {
-            BotHandler.initBots(lobbyId, nrBots, forceFlag);
+            BotHandler.initBots(lobbyId, nrBots, forceFlag, runTests);
         }
     }
 
     private static void printUsage() {
-        System.out.println("Usage: java AiController [options]");
+        System.out.println("Usage: java -jar StrategicSupremacy-1.0-shaded.jar [options]");
         System.out.println("Optional:");
         System.out.println("  -l, --lobby   <lobbyId>       The ID of the lobby to join.");
         System.out.println("  -b, --bots    <nrBots>        The number of bots to initialize.");
-        System.out.println("  -n, --name    <botName>       The name of the Bot.");
-        System.out.println("  -i, --ip      <ipAddress>     The ip address for the Bot.");
-        System.out.println("  -p, --port    <port>          The port for the Ai.");
-        System.out.println("  -t, --test    <path>          Run performance test");
-        System.out.println("  -l1,                          Force clients to update using l1");
-        System.out.println("  -l2,                          Force clients to update using l2");
-        System.out.println("  -l3,                          Force clients to update using l3");
+        System.out.println("  -i  --ip      <ipAddress>     The ip address for the naming service.");
+        System.out.println("  -p, --port    <port>          The port for the naming service.");
+        System.out.println("  -t, --test    <path>          Run performance test.");
+        System.out.println("  -l1, -l2, -l3                 Force clients to only update the game using l1, l2, or l3.");
+        System.out.println("  -a, --auto                    Creates a leader bot that will create a new lobby and start.");
+        System.out.println("                                the number of bots specified and start the game automatically.");
+        System.out.println("  -m, --map     <mapIndex>      The index of the map the leader bot will use when creating a lobby.");
         System.out.println("  -h, --help                    Show this usage information.");
         System.out.println("Notes:");
         System.out.println("  1. If bots are specified the user will not get any graphical interface.");

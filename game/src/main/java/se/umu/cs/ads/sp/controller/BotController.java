@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.controller;
 
+import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.BotHandler;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
@@ -16,16 +18,40 @@ public class BotController implements Runnable {
 
     private final ModelManager modelManager;
     private Timer updateLobbyTimer;
+    private Timer gameTimer;
     private Timer updateTimer;
+    private final int lobbyCount;
 
-    public BotController(long lobbyId) {
+    public BotController(long lobbyId, boolean isLeader, String forceFlag, int nrBots, int mapIndex, boolean runTests, boolean testAll) {
+        lobbyCount = nrBots;
         User botUser = new User(UtilModel.generateRandomString(10), UtilModel.getLocalIP(), UtilModel.getFreePort());
         modelManager = new ModelManager(botUser);
         initTimers();
-        if (lobbyId == -1) {
-            joinLobby(modelManager.getLobbyHandler().fetchLobbies().get(0).id);
+        if (isLeader) {
+            System.out.println("[Leader Bot] Trying to create lobby with the following settings:");
+            String ff = forceFlag.isEmpty() ? "None" : forceFlag;
+            String testing = testAll ? "ALL" : (runTests ? "LEADER_ONLY" : "NONE");
+            System.out.println("\t Force-Flag: " + ff + " Bots: " + nrBots + " MapIndex: " + mapIndex + " Testing: " + testing);
+            if (createLobby(nrBots, mapIndex)) {
+                System.out.println("\t Lobby created, spawning bots...");
+                BotHandler.initBots(modelManager.getLobbyHandler().getLobby().id, nrBots - 1, forceFlag, testAll);
+                updateLobbyTimer.start();
+            } else {
+                System.out.println("[Leader Bot] Could not create a lobby, shutting down...");
+                System.exit(0);
+            }
         } else {
-            joinLobby(lobbyId);
+            System.out.println("[Follower Bot] Trying to join lobby");
+            if (lobbyId == -1) {
+                for (Lobby lobby : modelManager.getLobbyHandler().fetchLobbies()) {
+                    if (joinLobby(lobby.id)) {
+                        // Successfully joined lobby
+                        break;
+                    }
+                }
+            } else {
+                joinLobby(lobbyId);
+            }
         }
     }
 
@@ -47,23 +73,65 @@ public class BotController implements Runnable {
     private void initTimers() {
 
         updateLobbyTimer = new Timer(500, e -> {
-            if (modelManager.hasGameStarted()) {
-                updateLobbyTimer.stop();
-                updateTimer.start();
+            if (modelManager.iAmLeader()) {
+                // I am leader, waiting for bots to populate lobby
+                if (lobbyCount == modelManager.getLobbyHandler().getLobby().currentPlayers) {
+                    System.out.println("[Leader Bot] All bots connected, starting game...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException exception) {
+                        exception.printStackTrace();
+                    }
+                    modelManager.startGame();
+                    updateLobbyTimer.stop();
+                    updateTimer.start();
+                    gameTimer.start();
+                } else {
+                    System.out.println("[Leader Bot] " + modelManager.getLobbyHandler().getLobby().currentPlayers + "/" + lobbyCount + " in lobby...");
+                }
+            } else {
+                // I am follower, waiting for game to start...
+                if (modelManager.hasGameStarted()) {
+                    System.out.println("[Follower Bot] Game started, time to play!");
+                    updateLobbyTimer.stop();
+                    updateTimer.start();
+                    gameTimer.start();
+                } else {
+                    System.out.println("[Follower Bot] Still waiting for game to start...");
+                }
             }
         });
 
+        gameTimer = new Timer(700, e -> {
+            long remainingTime = modelManager.getRoundRemainingTime();
+            if (remainingTime <= 0 && modelManager.iAmLeader()) {
+                System.out.println("[Leader Bot] Round over");
+            }
+        });
         updateTimer = new Timer(1000 / Constants.FPS, e -> {
             if (modelManager.hasGameFinished()) {
+                if (modelManager.iAmLeader()) {
+                    System.out.println("[Leader Bot] Game Finished!");
+                } else {
+                    System.out.println("[Follower Bot] Game Finished!");
+                }
                 updateTimer.stop();
+                modelManager.leaveOngoingGame();
+                System.exit(0);
             }
             update();
         });
     }
 
-    private void joinLobby(long lobbyId) {
+    private boolean joinLobby(long lobbyId) {
         modelManager.getLobbyHandler().joinLobby(lobbyId);
+        if (modelManager.getLobbyHandler().hasErrorOccurred()) {
+            System.out.println(modelManager.getLobbyHandler().getErrorMessage());
+            modelManager.getLobbyHandler().clearErrors();
+            return false;
+        }
         updateLobbyTimer.start();
+        return true;
     }
 
     public void update() {
@@ -91,22 +159,51 @@ public class BotController implements Runnable {
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("Usage: java AiController <lobbyId> [forceFlag]");
+        if (args.length != 7) {
+            System.err.println("Usage: java AiController <lobbyId> <isLeader> <forceFlag> <nrBots> <mapIndex> <runTests> <testAll>");
             System.exit(1);
         }
         AppSettings.SetGameConfig();
         long lobbyId = Long.parseLong(args[0]);
-        if (args[1].equals("-l1")) {
+        boolean isLeader = Boolean.parseBoolean(args[1]);
+        String forceFlag = args[2];
+        int nrBots = Integer.parseInt(args[3]);
+        int mapIndex = Integer.parseInt(args[4]);
+        boolean runTests = Boolean.parseBoolean(args[5]);
+        boolean testAll = Boolean.parseBoolean(args[6]);
+
+        AppSettings.RUN_PERFORMANCE_TEST = runTests;
+
+        if (forceFlag.equals("-l1")) {
             AppSettings.FORCE_L1 = true;
-        } else if (args[1].equals("-l2")) {
+        } else if (forceFlag.equals("-l2")) {
             AppSettings.FORCE_L2 = true;
-        } else if (args[1].equals("-l3")) {
+        } else if (forceFlag.equals("-l3")) {
             AppSettings.FORCE_L3 = true;
         }
-        BotController aiController = new BotController(lobbyId);
+
+        BotController aiController = new BotController(lobbyId, isLeader, forceFlag, nrBots, mapIndex, runTests, testAll);
         Thread aiThread = new Thread(aiController);
         aiThread.start();
+    }
+
+    private boolean createLobby(int nrBots, int mapIndex) {
+        String selectedMap = switch (mapIndex) {
+            case 0 -> "Beginner";
+            case 1 -> "Easy";
+            case 2 -> "Medium";
+            case 3 -> "Hard";
+            case 4 -> "Extreme";
+            default -> "";
+        };
+
+        modelManager.getLobbyHandler().createLobby("TestLobby-CreatedByBot", nrBots, selectedMap);
+        if (modelManager.getLobbyHandler().hasErrorOccurred()) {
+            System.out.println(modelManager.getLobbyHandler().getErrorMessage());
+            modelManager.getLobbyHandler().clearErrors();
+            return false;
+        }
+        return true;
     }
 }
 

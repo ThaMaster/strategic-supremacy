@@ -5,13 +5,13 @@ import io.grpc.StatusRuntimeException;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.ns.util.Util;
-import se.umu.cs.ads.sp.performance.LatencyTest;
-import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
+import se.umu.cs.ads.sp.performance.LatencyTest;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.UtilModel;
@@ -72,11 +72,11 @@ public class ComHandler {
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         if (fromLeader) {
             Long id = -1L;
-            if(AppSettings.RUN_PERFORMANCE_TEST) {
+            if (AppSettings.RUN_PERFORMANCE_TEST) {
                 id = init_latency_perf_test(TestLogger.L3_LEADER);
             }
             for (GameClient client : l3Clients.values()) {
-                    client.sendL3Message(message, id);
+                client.sendL3Message(message, id);
             }
         } else {
             User leader = modelManager.getLobbyHandler().getLobby().leader;
@@ -87,16 +87,16 @@ public class ComHandler {
         }
     }
 
-    public void updateEntityStateL1(EntityStateDTO dto){
-        if(l1Clients.isEmpty()){
+    public void updateEntityStateL1(EntityStateDTO dto) {
+        if (l1Clients.isEmpty()) {
             return;
         }
-        for(GameClient client : l1Clients.values()){
+        for (GameClient client : l1Clients.values()) {
             client.updateEntityState(dto);
         }
     }
 
-    public void handleUpdateState(EntityStateDTO dto){
+    public void handleUpdateState(EntityStateDTO dto) {
         modelManager.updateEntityState(dto);
     }
 
@@ -110,7 +110,7 @@ public class ComHandler {
             return;
         }
         Long id = -1L;
-        if(AppSettings.RUN_PERFORMANCE_TEST) {
+        if (AppSettings.RUN_PERFORMANCE_TEST) {
             id = init_latency_perf_test(TestLogger.L3_LEADER);
         }
         for (GameClient client : l2Clients.values()) {
@@ -129,7 +129,7 @@ public class ComHandler {
             return;
         }
         Long id = -1L;
-        if(AppSettings.RUN_PERFORMANCE_TEST) {
+        if (AppSettings.RUN_PERFORMANCE_TEST) {
             id = init_latency_perf_test(TestLogger.L1_LEADER);
         }
         for (GameClient client : l1Clients.values()) {
@@ -143,7 +143,7 @@ public class ComHandler {
     }
 
     public boolean leaderIsAlive() {
-        if(timeSinceL3Update == null){
+        if (timeSinceL3Update == null) {
             return true;
         }
         return (System.currentTimeMillis() - timeSinceL3Update) <
@@ -176,7 +176,6 @@ public class ComHandler {
         }
 
         if (!modelManager.hasGameStarted()) {
-            System.out.println("Starting map " + updatedLobby.selectedMap);
             modelManager.loadMap(updatedLobby.selectedMap);
             modelManager.getLobbyHandler().setLobby(updatedLobby);
         }
@@ -365,7 +364,7 @@ public class ComHandler {
     }
 
     //Returns the id for the performance test
-    private Long init_latency_perf_test(String type){
+    private Long init_latency_perf_test(String type) {
         Long performanceTestId = Util.generateId();
         LatencyTest latencyTest = new LatencyTest(performanceTestId);
         latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1); // -1 since we dont want to count ourself
