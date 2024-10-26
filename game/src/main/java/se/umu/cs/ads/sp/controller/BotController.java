@@ -1,6 +1,8 @@
 package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.User;
+import se.umu.cs.ads.sp.events.GameEvent;
+import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
 import se.umu.cs.ads.sp.util.AppSettings;
@@ -14,10 +16,8 @@ import java.util.ArrayList;
 public class BotController implements Runnable {
 
     private final ModelManager modelManager;
-
     private Timer updateLobbyTimer;
     private Timer updateTimer;
-    private Timer gameTimer;
 
     public BotController(long lobbyId) {
         User botUser = new User(UtilModel.generateRandomString(10), UtilModel.getLocalIP(), UtilModel.getFreePort());
@@ -47,19 +47,13 @@ public class BotController implements Runnable {
 
     private void initTimers() {
 
-        gameTimer = new Timer(700, e -> {
-            long remainingTime = modelManager.getRoundRemainingTime();
-            if (remainingTime <= 0 && modelManager.iAmLeader()) {
-            }
-        });
-
         updateLobbyTimer = new Timer(500, e -> {
             if (modelManager.hasGameStarted()) {
                 updateLobbyTimer.stop();
                 updateTimer.start();
-                gameTimer.start();
             }
         });
+
         updateTimer = new Timer(1000 / Constants.FPS, e -> {
             if (modelManager.hasGameFinished()) {
                 updateTimer.stop();
@@ -75,6 +69,7 @@ public class BotController implements Runnable {
 
     public void update() {
         modelManager.update();
+        GameEvents.getInstance().clearHistory();
     }
 
     private void moveRandomUnits() {

@@ -123,6 +123,12 @@ message UserId {
   int64 userId = 1;
 }
 
+message EntityState {
+  string state = 1;
+  int64 unitId = 2;
+  int64 attacker = 3;
+}
+
 service GameService {
   rpc removePlayerUnits (UserSkeletons) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
@@ -135,4 +141,5 @@ service GameService {
   rpc startGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc nextRound (StartGameRequest) returns (google.protobuf.Empty);
   rpc endGameMessage (UserScore) returns (google.protobuf.Empty);
+  rpc updateEntityState(EntityState) returns (google.protobuf.Empty);
 }

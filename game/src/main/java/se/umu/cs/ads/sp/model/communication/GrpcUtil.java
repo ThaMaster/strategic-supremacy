@@ -5,6 +5,7 @@ import se.umu.cs.ads.ns.app.User;
 import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.util.Position;
+import se.umu.cs.ads.sp.util.enums.EntityState;
 import se.umu.cs.ads.sp.util.enums.RewardType;
 
 import java.util.ArrayList;
@@ -294,6 +295,18 @@ public class GrpcUtil {
                 environments,
                 message.getSeverity()
         );
+    }
+
+    public static proto.EntityState toGrpcEntityState(EntityStateDTO dto){
+        return proto.EntityState.newBuilder()
+                .setState(dto.state().label)
+                .setUnitId(dto.unitId())
+                .setAttacker(dto.attacker())
+                .build();
+    }
+
+    public static EntityStateDTO fromGrpcEntityState(proto.EntityState state){
+        return new EntityStateDTO(EntityState.fromLabel(state.getState()), state.getUnitId(), state.getAttacker());
     }
 
     public static proto.L2Message toGrpcL2Message(L2UpdateDTO message) {

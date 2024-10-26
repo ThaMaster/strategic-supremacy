@@ -87,6 +87,19 @@ public class ComHandler {
         }
     }
 
+    public void updateEntityStateL1(EntityStateDTO dto){
+        if(l1Clients.isEmpty()){
+            return;
+        }
+        for(GameClient client : l1Clients.values()){
+            client.updateEntityState(dto);
+        }
+    }
+
+    public void handleUpdateState(EntityStateDTO dto){
+        modelManager.updateEntityState(dto);
+    }
+
     public void handleReceiveL3Msg(L3UpdateDTO message) {
         timeSinceL3Update = System.currentTimeMillis();
         modelManager.receiveL3Update(message);

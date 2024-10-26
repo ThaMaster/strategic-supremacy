@@ -112,7 +112,7 @@ public class PlayerUnit extends Entity {
                         attack();
                         shootCooldown.reset();
                     } else {
-                        this.state = EntityState.IDLE;
+                        setState(EntityState.IDLE);
                     }
                 } else {
                     attacked = false;
@@ -120,7 +120,7 @@ public class PlayerUnit extends Entity {
                 break;
             case TAKING_DAMAGE:
                 if (hitCooldown.hasElapsed()) {
-                    this.state = EntityState.IDLE;
+                    setState(EntityState.fromLabel(previousState.label));
                     hit = false;
                 } else {
                     hit = true;
@@ -129,7 +129,7 @@ public class PlayerUnit extends Entity {
             case MINING:
                 if (!this.goldMine.hasResourceLeft()) {
                     GameEvents.getInstance().addEvent(new GameEvent(goldMine.getId(), "depleted", EventType.MINE_DEPLETED, id));
-                    this.state = EntityState.IDLE;
+                    setState(EntityState.IDLE);
                     return;
                 } else if (miningCooldown.hasElapsed()) {
                     Collectable coin = new Gold(this.position, map);
@@ -182,7 +182,7 @@ public class PlayerUnit extends Entity {
         this.targetedUnit = target;
         this.targetedUnit.setSelected(true);
         this.destination = targetedUnit.position;
-        state = EntityState.ATTACKING;
+        setState(EntityState.ATTACKING);
     }
 
     public long getTargetId() {
@@ -217,7 +217,7 @@ public class PlayerUnit extends Entity {
             return;
         }
         GameEvents.getInstance().addEvent(new GameEvent(id, "Unit mining", EventType.MINING, id));
-        state = EntityState.MINING;
+        setState(EntityState.MINING);
         miningCooldown.start();
     }
 
@@ -247,7 +247,7 @@ public class PlayerUnit extends Entity {
 
     public void reset(Position newPosition) {
         collected.clear();
-        state = EntityState.IDLE;
+        setState(EntityState.IDLE);
         currentHp = maxHp;
         hasFlag = false;
         flagId = null;

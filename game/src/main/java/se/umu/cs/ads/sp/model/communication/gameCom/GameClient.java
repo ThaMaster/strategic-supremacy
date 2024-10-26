@@ -120,6 +120,24 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
+    public void updateEntityState(EntityStateDTO dto){
+        ListenableFuture<Empty> future = stub
+                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .updateEntityState(GrpcUtil.toGrpcEntityState(dto));
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable Empty result) {
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("\t Failed to send L3 update to client " + ip + ":" + port);
+                System.out.println("\t" + t.getMessage());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     public void sendL2Message(L2UpdateDTO msg) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)

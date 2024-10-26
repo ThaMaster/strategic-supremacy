@@ -23,6 +23,8 @@ public abstract class Entity extends GameObject {
     protected Cooldown hitCooldown;
     protected CollisionBox attackBox;
     protected EntityState state;
+    protected EntityState previousState;
+
     protected Map map;
     protected Position destination;
     private boolean selected = false;
@@ -33,6 +35,7 @@ public abstract class Entity extends GameObject {
         destination = startPos;
         this.entityType = entityType;
         state = EntityState.IDLE;
+        previousState = EntityState.IDLE;
         baseSpeed = 2;
         speedBuff = 0;
         this.baseHp = 100;
@@ -60,7 +63,7 @@ public abstract class Entity extends GameObject {
         if (Position.distance(this.position, destination) <= (baseSpeed + speedBuff)) {
             position = destination;
             collisionBox.setLocation(destination);
-            state = EntityState.IDLE;
+            setState(EntityState.IDLE);
             map.setInhabitant(this, position);
             return;
         }
@@ -78,7 +81,7 @@ public abstract class Entity extends GameObject {
         int col = newX / Constants.TILE_HEIGHT;
 
         if (map.getModelMap().get(row).get(col).hasCollision()) {
-            state = EntityState.IDLE;
+            setState(EntityState.IDLE);
             return;
         }
         Position newPos = new Position(newX, newY);
@@ -104,6 +107,10 @@ public abstract class Entity extends GameObject {
     public EntityState getState() {
         return state;
     }
+    public void setState(EntityState newState){
+        previousState = EntityState.fromLabel(state.label);
+        state = newState;
+    }
 
     public Position getDestination() {
         return this.destination;
@@ -112,11 +119,11 @@ public abstract class Entity extends GameObject {
     public void setDestination(Position newDestination) {
         if (position.equals(newDestination)) {
             if (state != EntityState.DEAD)
-                state = EntityState.IDLE;
+                setState(EntityState.IDLE);
             return;
         }
         this.destination = newDestination;
-        this.state = EntityState.RUNNING;
+        setState(EntityState.RUNNING);
     }
 
     public String getEntityType() {
@@ -124,12 +131,12 @@ public abstract class Entity extends GameObject {
     }
 
     public void takeDamage(int damage, long attacker) {
-        this.state = EntityState.TAKING_DAMAGE;
+        setState(EntityState.TAKING_DAMAGE);
         this.currentHp -= damage;
         hitCooldown.start();
         if (currentHp <= 0) {
             GameEvents.getInstance().addEvent(new GameEvent(attacker, "Unit died!", EventType.DEATH, id));
-            this.state = EntityState.DEAD;
+            setState(EntityState.DEAD);
             this.destroy(map);
         } else {
             GameEvents.getInstance().addEvent(new GameEvent(attacker, "Unit took damage!", EventType.TAKE_DMG, id));
@@ -158,7 +165,7 @@ public abstract class Entity extends GameObject {
     public void setCurrentHp(int newHp) {
         currentHp = newHp;
         if (currentHp <= 0) {
-            state = EntityState.DEAD;
+            setState(EntityState.DEAD);
         }
     }
 

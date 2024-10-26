@@ -84,6 +84,13 @@ public class GameServer {
         }
 
         @Override
+        public void updateEntityState(EntityState request, StreamObserver<Empty> responseObserver) {
+            comHandler.handleUpdateState(GrpcUtil.fromGrpcEntityState(request));
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+
+        @Override
         public void removePlayerUnits(UserSkeletons request, StreamObserver<Empty> responseObserver) {
             UserSkeletonsDTO skeletons = GrpcUtil.fromGrpcUserSkeletons(request);
             long userId = skeletons.userId();

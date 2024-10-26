@@ -557,19 +557,23 @@ public class ModelManager {
                     break;
                 case DEATH:
                     PlayerUnit unit;
-                    if (objectHandler.getMyUnits().containsKey(event.getId())) {
+                    Long deadUnit = event.getEventAuthor();
+                    Long killer = event.getId();
+                    //Event id is the attacker, author is the unit that died
+                    if (objectHandler.getMyUnits().containsKey(killer)) {
                         this.currentPoints++;
                         this.currentGold += 10;
                     }
-                    if (objectHandler.getMyUnitIds().contains(event.getEventAuthor())) {
-                        unit = objectHandler.getMyUnits().get(event.getEventAuthor());
+                    if (objectHandler.getMyUnitIds().contains(deadUnit)) {
+                        unit = objectHandler.getMyUnits().get(deadUnit);
                     } else {
-                        unit = objectHandler.getEnemyUnits().get(event.getEventAuthor());
+                        unit = objectHandler.getEnemyUnits().get(deadUnit);
                     }
                     if (unit.hasFlag()) {
                         objectHandler.spawnFlag(map, unit.getPosition(), unit.getFlagId());
                         unit.setHasFlag(false, null);
                     }
+                    comHandler.updateEntityStateL1(new EntityStateDTO(EntityState.DEAD, deadUnit, killer));
                     break;
                 case ATTACK:
                     break;
@@ -598,6 +602,15 @@ public class ModelManager {
             GameEvents.getInstance().moveToHistory(event);
         }
         GameEvents.getInstance().clearEvents();
+    }
+
+    public void updateEntityState(EntityStateDTO dto){
+        if(objectHandler.getMyUnits().containsKey(dto.unitId())){
+            objectHandler.getMyUnits().get(dto.unitId()).setState(dto.state());
+        }
+        else{
+            objectHandler.getEnemyUnits().get(dto.unitId()).setState(dto.state());
+        }
     }
 
     private void startRoundTimer() {
