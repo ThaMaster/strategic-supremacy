@@ -90,7 +90,7 @@ public class ModelManager {
         long targetId = checkEntityHit(newPosition);
         if (targetId != -1 && fov.isInFov(newPosition)) {
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
-                if(unit.getState() == EntityState.DEAD){
+                if (unit.getState() == EntityState.DEAD) {
                     continue;
                 }
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
@@ -103,15 +103,15 @@ public class ModelManager {
             // Slightly randomise the units, so they do not get the EXACT same position.
             Position offsetPosition = newPosition;
             for (PlayerUnit unit : objectHandler.getSelectedUnits()) {
-                if(unit.getState() == EntityState.DEAD){
+                if (unit.getState() == EntityState.DEAD) {
                     continue;
                 }
+                unit.setAttackTarget(null);
                 unit.setDestination(offsetPosition);
                 do {
                     offsetPosition = new Position(newPosition.getX() + UtilModel.getRandomInt(-15, 15), newPosition.getY() + UtilModel.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-
             sendL1Update();
             return true;
         }
@@ -557,7 +557,7 @@ public class ModelManager {
         for (GameEvent event : events) {
             switch (event.getType()) {
                 case STATE_CHANGE:
-                    if(objectHandler.getMyUnits().containsKey(event.getEventAuthor())){
+                    if (objectHandler.getMyUnits().containsKey(event.getEventAuthor())) {
                         //System.out.println("\t SENDING l1 UPDATE STATE CHANGE");
                         //sendL1Update();
                     }
@@ -615,11 +615,10 @@ public class ModelManager {
         GameEvents.getInstance().clearEvents();
     }
 
-    public void updateEntityState(EntityStateDTO dto){
-        if(objectHandler.getMyUnits().containsKey(dto.unitId())){
+    public void updateEntityState(EntityStateDTO dto) {
+        if (objectHandler.getMyUnits().containsKey(dto.unitId())) {
             objectHandler.getMyUnits().get(dto.unitId()).setState(dto.state());
-        }
-        else{
+        } else {
             objectHandler.getEnemyUnits().get(dto.unitId()).setState(dto.state());
         }
     }

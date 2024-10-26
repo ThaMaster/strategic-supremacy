@@ -527,14 +527,11 @@ public class ObjectHandler {
             enemyUnit.setPosition(update.position());
             long targetUnit = update.targetUnitId();
 
-            System.out.println("\t NEW L1 UPDATE");
             if (targetUnit != -1) {
-                System.out.println("\tENEMY HAS TARGET :D");
                 enemyUnit.setAttackTarget(
                         myUnits.containsKey(targetUnit) ? myUnits.get(targetUnit) : enemyUnits.get(targetUnit)
                 );
             } else {
-                System.out.println("\tSET DESTINATION ZOMBIE NATION");
                 enemyUnit.setDestination(update.destination());
             }
             if (update.flagId() != -1) {
