@@ -59,9 +59,15 @@ public class PlayerUnitView extends EntityView {
         if (AppSettings.DEBUG) {
             if (selected) {
                 g2d.setColor(Color.GREEN);
+            } else {
+                g2d.setColor(Color.RED);
             }
             drawCollisionBox(g2d);
             g2d.drawOval(screenPos.getX() - attackRange, screenPos.getY() - attackRange, attackRange * 2, attackRange * 2);
+            g2d.setColor(Color.WHITE);
+            g2d.drawOval(screenPos.getX() - Constants.L1_RADIUS, screenPos.getY() - Constants.L1_RADIUS, Constants.L1_RADIUS * 2, Constants.L1_RADIUS * 2);
+            g2d.setColor(Color.YELLOW);
+            g2d.drawOval(screenPos.getX() - Constants.L2_RADIUS, screenPos.getY() - Constants.L2_RADIUS, Constants.L2_RADIUS * 2, Constants.L2_RADIUS * 2);
         }
         this.animator.draw(g2d, screenPos);
     }

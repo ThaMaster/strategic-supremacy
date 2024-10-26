@@ -95,7 +95,7 @@ public class ModelManager {
                 }
                 unit.setAttackTarget(objectHandler.getEnemyUnits().get(targetId));
             }
-            sendL1Update();
+            // sendL1Update();
             return true;
         }
 
@@ -106,13 +106,13 @@ public class ModelManager {
                 if (unit.getState() == EntityState.DEAD) {
                     continue;
                 }
-                unit.setAttackTarget(null);
                 unit.setDestination(offsetPosition);
                 do {
                     offsetPosition = new Position(newPosition.getX() + UtilModel.getRandomInt(-15, 15), newPosition.getY() + UtilModel.getRandomInt(-15, 15));
                 } while (!isWalkable(offsetPosition));
             }
-            sendL1Update();
+
+            // sendL1Update();
             return true;
         }
         return false;
@@ -496,21 +496,24 @@ public class ModelManager {
             return false;
         }
 
-        ArrayList<Rectangle> myBBs = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
-        ArrayList<Rectangle> externalBBs = getBBByPositions(positions);
+        Rectangle myBB = getBBByUnits(new ArrayList<>(objectHandler.getMyUnits().values()));
+        Rectangle externalBB = getBBByPositions(positions);
         int index = layerIndex - 1;
 
         // Should incomplete initialize info occur, just return false
-        if ((index != 0 && index != 1) || myBBs == null || externalBBs == null) {
+        if ((index != 0 && index != 1) || myBB == null || externalBB == null) {
             return false;
         }
 
+        int distanceThreshold = (layerIndex == 1) ? Constants.L1_RADIUS : Constants.L2_RADIUS;
         // Checks if users bounding box intersects with other users bounding box
-        if (myBBs.get(index).intersects(externalBBs.get(index))) {
+        if (myBB.intersects(externalBB)) {
             // Now check each unit to see if they are inside the bounding box
             for (Position pos : positions) {
-                if (myBBs.get(index).contains(new Point(pos.getX(), pos.getY()))) {
-                    return true;
+                for (PlayerUnit myUnit : objectHandler.getMyUnits().values()) {
+                    if (Position.distance(myUnit.getPosition(), pos) < distanceThreshold) {
+                        return true;
+                    }
                 }
             }
         }
@@ -559,7 +562,7 @@ public class ModelManager {
                 case STATE_CHANGE:
                     if (objectHandler.getMyUnits().containsKey(event.getEventAuthor())) {
                         //System.out.println("\t SENDING l1 UPDATE STATE CHANGE");
-                        //sendL1Update();
+                        sendL1Update();
                     }
                 case NEW_ROUND:
                     //Create logic
@@ -701,16 +704,15 @@ public class ModelManager {
         }
     }
 
-    public ArrayList<Rectangle> getBBByUnits(ArrayList<PlayerUnit> units) {
+    public Rectangle getBBByUnits(ArrayList<PlayerUnit> units) {
         return getBBByPositions(new ArrayList<>(units.stream().map(GameObject::getPosition).toList()));
     }
 
-    public ArrayList<Rectangle> getBBByPositions(ArrayList<Position> positions) {
+    public Rectangle getBBByPositions(ArrayList<Position> positions) {
         if (positions.isEmpty()) {
             return null;
         }
 
-        ArrayList<Rectangle> bbs = new ArrayList<>();
 
         // Initialize min and max coordinates to the first position
         int minX = positions.get(0).getX();
@@ -729,14 +731,9 @@ public class ModelManager {
         }
 
         // Expand the bounding box by the radius
-        Position minPosL1 = new Position(minX - Constants.L1_RADIUS, minY - Constants.L1_RADIUS);
-        Position maxPosL1 = new Position(maxX + Constants.L1_RADIUS, maxY + Constants.L1_RADIUS);
-        bbs.add(new Rectangle(minPosL1.getX(), minPosL1.getY(), maxPosL1.getX() - minPosL1.getX(), maxPosL1.getY() - minPosL1.getY()));
-
-        Position minPosL2 = new Position(minX - Constants.L2_RADIUS, minY - Constants.L2_RADIUS);
-        Position maxPosL2 = new Position(maxX + Constants.L2_RADIUS, maxY + Constants.L2_RADIUS);
-        bbs.add(new Rectangle(minPosL2.getX(), minPosL2.getY(), maxPosL2.getX() - minPosL2.getX(), maxPosL2.getY() - minPosL2.getY()));
-        return bbs;
+        Position minPosL1 = new Position(minX - Constants.L2_RADIUS, minY - Constants.L2_RADIUS);
+        Position maxPosL1 = new Position(maxX + Constants.L2_RADIUS, maxY + Constants.L2_RADIUS);
+        return new Rectangle(minPosL1.getX(), minPosL1.getY(), maxPosL1.getX() - minPosL1.getX(), maxPosL1.getY() - minPosL1.getY());
     }
 
     public void setNewLeader(long userId) {

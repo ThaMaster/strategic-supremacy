@@ -526,7 +526,6 @@ public class ObjectHandler {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             enemyUnit.setPosition(update.position());
             long targetUnit = update.targetUnitId();
-
             if (targetUnit != -1) {
                 enemyUnit.setAttackTarget(
                         myUnits.containsKey(targetUnit) ? myUnits.get(targetUnit) : enemyUnits.get(targetUnit)

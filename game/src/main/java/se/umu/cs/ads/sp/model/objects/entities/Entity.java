@@ -111,6 +111,7 @@ public abstract class Entity extends GameObject {
         return state;
     }
     public void setState(EntityState newState){
+        GameEvents.getInstance().addEvent(new GameEvent(Util.generateId(), "", EventType.STATE_CHANGE, this.id));
         if(newState == state){
             return;
         }
@@ -119,7 +120,6 @@ public abstract class Entity extends GameObject {
         if(state == EntityState.DEAD){
             selected = false;
         }
-        GameEvents.getInstance().addEvent(new GameEvent(Util.generateId(), "", EventType.STATE_CHANGE, this.id));
     }
 
     public Position getDestination() {

@@ -220,7 +220,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                 gController.toggleShopWindow();
             case KeyEvent.VK_SPACE:
                 ArrayList<Long> selectedUnits = gController.getSelectedUnits();
-                if(selectedUnits.size() > 0){
+                if (selectedUnits.size() > 0) {
                     Position pos = this.gameEntitiesView.get(selectedUnits.get(0)).getPosition();
                     Camera.setPosition(pos);
                 }
@@ -276,20 +276,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         if (AppSettings.DEBUG) {
-            ArrayList<Rectangle> bbs = gController.getPlayerBoundingBoxes();
-            Rectangle l1BB = bbs.get(0);
-            Rectangle l2BB = bbs.get(1);
-            if (l1BB == null || l2BB == null) {
+            Rectangle bb = gController.getPlayerBoundingBox();
+            if (bb == null) {
                 System.out.println("Trying to render bounding box but got null!");
             } else {
-                Position screenPosL1 = Camera.worldToScreen((int) l1BB.getX(), (int) l1BB.getY());
-                Position screenPosL2 = Camera.worldToScreen((int) l2BB.getX(), (int) l2BB.getY());
-
-                g2d.setColor(Color.RED);
-                g2d.drawRect(screenPosL1.getX(), screenPosL1.getY(), (int) l1BB.getWidth(), (int) l1BB.getHeight());
-                g2d.setColor(Color.ORANGE);
-                g2d.drawRect(screenPosL2.getX(), screenPosL2.getY(), (int) l2BB.getWidth(), (int) l2BB.getHeight());
-
+                Position screenPosL1 = Camera.worldToScreen((int) bb.getX(), (int) bb.getY());
+                g2d.setColor(Color.CYAN);
+                g2d.drawRect(screenPosL1.getX(), screenPosL1.getY(), (int) bb.getWidth(), (int) bb.getHeight());
             }
         }
     }
@@ -500,7 +493,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     if (gController.isMyUnit(event.getId())) {
                         gController.updateHudInfo();
                     }
-                    if ( gController.isMe(event.getEventAuthor())) {
+                    if (gController.isMe(event.getEventAuthor())) {
                         addTextEvent(event, 15, EventColor.ALERT);
                     }
                     break;

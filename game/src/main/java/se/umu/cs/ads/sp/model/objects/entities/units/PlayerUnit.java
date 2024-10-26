@@ -85,7 +85,7 @@ public class PlayerUnit extends Entity {
     }
 
     public Long getFlagId() {
-        if (flagId == null) {
+        if(flagId == null) {
             return -1L;
         }
         return flagId;
@@ -93,7 +93,7 @@ public class PlayerUnit extends Entity {
 
     @Override
     public void update() {
-        if (!(state == EntityState.ATTACKING || (state == EntityState.TAKING_DAMAGE && previousState == EntityState.ATTACKING))) {
+        if(!(state == EntityState.ATTACKING || (state == EntityState.TAKING_DAMAGE && previousState == EntityState.ATTACKING))){
             //We are not attacking, we are not taking taking, and we were not attacking
             setAttackTarget(null);
         }
@@ -183,15 +183,14 @@ public class PlayerUnit extends Entity {
     }
 
     public void setAttackTarget(PlayerUnit target) {
-        if (target == null) {
-            if (this.targetedUnit == null) {
+        if(target == null){
+            if(this.targetedUnit == null){
                 return;
             }
             this.targetedUnit.setSelected(false);
             this.targetedUnit = null;
             return;
         }
-        
         this.targetedUnit = target;
         this.targetedUnit.setSelected(true);
         this.destination = targetedUnit.position;
@@ -213,7 +212,7 @@ public class PlayerUnit extends Entity {
     public void attack() {
         GameEvents.getInstance().addEvent(new GameEvent(targetedUnit.id, "Unit attacking", EventType.ATTACK, id));
         targetedUnit.takeDamage(baseAttack + attackBuff, id);
-        if (targetedUnit.getState() == EntityState.DEAD) {
+        if(targetedUnit.getState() == EntityState.DEAD){
             setState(EntityState.IDLE);
         }
     }

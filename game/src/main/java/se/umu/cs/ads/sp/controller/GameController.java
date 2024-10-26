@@ -426,7 +426,7 @@ public class GameController implements ActionListener {
         mainFrame.getHudPanel().toggleUpgradeMenu();
     }
 
-    public ArrayList<Rectangle> getPlayerBoundingBoxes() {
+    public Rectangle getPlayerBoundingBox() {
         return modelManager.getBBByUnits(
                 new ArrayList<>(modelManager.getObjectHandler().getMyUnits().values()));
     }
