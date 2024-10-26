@@ -113,6 +113,7 @@ public class PlayerUnit extends Entity {
                         shootCooldown.reset();
                     } else {
                         setState(EntityState.IDLE);
+                        targetedUnit = null;
                     }
                 } else {
                     attacked = false;
