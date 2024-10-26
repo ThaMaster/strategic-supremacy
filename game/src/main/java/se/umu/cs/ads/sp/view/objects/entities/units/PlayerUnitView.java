@@ -56,7 +56,7 @@ public class PlayerUnitView extends EntityView {
             }
         }
 
-        if (AppSettings.DEBUG) {
+        if (AppSettings.DEBUG && isMyUnit) {
             if (selected) {
                 g2d.setColor(Color.GREEN);
             } else {
