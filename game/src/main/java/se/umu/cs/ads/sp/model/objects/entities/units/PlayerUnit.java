@@ -182,6 +182,9 @@ public class PlayerUnit extends Entity {
 
     public void setAttackTarget(PlayerUnit target) {
         if(target == null){
+            if(this.targetedUnit == null){
+                return;
+            }
             this.targetedUnit.setSelected(false);
             this.targetedUnit = target;
             return;

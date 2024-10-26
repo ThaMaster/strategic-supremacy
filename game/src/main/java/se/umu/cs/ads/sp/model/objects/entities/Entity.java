@@ -136,7 +136,6 @@ public abstract class Entity extends GameObject {
     }
 
     public void takeDamage(int damage, long attacker) {
-        setState(EntityState.TAKING_DAMAGE);
         this.currentHp -= damage;
         hitCooldown.start();
         if (currentHp <= 0) {
@@ -144,6 +143,7 @@ public abstract class Entity extends GameObject {
             setState(EntityState.DEAD);
             this.destroy(map);
         } else {
+            setState(EntityState.TAKING_DAMAGE);
             GameEvents.getInstance().addEvent(new GameEvent(attacker, "Unit took damage!", EventType.TAKE_DMG, id));
         }
     }
