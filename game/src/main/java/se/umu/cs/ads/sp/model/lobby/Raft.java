@@ -56,18 +56,17 @@ public class Raft {
     }
 
     public void receiveVote(boolean approved){
-        System.out.println("Received a vote -> " + approved);
         receivedVotes++;
-        if(approved){
+        if(approved ){
             numApprovedVotes++;
-            if(numApprovedVotes > numClients/2){
+            if(numApprovedVotes > numClients/2 && state != LobbyClientState.LEADER) {
                 //Got a majority of the votes, I am now the leader
                 state = LobbyClientState.LEADER;
                 if(AppSettings.DEBUG){
                     GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "I have become the new game leader", EventType.LOGG, lobbyHandler.getLobby().id));
                 }
                 System.out.println();
-                System.out.println("\t I AM THE LEADER NOW");
+                System.out.println("\t I AM THE LEADER NOW -> " + Thread.currentThread());
                 System.out.println();
                 comHandler.notifyNewLeader();
             }
@@ -88,9 +87,6 @@ public class Raft {
         if(AppSettings.DEBUG){
             GameEvents.getInstance().addEvent(new GameEvent(UtilModel.generateId(), "New leader has been elected", EventType.LOGG, lobbyHandler.getLobby().id));
         }
-        System.out.println();
-        System.out.println("\t I NOW A FOLLOWER");
-        System.out.println();
         state = LobbyClientState.FOLLOWER;
     }
 

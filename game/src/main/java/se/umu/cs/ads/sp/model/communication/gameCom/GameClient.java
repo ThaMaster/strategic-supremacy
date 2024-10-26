@@ -214,7 +214,6 @@ public class GameClient {
     }
 
     public void requestVote(LeaderRequestDto request) {
-        System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<CandidateLeaderResponse> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .requestVote(GrpcUtil.toGrpcLeaderRequest(request));
@@ -235,14 +234,12 @@ public class GameClient {
     }
 
     public void notifyNewLeader(proto.UserId user) {
-        System.out.println("[Client] Requesting a vote for leader election...");
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .notifyNewLeader(user);
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty empty) {
-                System.out.println("\t Successfully notified about new leader");
             }
 
             @Override

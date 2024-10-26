@@ -26,7 +26,7 @@ public class ComHandler {
     public final ConcurrentHashMap<Long, GameClient> l3Clients;
     public final ConcurrentHashMap<Long, GameClient> l2Clients;
     public final ConcurrentHashMap<Long, GameClient> l1Clients;
-    private long timeSinceL3Update;
+    private Long timeSinceL3Update;
 
     public ComHandler(int port, ModelManager modelManager) {
         l3Clients = new ConcurrentHashMap<>();
@@ -134,8 +134,11 @@ public class ComHandler {
     }
 
     public boolean leaderIsAlive() {
+        if(timeSinceL3Update == null){
+            return true;
+        }
         return (System.currentTimeMillis() - timeSinceL3Update) <
-                UtilModel.getRandomInt((int) Constants.L3_UPDATE_TIME, (int) Constants.L3_UPDATE_TIME + 2000);
+                UtilModel.getRandomInt((int) Constants.L3_UPDATE_TIME + 1000, (int) Constants.L3_UPDATE_TIME + 2000);
         //Randomize to minimize the risk of two candidates starting election at the same time
     }
 
@@ -185,12 +188,10 @@ public class ComHandler {
     public void sendStartGameRequest(StartGameRequestDTO req, User user) {
         GameClient client = l3Clients.get(user.id);
         client.startGame(req);
-        timeSinceL3Update = System.currentTimeMillis();
     }
 
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
-        timeSinceL3Update = System.currentTimeMillis();
     }
 
     public void markLobbyStarted(long lobbyId) {
@@ -309,7 +310,6 @@ public class ComHandler {
     public void notifyNewLeader() {
         long playerId = modelManager.getPlayer().id;
         for (GameClient client : l3Clients.values()) {
-            System.out.println("\t Sending to " + client.getUsername());
             client.notifyNewLeader(GrpcUtil.toGrpcUserId(playerId));
         }
         modelManager.setNewLeader(modelManager.getPlayer().id);
