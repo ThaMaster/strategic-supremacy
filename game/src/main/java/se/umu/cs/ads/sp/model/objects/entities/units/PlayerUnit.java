@@ -92,6 +92,9 @@ public class PlayerUnit extends Entity {
 
     @Override
     public void update() {
+        if(state != EntityState.ATTACKING){
+            setAttackTarget(null);
+        }
         switch (state) {
             case IDLE:
                 break;
@@ -139,7 +142,6 @@ public class PlayerUnit extends Entity {
                 }
                 break;
             case DEAD:
-
                 break;
             default:
                 break;

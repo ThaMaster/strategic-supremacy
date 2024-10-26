@@ -532,7 +532,6 @@ public class ObjectHandler {
                         myUnits.containsKey(targetUnit) ? myUnits.get(targetUnit) : enemyUnits.get(targetUnit)
                 );
             } else {
-                enemyUnit.setAttackTarget(null);
                 enemyUnit.setDestination(update.destination());
             }
             if (update.flagId() != -1) {

@@ -106,7 +106,6 @@ public class ModelManager {
                 if(unit.getState() == EntityState.DEAD){
                     continue;
                 }
-                unit.setAttackTarget(null);
                 unit.setDestination(offsetPosition);
                 do {
                     offsetPosition = new Position(newPosition.getX() + UtilModel.getRandomInt(-15, 15), newPosition.getY() + UtilModel.getRandomInt(-15, 15));
