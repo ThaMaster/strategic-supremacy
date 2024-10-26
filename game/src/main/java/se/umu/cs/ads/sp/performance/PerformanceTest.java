@@ -14,6 +14,7 @@ public class PerformanceTest implements ITest{
 
     public PerformanceTest(Long id){
         this.id = id;
+        startTime = System.currentTimeMillis();
     }
 
     public Long getId(){

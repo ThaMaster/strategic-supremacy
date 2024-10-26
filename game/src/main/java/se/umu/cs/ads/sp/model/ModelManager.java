@@ -556,7 +556,7 @@ public class ModelManager {
     }
 
     private void collectEvents() {
-        ArrayList<GameEvent> events = GameEvents.getInstance().getEvents();
+        ArrayList<GameEvent> events = new ArrayList<>(GameEvents.getInstance().getEvents());
         for (GameEvent event : events) {
             switch (event.getType()) {
                 case STATE_CHANGE:

@@ -191,10 +191,13 @@ public class PlayerUnit extends Entity {
             this.targetedUnit = null;
             return;
         }
-        this.targetedUnit = target;
-        this.targetedUnit.setSelected(true);
-        this.destination = targetedUnit.position;
-        setState(EntityState.ATTACKING);
+        targetedUnit = target;
+        synchronized (targetedUnit) {
+            this.targetedUnit.setSelected(true);
+            this.destination = targetedUnit.position;
+            setState(EntityState.ATTACKING);
+        }
+
     }
 
     public long getTargetId() {
