@@ -171,7 +171,6 @@ public class GrpcUtil {
         }
 
         lobby.setUsers(users);
-        lobby.setMessageCount(request.getMessageCount());
         return lobby;
     }
 
@@ -181,8 +180,7 @@ public class GrpcUtil {
                 .setLeader(toGrpcUser(lobby.leader))
                 .setSelectedMap(lobby.selectedMap)
                 .setMaxPlayers(lobby.maxPlayers)
-                .setLobbyName(lobby.name)
-                .setMessageCount(lobby.messageCount);
+                .setLobbyName(lobby.name);
         for (User user : lobby.users) {
             builder.addUsers(toGrpcUser(user));
         }

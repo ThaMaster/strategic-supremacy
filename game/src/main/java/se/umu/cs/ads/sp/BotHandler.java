@@ -24,6 +24,7 @@ public class BotHandler {
         try {
             for (int i = 0; i < nrBots; i++) {
                 bots.add(startBotInstance(lobbyId, false, forceFlag, nrBots, -1, runTests, false));
+                Thread.sleep(250);
             }
 
             // Add a shutdown hook to destroy all processes when the JVM shuts down
@@ -32,17 +33,19 @@ public class BotHandler {
                     process.destroy(); // Destroy each process
                 }
             }));
-            if(noLeader){
-                for(Process process : bots){
-                    try{
+            if (noLeader) {
+                for (Process process : bots) {
+                    try {
                         process.waitFor();
-                    }catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

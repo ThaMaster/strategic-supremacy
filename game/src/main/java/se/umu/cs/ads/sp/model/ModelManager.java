@@ -534,7 +534,7 @@ public class ModelManager {
      */
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
-        if(AppSettings.RUN_PERFORMANCE_TEST && iAmLeader()){
+        if (AppSettings.RUN_PERFORMANCE_TEST && iAmLeader()) {
             TestLogger.outputPerformance();
         }
 
@@ -570,8 +570,6 @@ public class ModelManager {
             switch (event.getType()) {
                 case STATE_CHANGE:
                     if (objectHandler.getMyUnits().containsKey(event.getEventAuthor())) {
-                        System.out.println("My units changed state!");
-                        //System.out.println("\t SENDING l1 UPDATE STATE CHANGE");
                         sendL1Update();
                     }
                 case NEW_ROUND:
@@ -703,16 +701,13 @@ public class ModelManager {
             }
             ArrayList<Position> skeletonPos = new ArrayList<>(skeletons.entities().stream().map(EntitySkeletonDTO::position).toList());
             // Check l1, then l2, otherwise just move user to l3
-            if(AppSettings.FORCE_L1){
+            if (AppSettings.FORCE_L1) {
                 comHandler.moveUserToL1(skeletons.userId());
-            }
-            else if(AppSettings.FORCE_L2){
+            } else if (AppSettings.FORCE_L2) {
                 comHandler.moveUserToL2(skeletons.userId());
-            }
-            else if(AppSettings.FORCE_L3){
+            } else if (AppSettings.FORCE_L3) {
                 comHandler.moveUserToL3(skeletons.userId());
-            }
-            else{
+            } else {
                 if (isInsideLayer(skeletonPos, 1)) {
                     comHandler.moveUserToL1(skeletons.userId());
                 } else if (isInsideLayer(skeletonPos, 2)) {

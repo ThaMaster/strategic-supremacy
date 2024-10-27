@@ -16,8 +16,6 @@ public class Lobby {
     public String selectedMap;
     public boolean started;
 
-    public int messageCount = 0;
-
     public Lobby(Long id, String name, int maxPlayers) {
         this.id = id;
         this.name = name;
@@ -45,10 +43,6 @@ public class Lobby {
     public void setUsers(ArrayList<User> users) {
         this.users = users;
         this.currentPlayers = users.size();
-    }
-
-    public void setMessageCount(int count) {
-        this.messageCount = count;
     }
 
     public void addLeader(User user) {
