@@ -8,7 +8,6 @@ import proto.*;
 import se.umu.cs.ads.sp.model.communication.ComHandler;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.EntitySkeletonDTO;
-import se.umu.cs.ads.sp.model.communication.dto.StartGameRequestDTO;
 import se.umu.cs.ads.sp.model.communication.dto.UserSkeletonsDTO;
 
 import java.io.IOException;
@@ -77,9 +76,12 @@ public class GameServer {
         }
 
         @Override
-        public void l1Update(L1Message request, StreamObserver<Empty> responseObserver) {
-            comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
-            responseObserver.onNext(Empty.newBuilder().build());
+        public void l1Update(L1Message request, StreamObserver<ErrorOccurred> responseObserver) {
+            boolean errorOccurred = comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
+            if(errorOccurred) {
+                System.out.println("ERROR OCCURRED");
+            }
+            responseObserver.onNext(proto.ErrorOccurred.newBuilder().setError(errorOccurred).build());
             responseObserver.onCompleted();
         }
 

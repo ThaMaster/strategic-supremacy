@@ -129,10 +129,14 @@ message EntityState {
   int64 attacker = 3;
 }
 
+message ErrorOccurred {
+  bool error = 1;
+}
+
 service GameService {
   rpc removePlayerUnits (UserSkeletons) returns (google.protobuf.Empty);
   rpc updateLobby(DetailedLobbyInfo) returns (google.protobuf.Empty);
-  rpc l1Update (L1Message) returns (google.protobuf.Empty);
+  rpc l1Update (L1Message) returns (ErrorOccurred);
   rpc l2Update (L2Message) returns (google.protobuf.Empty);
   rpc l3Update(L3Message) returns (google.protobuf.Empty);
   rpc defeatUpdate (UserId) returns (google.protobuf.Empty);

@@ -1,14 +1,13 @@
 package se.umu.cs.ads.sp.performance;
 
-import se.umu.cs.ads.sp.util.Position;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 public class ConsistencyTest extends ITest {
 
-    private int errors;
+    private double errors;
+    private double numClients;
 
     public ConsistencyTest(Long id) {
         super(id);
@@ -17,6 +16,7 @@ public class ConsistencyTest extends ITest {
     @Override
     public void start() {
         errors = 0;
+        numClients = 1;
     }
 
     @Override
@@ -24,15 +24,16 @@ public class ConsistencyTest extends ITest {
 
     }
 
-    @Override
-    public void output() throws IOException {
-        Files.writeString(targetFile, errors + "," + System.lineSeparator(), StandardOpenOption.APPEND);
+    public void setNumClients(double clients) {
+        this.numClients = clients;
     }
 
-    public void checkData(Position localPosition, Position remotePosition) {
-        if (Position.distance(localPosition, remotePosition) > TestConstants.POSITION_ERROR_MARGIN) {
-            errors++;
-            System.out.println(errors);
-        }
+    public void addError() {
+        errors++;
+    }
+
+    @Override
+    public void output() throws IOException {
+        Files.writeString(targetFile, "Total: " + errors + " clients " + numClients + ": " + errors / numClients + "," + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 }

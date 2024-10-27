@@ -10,6 +10,7 @@ import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
+import se.umu.cs.ads.sp.performance.ConsistencyTest;
 import se.umu.cs.ads.sp.performance.LatencyTest;
 import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
@@ -23,9 +24,9 @@ public class ComHandler {
 
     private final NsClient nsClient;
     private final ModelManager modelManager;
-    public final ConcurrentHashMap<Long, GameClient> l3Clients;
-    public final ConcurrentHashMap<Long, GameClient> l2Clients;
-    public final ConcurrentHashMap<Long, GameClient> l1Clients;
+    public ConcurrentHashMap<Long, GameClient> l3Clients;
+    public ConcurrentHashMap<Long, GameClient> l2Clients;
+    public ConcurrentHashMap<Long, GameClient> l1Clients;
     private Long timeSinceL3Update;
 
     public ComHandler(int port, ModelManager modelManager) {
@@ -72,7 +73,7 @@ public class ComHandler {
     public void sendL3Update(L3UpdateDTO message, boolean fromLeader) {
         if (fromLeader) {
             Long id = -1L;
-            if (AppSettings.RUN_PERFORMANCE_TEST) {
+            if (AppSettings.RUN_PERFORMANCE_TEST && modelManager.iAmLeader()) {
                 id = init_latency_perf_test(TestLogger.L3_LEADER_LATENCY, l3Clients.size());
             }
             for (GameClient client : l3Clients.values()) {
@@ -110,7 +111,7 @@ public class ComHandler {
             return;
         }
         Long id = -1L;
-        if (AppSettings.RUN_PERFORMANCE_TEST) {
+        if (AppSettings.RUN_PERFORMANCE_TEST && modelManager.iAmLeader()) {
             id = init_latency_perf_test(TestLogger.L2_LATENCY, l2Clients.size());
         }
         for (GameClient client : l2Clients.values()) {
@@ -129,18 +130,20 @@ public class ComHandler {
         }
 
         Long id = -1L;
-        if (AppSettings.RUN_PERFORMANCE_TEST) {
+        Long cId = -1L;
+        if (AppSettings.RUN_PERFORMANCE_TEST && modelManager.iAmLeader()) {
             id = init_latency_perf_test(TestLogger.L1_LATENCY, l1Clients.size());
+            cId = init_consistency_test(TestLogger.CONSISTENCY, l1Clients.size());
         }
 
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
-            client.sendL1Message(message, id);
+            client.sendL1Message(message, id, cId);
         }
     }
 
-    public void handleReceiveL1Msg(L1UpdateDTO message) {
-        modelManager.receiveL1Update(message);
+    public boolean handleReceiveL1Msg(L1UpdateDTO message) {
+        return modelManager.receiveL1Update(message);
     }
 
     public boolean leaderIsAlive() {
@@ -201,6 +204,7 @@ public class ComHandler {
 
     public void startGame(StartGameRequestDTO req) {
         modelManager.startGameReq(req);
+        setupForceLayer();
     }
 
     public void markLobbyStarted(long lobbyId) {
@@ -358,22 +362,14 @@ public class ComHandler {
         }
     }
 
-    private void updateLobbyInNewContext(Lobby updatedLobby) {
-        // Create a new context and attach it (Needed because other
-        // will immediately also use this sub).
-        Context newContext = Context.current().fork();
-        Context previousContext = newContext.attach();
-        try {
-            sendUpdatedLobby(updatedLobby);
-        } finally {
-            // Switch back to the previous context
-            newContext.detach(previousContext);
-        }
-    }
-
     public void resetClients() {
-        l1Clients.clear();
-        l2Clients.clear();
+        if (!AppSettings.FORCE_L1) {
+            l1Clients.clear();
+        }
+
+        if (!AppSettings.FORCE_L2) {
+            l2Clients.clear();
+        }
     }
 
     //Returns the id for the performance test
@@ -383,5 +379,23 @@ public class ComHandler {
         latencyTest.setNumClients(numClientsToWaitFor);
         TestLogger.newEntry(TestLogger.getTestName(testName), latencyTest);
         return performanceTestId;
+    }
+
+    private Long init_consistency_test(String testName, int numClientsToWaitFor) {
+        Long cId = Util.generateId();
+        ConsistencyTest cTest = new ConsistencyTest(cId);
+        cTest.setNumClients(numClientsToWaitFor);
+        TestLogger.newEntry(TestLogger.getTestName(testName), cTest);
+        return cId;
+    }
+
+    public void setupForceLayer() {
+        if(AppSettings.FORCE_L1) {
+            l1Clients = l3Clients;
+        }
+
+        if(AppSettings.FORCE_L2) {
+            l2Clients = l3Clients;
+        }
     }
 }

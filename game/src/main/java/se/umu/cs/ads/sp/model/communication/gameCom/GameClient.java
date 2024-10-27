@@ -9,13 +9,15 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import proto.CandidateLeaderResponse;
+import proto.ErrorOccurred;
 import proto.GameServiceGrpc;
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.communication.GrpcUtil;
 import se.umu.cs.ads.sp.model.communication.dto.*;
+import se.umu.cs.ads.sp.performance.ConsistencyTest;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 
 import java.util.concurrent.TimeUnit;
@@ -107,7 +109,7 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST && perfId != -1) {
+                if (AppSettings.RUN_PERFORMANCE_TEST && perfId != -1) {
                     TestLogger.setFinished(perfId);
                 }
             }
@@ -120,7 +122,7 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void updateEntityState(EntityStateDTO dto){
+    public void updateEntityState(EntityStateDTO dto) {
         ListenableFuture<Empty> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .updateEntityState(GrpcUtil.toGrpcEntityState(dto));
@@ -145,7 +147,7 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST  && perfId != -1){
+                if (AppSettings.RUN_PERFORMANCE_TEST && perfId != -1) {
                     TestLogger.setFinished(perfId);
                 }
             }
@@ -158,17 +160,25 @@ public class GameClient {
         }, MoreExecutors.directExecutor());
     }
 
-    public void sendL1Message(L1UpdateDTO msg, Long perfId) {
-        ListenableFuture<Empty> future = stub
+    public void sendL1Message(L1UpdateDTO msg, Long perfId, Long cId) {
+        ListenableFuture<ErrorOccurred> future = stub
                 .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
                 .l1Update(GrpcUtil.toGrpcL1Message(msg));
 
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
-            public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST  && perfId != -1){
+            public void onSuccess(@Nullable ErrorOccurred error) {
+                if (AppSettings.RUN_PERFORMANCE_TEST && perfId != -1) {
                     TestLogger.setFinished(perfId);
                 }
+
+                if (AppSettings.RUN_PERFORMANCE_TEST && cId != -1) {
+                    ConsistencyTest cTest = (ConsistencyTest) TestLogger.getTest(cId);
+                    if (error != null && error.getError()) {
+                        cTest.addError();
+                    }
+                }
+
             }
 
             @Override

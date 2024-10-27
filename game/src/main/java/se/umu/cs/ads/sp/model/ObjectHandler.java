@@ -13,6 +13,7 @@ import se.umu.cs.ads.sp.model.objects.environment.Base;
 import se.umu.cs.ads.sp.model.objects.environment.Environment;
 import se.umu.cs.ads.sp.model.objects.environment.GoldMine;
 import se.umu.cs.ads.sp.performance.ConsistencyTest;
+import se.umu.cs.ads.sp.performance.TestConstants;
 import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
@@ -39,15 +40,11 @@ public class ObjectHandler {
 
     private boolean myUnitsDead = false;
 
-    private Long consistencyTestId;
-
     public ObjectHandler(User user) {
         this.user = user;
 
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            consistencyTestId = Util.generateId();
-            ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
-            TestLogger.newEntry(TestLogger.getTestName(TestLogger.CONSISTENCY), consistencyTest);
+
         }
     }
 
@@ -532,11 +529,15 @@ public class ObjectHandler {
         }
     }
 
-    public void updateEnemyUnits(ArrayList<UnitDTO> updates) {
+    public boolean updateEnemyUnits(ArrayList<UnitDTO> updates) {
+        boolean errorOccurred = false;
         for (UnitDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             if (AppSettings.RUN_PERFORMANCE_TEST) {
-                ((ConsistencyTest) TestLogger.getTest(consistencyTestId)).checkData(enemyUnit.getPosition(), update.position());
+                if (Position.distance(enemyUnit.getPosition(), update.position()) > TestConstants.POSITION_ERROR_MARGIN) {
+                    System.out.println("ERROR OCCURRED IN OBJECT HANDLER");
+                    errorOccurred = true;
+                }
             }
             enemyUnit.setPosition(update.position());
             long targetUnit = update.targetUnitId();
@@ -557,6 +558,7 @@ public class ObjectHandler {
             enemyUnit.setSpeedBuff(update.speedBuff());
             enemyUnit.setAttackBuff(update.attackBuff());
         }
+        return errorOccurred;
     }
 
     public ArrayList<Long> getMyUnitIds() {

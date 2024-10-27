@@ -2,12 +2,9 @@ package se.umu.cs.ads.sp.controller;
 
 import se.umu.cs.ads.ns.app.Lobby;
 import se.umu.cs.ads.ns.app.User;
-import se.umu.cs.ads.sp.BotHandler;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
-import se.umu.cs.ads.sp.performance.TestConstants;
-import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
@@ -20,7 +17,6 @@ public class BotController implements Runnable {
 
     private final ModelManager modelManager;
     private Timer updateLobbyTimer;
-    private Timer gameTimer;
     private Timer updateTimer;
     private final int lobbyCount;
 
@@ -86,7 +82,6 @@ public class BotController implements Runnable {
                     modelManager.startGame();
                     updateLobbyTimer.stop();
                     updateTimer.start();
-                    gameTimer.start();
                 } else {
                     System.out.println("[Leader Bot] " + modelManager.getLobbyHandler().getLobby().currentPlayers + "/" + lobbyCount + " in lobby...");
                 }
@@ -96,17 +91,9 @@ public class BotController implements Runnable {
                     System.out.println("[Follower Bot] Game started, time to play!");
                     updateLobbyTimer.stop();
                     updateTimer.start();
-                    gameTimer.start();
                 } else {
                     System.out.println("[Follower Bot] Still waiting for game to start...");
                 }
-            }
-        });
-
-        gameTimer = new Timer(700, e -> {
-            long remainingTime = modelManager.getRoundRemainingTime();
-            if (remainingTime <= 0 && modelManager.iAmLeader()) {
-                System.out.println("[Leader Bot] Round over");
             }
         });
         updateTimer = new Timer(1000 / Constants.FPS, e -> {

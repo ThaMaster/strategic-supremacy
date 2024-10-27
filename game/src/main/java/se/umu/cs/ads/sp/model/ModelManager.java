@@ -188,6 +188,7 @@ public class ModelManager {
      * in the lobby. It will
      */
     public void startGame() {
+        comHandler.setupForceLayer();
         System.out.println("[Client] Sending out start request to lobby...");
         comHandler.markLobbyStarted(lobbyHandler.getLobby().id);
         StartGameRequestDTO req = objectHandler.initializeWorld(map, lobbyHandler.getLobby().users);
@@ -295,6 +296,7 @@ public class ModelManager {
         comHandler.sendNextRound(request);
         fov.updateUnitPositions(new ArrayList<>(objectHandler.getMyUnits().values()));
         startRoundTimer();
+        System.out.println("[Leader] Sending next round request!");
         GameEvents.getInstance().addEvent(new GameEvent(player.id, "Next Round!", EventType.NEW_ROUND, -1));
         defeatedPlayers = 0;
         currentRound++;
@@ -400,9 +402,10 @@ public class ModelManager {
      *
      * @param update The L1 update message.
      */
-    public void receiveL1Update(L1UpdateDTO update) {
-        objectHandler.updateEnemyUnits(update.entities());
+    public boolean receiveL1Update(L1UpdateDTO update) {
+        boolean errorOccurred = objectHandler.updateEnemyUnits(update.entities());
         updateBoundariesFromL1Message(update);
+        return errorOccurred;
     }
 
     /**
