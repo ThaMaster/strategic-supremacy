@@ -18,6 +18,7 @@ public class LatencyTest extends PerformanceTest {
         numResponses++;
         if (numResponses == numClients) {
             this.endTime = System.currentTimeMillis();
+            System.out.println("LEADER ELECTION -> " + (endTime - startTime));
         }
     }
 }

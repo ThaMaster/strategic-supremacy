@@ -18,11 +18,11 @@ public class TestLogger {
     public static String L3_LEADER_LATENCY = "L3-Leader-Latency";
     public static String L3_FOLLOWER_LATENCY = "L3-Follower-Latency";
     public static String CONSISTENCY = "Consistency";
-
+    public static String RAFT = "Raft";
     private final static String[] files = {
             L1_LATENCY, L2_LATENCY,
             L3_LEADER_LATENCY, L3_FOLLOWER_LATENCY,
-            CONSISTENCY
+            CONSISTENCY, RAFT
     };
     private static final Map<String, Path> fileMap = new HashMap<>();
     private static Map<Long, ITest> test = new HashMap<>();
