@@ -173,13 +173,9 @@ public class GameClient {
                 }
 
                 if (AppSettings.RUN_PERFORMANCE_TEST && cId != -1) {
-                    System.out.println("Checking consistency...");
                     ConsistencyTest cTest = (ConsistencyTest) TestLogger.getTest(cId);
                     if (error != null && error.getError()) {
-                        System.out.println("ADDING ERROR");
                         cTest.addError();
-                    } else {
-                        System.out.println("NO ERROR");
                     }
                 }
 
