@@ -46,7 +46,7 @@ public class ObjectHandler {
         this.user = user;
         consistencyTestId = Util.generateId();
         ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
-        TestLogger.newEntry(TestLogger.CONSISTENCY, consistencyTest);
+        TestLogger.newEntry("Consistency", TestLogger.CONSISTENCY, consistencyTest);
     }
 
     public void update(Map map) {

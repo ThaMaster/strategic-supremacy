@@ -27,6 +27,7 @@ public class ComHandler {
     public final ConcurrentHashMap<Long, GameClient> l2Clients;
     public final ConcurrentHashMap<Long, GameClient> l1Clients;
     private Long timeSinceL3Update;
+    private int numPlayers;
 
     public ComHandler(int port, ModelManager modelManager) {
         l3Clients = new ConcurrentHashMap<>();
@@ -73,12 +74,16 @@ public class ComHandler {
         if (fromLeader) {
             Long id = -1L;
             if (AppSettings.RUN_PERFORMANCE_TEST) {
-                id = init_latency_perf_test(TestLogger.L3_LEADER);
+                id = init_latency_perf_test("L3", "L3-Leader-Latency");
             }
             for (GameClient client : l3Clients.values()) {
                 client.sendL3Message(message, id);
             }
         } else {
+            Long id = -1L;
+            if (AppSettings.RUN_PERFORMANCE_TEST) {
+                id = init_latency_perf_test("L3", TestLogger.L3_FOLLOWER_LATENCY);
+            }
             User leader = modelManager.getLobbyHandler().getLobby().leader;
             if (l3Clients.containsKey(leader.id)) {
                 GameClient client = l3Clients.get(leader.id);
@@ -111,11 +116,10 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test(TestLogger.L3_LEADER);
+            id = init_latency_perf_test("L2", TestLogger.L2_LATENCY);
         }
         for (GameClient client : l2Clients.values()) {
             // Send l2 update only to those in the zone
-
             client.sendL2Message(message, id);
         }
     }
@@ -130,7 +134,7 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test(TestLogger.L1_LEADER);
+            id = init_latency_perf_test("L1", TestLogger.L1_LATENCY);
         }
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
@@ -178,6 +182,8 @@ public class ComHandler {
         if (!modelManager.hasGameStarted()) {
             modelManager.loadMap(updatedLobby.selectedMap);
             modelManager.getLobbyHandler().setLobby(updatedLobby);
+        } else {
+            this.numPlayers = updatedLobby.currentPlayers;
         }
     }
 
@@ -364,11 +370,12 @@ public class ComHandler {
     }
 
     //Returns the id for the performance test
-    private Long init_latency_perf_test(String type) {
+    private Long init_latency_perf_test(String folder, String testName) {
+        testName += "-" + numPlayers + ".txt";
         Long performanceTestId = Util.generateId();
         LatencyTest latencyTest = new LatencyTest(performanceTestId);
-        latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1); // -1 since we dont want to count ourself
-        TestLogger.newEntry(type, latencyTest);
+        latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1);
+        TestLogger.newEntry(folder, testName, latencyTest);
         return performanceTestId;
     }
 }

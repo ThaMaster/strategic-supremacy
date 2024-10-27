@@ -5,23 +5,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class PerformanceTest implements ITest{
+public class PerformanceTest extends ITest {
 
-    protected Long id;
     protected Long startTime;
     protected Long endTime;
-    protected Path targetFile;
 
-    public PerformanceTest(Long id){
-        this.id = id;
-        startTime = System.currentTimeMillis();
+    public PerformanceTest(Long id) {
+        super(id);
     }
 
-    public Long getId(){
-        return id;
-    }
-
-    public void setTargetFile(Path path){
+    public void setTargetFile(Path path) {
         this.targetFile = path;
     }
 
@@ -30,11 +23,11 @@ public class PerformanceTest implements ITest{
         startTime = System.currentTimeMillis();
     }
 
-    public void finish(){
+    public void finish() {
         endTime = System.currentTimeMillis();
     }
 
     public void output() throws IOException {
-        Files.writeString(targetFile, endTime-startTime + System.lineSeparator(), StandardOpenOption.APPEND);
+        Files.writeString(targetFile, endTime - startTime + "," + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 }

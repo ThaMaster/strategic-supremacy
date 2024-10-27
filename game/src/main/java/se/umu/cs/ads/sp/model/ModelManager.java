@@ -13,6 +13,7 @@ import se.umu.cs.ads.sp.model.map.Map;
 import se.umu.cs.ads.sp.model.objects.GameObject;
 import se.umu.cs.ads.sp.model.objects.collectables.Reward;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
@@ -544,6 +545,9 @@ public class ModelManager {
         objectHandler.clearGameObjects();
         lobbyHandler.leaveLobby();
         started = false;
+        if(AppSettings.RUN_PERFORMANCE_TEST){
+            TestLogger.outputPerformance();
+        }
     }
 
     public void removePlayer(long userId, ArrayList<Long> unitIds) {

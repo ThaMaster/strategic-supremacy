@@ -3,15 +3,13 @@ package se.umu.cs.ads.sp.performance;
 import se.umu.cs.ads.sp.util.Position;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
-public class ConsistencyTest implements ITest {
+public class ConsistencyTest extends ITest {
 
     private int errors;
-    private Long id;
+
     public ConsistencyTest(Long id) {
-        this.id = id;
-        start();
+        super(id);
     }
 
     @Override
@@ -25,21 +23,8 @@ public class ConsistencyTest implements ITest {
     }
 
     @Override
-    public void setTargetFile(Path path) {
-
-    }
-
-    @Override
     public void output() throws IOException {
 
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public void checkData(int localData, int remoteData) {
     }
 
     public void checkData(Position localPosition, Position remotePosition) {
