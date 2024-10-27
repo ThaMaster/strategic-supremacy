@@ -55,6 +55,7 @@ message DetailedLobbyInfo {
   repeated User users = 4;
   int32 maxPlayers = 5;
   string selectedMap = 6;
+  int32 messageCount = 7;
 }
 
 service GrpcNamingService {

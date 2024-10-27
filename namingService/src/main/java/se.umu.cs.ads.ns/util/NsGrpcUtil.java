@@ -98,7 +98,8 @@ public class NsGrpcUtil {
                 .setLeader(toGrpc(lobby.leader))
                 .setSelectedMap(lobby.selectedMap)
                 .setMaxPlayers(lobby.maxPlayers)
-                .setLobbyName(lobby.name);
+                .setLobbyName(lobby.name)
+                .setMessageCount(lobby.messageCount);
         for (User user : lobby.users) {
             builder.addUsers(toGrpc(user));
         }
@@ -118,6 +119,8 @@ public class NsGrpcUtil {
         for (nsProto.User user : request.getUsersList()) {
             users.add(fromGrpc(user));
         }
+
+        lobby.setMessageCount(request.getMessageCount());
         lobby.setUsers(users);
         return lobby;
     }

@@ -36,7 +36,6 @@ public class BotController implements Runnable {
             System.out.println("\t Force-Flag: " + ff + " Bots: " + nrBots + " MapIndex: " + mapIndex + " Testing: " + testing);
             if (createLobby(nrBots, mapIndex)) {
                 System.out.println("\t Lobby created, spawning bots...");
-                BotHandler.initBots(modelManager.getLobbyHandler().getLobby().id, nrBots - 1, forceFlag, testAll, false);
                 updateLobbyTimer.start();
             } else {
                 System.out.println("[Leader Bot] Could not create a lobby, shutting down...");

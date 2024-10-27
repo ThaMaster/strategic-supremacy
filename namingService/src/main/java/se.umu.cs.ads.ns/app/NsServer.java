@@ -56,6 +56,7 @@ public class NsServer {
             Lobby lobby = new Lobby(leader, request.getLobbyName(), request.getMaxPlayers());
             lobby.selectedMap = request.getSelectedMap();
             lobby.started = false;
+            lobby.messageCount = 0;
             lobbies.put(lobby.id, lobby);
 
             System.out.println("[Server] New lobby created, responding with id: " + lobby.id);
@@ -98,6 +99,7 @@ public class NsServer {
             if (!lobby.users.contains(joiningUser)) {
                 System.out.println("\t Successfully joined!");
                 lobby.addUser(NsGrpcUtil.fromGrpc(request.getUser()));
+                lobby.messageCount++;
             } else {
                 System.out.println("\t User already exists!");
             }
@@ -125,6 +127,8 @@ public class NsServer {
             if (lobby.currentPlayers == 0) {
                 System.out.println("\t Lobby became empty, removing.");
                 lobbies.remove(lobby.id);
+            } else {
+                lobby.messageCount++;
             }
             responseObserver.onNext(NsGrpcUtil.toGrpc(lobby.leader));
             responseObserver.onCompleted();
@@ -134,6 +138,7 @@ public class NsServer {
         public void startLobby(LobbyId request, StreamObserver<Empty> responseObserver) {
             Lobby lobby = lobbies.get(request.getId());
             lobby.started = true;
+            lobby.messageCount++;
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }

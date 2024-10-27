@@ -10,6 +10,7 @@ import se.umu.cs.ads.sp.model.communication.dto.*;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameClient;
 import se.umu.cs.ads.sp.model.communication.gameCom.GameServer;
 import se.umu.cs.ads.sp.model.communication.nsCom.NsClient;
+import se.umu.cs.ads.sp.model.lobby.LobbyHandler;
 import se.umu.cs.ads.sp.performance.LatencyTest;
 import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
@@ -127,10 +128,13 @@ public class ComHandler {
         if (l1Clients.isEmpty()) {
             return;
         }
+
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
+            System.out.println("Adding L1 results to test");
             id = init_latency_perf_test(TestLogger.L1_LATENCY, l1Clients.size());
         }
+
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
             client.sendL1Message(message, id);
@@ -166,6 +170,18 @@ public class ComHandler {
     }
 
     public void updateLobby(Lobby updatedLobby) {
+
+        LobbyHandler lHandler = modelManager.getLobbyHandler();
+        if (lHandler.getLobby().messageCount > updatedLobby.messageCount) {
+            System.out.println("Got old lobby, updating others!");
+            updateLobbyInNewContext(modelManager.getLobbyHandler().getLobby());
+            return;
+        } else if (lHandler.getLobby().messageCount == updatedLobby.messageCount) {
+            System.out.println("Got same lobby, doing nothing :=)");
+            return;
+        }
+        System.out.println("Got new lobby! -> " + updatedLobby.messageCount);
+
         for (User user : updatedLobby.users) {
             if (!l3Clients.containsKey(user.id) && user.id != modelManager.getPlayer().id) {
                 GameClient client = new GameClient();
@@ -350,6 +366,19 @@ public class ComHandler {
             } else if (layerIndex == 2) {
                 sendL2Update(modelManager.constructL2Message());
             }
+        } finally {
+            // Switch back to the previous context
+            newContext.detach(previousContext);
+        }
+    }
+
+    private void updateLobbyInNewContext(Lobby updatedLobby) {
+        // Create a new context and attach it (Needed because other
+        // will immediately also use this sub).
+        Context newContext = Context.current().fork();
+        Context previousContext = newContext.attach();
+        try {
+            sendUpdatedLobby(updatedLobby);
         } finally {
             // Switch back to the previous context
             newContext.detach(previousContext);

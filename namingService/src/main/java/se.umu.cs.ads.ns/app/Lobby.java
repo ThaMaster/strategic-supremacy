@@ -14,8 +14,9 @@ public class Lobby {
     public int maxPlayers;
     public int currentPlayers;
     public String selectedMap;
-
     public boolean started;
+
+    public int messageCount = 0;
 
     public Lobby(Long id, String name, int maxPlayers) {
         this.id = id;
@@ -46,18 +47,22 @@ public class Lobby {
         this.currentPlayers = users.size();
     }
 
-    public void addLeader(User user){
+    public void setMessageCount(int count) {
+        this.messageCount = count;
+    }
+
+    public void addLeader(User user) {
         this.leader = user;
         addUser(user);
     }
 
-    public void addUser(User user){
+    public void addUser(User user) {
         this.users.add(user);
         this.currentPlayers++;
     }
 
     public void removeUser(User user) {
-        for(User lobbyUser : this.users) {
+        for (User lobbyUser : this.users) {
             if (lobbyUser.id == user.id) {
                 this.users.remove(lobbyUser);
                 this.currentPlayers--;
@@ -67,7 +72,7 @@ public class Lobby {
     }
 
     public boolean hasUser(User user) {
-        for(User lobbyUser : this.users) {
+        for (User lobbyUser : this.users) {
             if (lobbyUser.id == user.id) {
                 return true;
             }

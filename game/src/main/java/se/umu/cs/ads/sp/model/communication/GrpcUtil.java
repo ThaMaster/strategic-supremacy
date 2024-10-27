@@ -171,6 +171,7 @@ public class GrpcUtil {
         }
 
         lobby.setUsers(users);
+        lobby.setMessageCount(request.getMessageCount());
         return lobby;
     }
 
@@ -180,7 +181,8 @@ public class GrpcUtil {
                 .setLeader(toGrpcUser(lobby.leader))
                 .setSelectedMap(lobby.selectedMap)
                 .setMaxPlayers(lobby.maxPlayers)
-                .setLobbyName(lobby.name);
+                .setLobbyName(lobby.name)
+                .setMessageCount(lobby.messageCount);
         for (User user : lobby.users) {
             builder.addUsers(toGrpcUser(user));
         }
@@ -297,7 +299,7 @@ public class GrpcUtil {
         );
     }
 
-    public static proto.EntityState toGrpcEntityState(EntityStateDTO dto){
+    public static proto.EntityState toGrpcEntityState(EntityStateDTO dto) {
         return proto.EntityState.newBuilder()
                 .setState(dto.state().label)
                 .setUnitId(dto.unitId())
@@ -305,7 +307,7 @@ public class GrpcUtil {
                 .build();
     }
 
-    public static EntityStateDTO fromGrpcEntityState(proto.EntityState state){
+    public static EntityStateDTO fromGrpcEntityState(proto.EntityState state) {
         return new EntityStateDTO(EntityState.fromLabel(state.getState()), state.getUnitId(), state.getAttacker());
     }
 

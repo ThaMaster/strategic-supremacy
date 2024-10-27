@@ -570,6 +570,7 @@ public class ModelManager {
             switch (event.getType()) {
                 case STATE_CHANGE:
                     if (objectHandler.getMyUnits().containsKey(event.getEventAuthor())) {
+                        System.out.println("My units changed state!");
                         //System.out.println("\t SENDING l1 UPDATE STATE CHANGE");
                         sendL1Update();
                     }

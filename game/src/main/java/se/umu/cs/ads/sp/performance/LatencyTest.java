@@ -1,23 +1,23 @@
 package se.umu.cs.ads.sp.performance;
 
-public class LatencyTest extends PerformanceTest{
+public class LatencyTest extends PerformanceTest {
     private int numClients;
-    private int numResponses = 0;
+    private int numResponses;
+
     public LatencyTest(Long id) {
         super(id);
         numResponses = 0;
     }
 
-    public void setNumClients(int amount){
+    public void setNumClients(int amount) {
         numClients = amount;
     }
 
     @Override
-    public void finish(){
+    public void finish() {
         numResponses++;
-        if(numResponses == numClients) {
+        if (numResponses == numClients) {
             this.endTime = System.currentTimeMillis();
-            System.out.println("L3 Latency -> " + (this.endTime - this.startTime));
         }
     }
 }
