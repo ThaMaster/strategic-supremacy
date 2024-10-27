@@ -534,6 +534,9 @@ public class ModelManager {
      */
     public void leaveOngoingGame() {
         System.out.println("[Client] Leaving ongoing game...");
+        if(AppSettings.RUN_PERFORMANCE_TEST && iAmLeader()){
+            TestLogger.outputPerformance();
+        }
 
         if (l3Timer != null) l3Timer.cancel();
         if (l2Timer != null) l2Timer.cancel();
@@ -544,9 +547,6 @@ public class ModelManager {
         objectHandler.clearGameObjects();
         lobbyHandler.leaveLobby();
         started = false;
-        if(AppSettings.RUN_PERFORMANCE_TEST && iAmLeader()){
-            TestLogger.outputPerformance();
-        }
     }
 
     public void removePlayer(long userId, ArrayList<Long> unitIds) {

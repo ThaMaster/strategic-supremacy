@@ -296,7 +296,6 @@ public class ComHandler {
     }
 
     public void moveUserToL1(Long userId) {
-
         if (l1Clients.containsKey(userId)) {
             return;
         }

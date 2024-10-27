@@ -51,11 +51,11 @@ public class Main {
         if (parser.hasFlag(("-t"))) {
             AppSettings.RUN_PERFORMANCE_TEST = true;
             runTests = true;
-            TestLogger.init(nrBots);
+            TestLogger.init();
         } else if (parser.hasFlag(("--test"))) {
             AppSettings.RUN_PERFORMANCE_TEST = true;
             runTests = true;
-            TestLogger.init(nrBots);
+            TestLogger.init();
         }
 
         boolean testAll = false;
@@ -63,7 +63,7 @@ public class Main {
             AppSettings.RUN_PERFORMANCE_TEST = true;
             runTests = true;
             testAll = true;
-            TestLogger.init(nrBots);
+            TestLogger.init();
         }
 
         long lobbyId = -1;

@@ -28,7 +28,7 @@ public class TestLogger {
     private static Map<Long, ITest> test = new HashMap<>();
 
 
-    public synchronized static void init(int numPlayers) {
+    public synchronized static void init() {
         basePath = Paths.get("spTests");
         try {
             // Create the "performance test" base directory if it doesn't exist
@@ -49,14 +49,12 @@ public class TestLogger {
 
                     if (fileName.startsWith(subDirs[i])) {
                         Path filePath = subDirPath.resolve(fileName);
-                        System.out.println("\t Adding Test-File -> " + fileName + " to folder -> " + subDirPath);
                         fileMap.put(fileName, filePath);
                         // Create the file if it does not exist
                         if (Files.notExists(filePath)) {
                             Files.createFile(filePath);
                         }
                     }
-
                 }
             }
 
@@ -80,7 +78,7 @@ public class TestLogger {
             test.targetFile = fileMap.get(fileName);
             TestLogger.test.put(test.getId(), test);
         } else {
-            init(AppSettings.NUM_BOTS);
+            init();
             test.targetFile = fileMap.get(fileName);
             TestLogger.test.put(test.getId(), test);
         }

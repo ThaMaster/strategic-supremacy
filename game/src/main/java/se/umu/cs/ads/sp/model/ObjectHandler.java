@@ -43,9 +43,12 @@ public class ObjectHandler {
 
     public ObjectHandler(User user) {
         this.user = user;
-        consistencyTestId = Util.generateId();
-        ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
-        TestLogger.newEntry(TestLogger.getTestName(TestLogger.CONSISTENCY), consistencyTest);
+
+        if (AppSettings.RUN_PERFORMANCE_TEST) {
+            consistencyTestId = Util.generateId();
+            ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
+            TestLogger.newEntry(TestLogger.getTestName(TestLogger.CONSISTENCY), consistencyTest);
+        }
     }
 
     public void update(Map map) {
