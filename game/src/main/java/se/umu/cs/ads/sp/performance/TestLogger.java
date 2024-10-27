@@ -1,5 +1,7 @@
 package se.umu.cs.ads.sp.performance;
 
+import se.umu.cs.ads.sp.util.AppSettings;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,11 +13,11 @@ public class TestLogger {
 
     private static Path basePath;
     private final static String[] subDirs = {"L1", "L2", "L3", "Raft", "Consistency"};
-    public static String L1_LATENCY = "L1-Latency.txt";
-    public static String L2_LATENCY = "L2-Latency.txt";
-    public static String L3_LEADER_LATENCY = "L3-Leader-Latency.txt";
-    public static String L3_FOLLOWER_LATENCY = "L3-Follower-Latency.txt";
-    public static String CONSISTENCY = "Consistency.txt";
+    public static String L1_LATENCY = "L1-Latency";
+    public static String L2_LATENCY = "L2-Latency";
+    public static String L3_LEADER_LATENCY = "L3-Leader-Latency";
+    public static String L3_FOLLOWER_LATENCY = "L3-Follower-Latency";
+    public static String CONSISTENCY = "Consistency";
 
     private final static String[] files = {
             L1_LATENCY, L2_LATENCY,
@@ -26,12 +28,16 @@ public class TestLogger {
     private static Map<Long, ITest> test = new HashMap<>();
 
 
-    public static void init(String path) {
+    public synchronized static void init(int numPlayers) {
         basePath = Paths.get("spTests");
-        if (!path.equals("true")) {
-            basePath = Paths.get(path, "spTests");
+        String ff = "";
+        if(AppSettings.FORCE_L1) {
+            ff = "-F-L1";
+        } else if(AppSettings.FORCE_L2) {
+            ff = "-F-L2";
+        } else if(AppSettings.FORCE_L3) {
+            ff = "-F-L3";
         }
-
         try {
             // Create the "performance test" base directory if it doesn't exist
             if (Files.notExists(basePath)) {
@@ -45,6 +51,21 @@ public class TestLogger {
                 if (Files.notExists(subDirPath)) {
                     Files.createDirectory(subDirPath);
                 }
+
+                for(int j = 0; j < files.length; j++){
+                    String fileName = files[i] + "-" + numPlayers + ff + ".txt";
+
+                    if(fileName.startsWith(subDirs[i])){
+                        Path filePath = subDirPath.resolve(fileName);
+                        System.out.println("\t Adding Test-File -> " + fileName + " to folder -> " + subDirPath);
+                        fileMap.put(fileName, filePath);
+                        // Create the file if it does not exist
+                        if (Files.notExists(filePath)) {
+                            Files.createFile(filePath);
+                        }
+                    }
+
+                }
             }
 
             System.out.println("\t[Performance Logger] - Directories and files initialized successfully.");
@@ -55,29 +76,21 @@ public class TestLogger {
     }
 
     public static void setFinished(long testId) {
-        test.get(testId).finish();
+        if(test.containsKey(testId)){
+            test.get(testId).finish();
+        }else{
+            System.out.println("\tCould find test");
+        }
     }
 
     public static void newEntry(String folder, String fileName, ITest test) {
-        try {
-            Path subDirPath = basePath.resolve(folder);
-
-            if (Files.notExists(subDirPath)) {
-                Files.createDirectory(subDirPath);
-            }
-
-            Path filePath = subDirPath.resolve(fileName);
-            fileMap.put(fileName, filePath);
-
-            // Create the file if it does not exist
-            if (Files.notExists(filePath)) {
-                Files.createFile(filePath);
-            }
-
-            test.setTargetFile(filePath);
+        if(fileMap.containsKey(fileName)){
+            test.targetFile = fileMap.get(fileName);
             TestLogger.test.put(test.getId(), test);
-        } catch (IOException e) {
-            e.printStackTrace();
+        }else{
+            init(AppSettings.NUM_BOTS);
+            test.targetFile = fileMap.get(fileName);
+            TestLogger.test.put(test.getId(), test);
         }
     }
 

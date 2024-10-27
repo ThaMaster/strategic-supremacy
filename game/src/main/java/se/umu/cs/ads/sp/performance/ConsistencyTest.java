@@ -3,6 +3,8 @@ package se.umu.cs.ads.sp.performance;
 import se.umu.cs.ads.sp.util.Position;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 public class ConsistencyTest extends ITest {
 
@@ -24,7 +26,7 @@ public class ConsistencyTest extends ITest {
 
     @Override
     public void output() throws IOException {
-
+        Files.writeString(targetFile, errors + "," + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 
     public void checkData(Position localPosition, Position remotePosition) {

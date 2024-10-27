@@ -28,6 +28,9 @@ public class PerformanceTest extends ITest {
     }
 
     public void output() throws IOException {
+        if(endTime == null){
+            return;
+        }
         Files.writeString(targetFile, endTime - startTime + "," + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 }

@@ -37,6 +37,7 @@ public class ComHandler {
         nsClient = new NsClient();
         this.modelManager = modelManager;
         new GameServer(port, this).start();
+        numPlayers = AppSettings.NUM_BOTS;
     }
 
     public void sendDefeatUpdate(long userId) {
@@ -74,20 +75,16 @@ public class ComHandler {
         if (fromLeader) {
             Long id = -1L;
             if (AppSettings.RUN_PERFORMANCE_TEST) {
-                id = init_latency_perf_test("L3", "L3-Leader-Latency");
+                id = init_latency_perf_test("L3", "L3-Leader-Latency", l3Clients.size());
             }
             for (GameClient client : l3Clients.values()) {
                 client.sendL3Message(message, id);
             }
         } else {
-            Long id = -1L;
-            if (AppSettings.RUN_PERFORMANCE_TEST) {
-                id = init_latency_perf_test("L3", TestLogger.L3_FOLLOWER_LATENCY);
-            }
             User leader = modelManager.getLobbyHandler().getLobby().leader;
             if (l3Clients.containsKey(leader.id)) {
                 GameClient client = l3Clients.get(leader.id);
-                client.sendL3Message(message, id);
+                client.sendL3Message(message, -1);
             }
         }
     }
@@ -116,7 +113,7 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test("L2", TestLogger.L2_LATENCY);
+            id = init_latency_perf_test("L2", TestLogger.L2_LATENCY, l2Clients.size());
         }
         for (GameClient client : l2Clients.values()) {
             // Send l2 update only to those in the zone
@@ -134,7 +131,7 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test("L1", TestLogger.L1_LATENCY);
+            id = init_latency_perf_test("L1", TestLogger.L1_LATENCY, l1Clients.size());
         }
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
@@ -198,13 +195,11 @@ public class ComHandler {
     }
 
     public void sendStartGameRequest(StartGameRequestDTO req, User user) {
-        numPlayers = l3Clients.size() + 1;
         GameClient client = l3Clients.get(user.id);
         client.startGame(req);
     }
 
     public void startGame(StartGameRequestDTO req) {
-        numPlayers = l3Clients.size() + 1;
         modelManager.startGameReq(req);
     }
 
@@ -370,7 +365,7 @@ public class ComHandler {
     }
 
     //Returns the id for the performance test
-    private Long init_latency_perf_test(String folder, String testName) {
+    private Long init_latency_perf_test(String folder, String testName, int numClientsToWaitFor) {
         String forceString = "";
         if (AppSettings.FORCE_L1) {
             forceString = "-F-L1";
@@ -383,7 +378,7 @@ public class ComHandler {
         testName += "-" + numPlayers + forceString + ".txt";
         Long performanceTestId = Util.generateId();
         LatencyTest latencyTest = new LatencyTest(performanceTestId);
-        latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1);
+        latencyTest.setNumClients(numClientsToWaitFor);
         TestLogger.newEntry(folder, testName, latencyTest);
         return performanceTestId;
     }

@@ -19,7 +19,7 @@ public class BotHandler {
         }
     }
 
-    public static void initBots(long lobbyId, int nrBots, String forceFlag, boolean runTests) {
+    public static void initBots(long lobbyId, int nrBots, String forceFlag, boolean runTests, boolean noLeader) {
         ArrayList<Process> bots = new ArrayList<>();
         try {
             for (int i = 0; i < nrBots; i++) {
@@ -32,6 +32,15 @@ public class BotHandler {
                     process.destroy(); // Destroy each process
                 }
             }));
+            if(noLeader){
+                for(Process process : bots){
+                    try{
+                        process.waitFor();
+                    }catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

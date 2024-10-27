@@ -6,6 +6,8 @@ import se.umu.cs.ads.sp.BotHandler;
 import se.umu.cs.ads.sp.events.GameEvents;
 import se.umu.cs.ads.sp.model.ModelManager;
 import se.umu.cs.ads.sp.model.objects.entities.units.PlayerUnit;
+import se.umu.cs.ads.sp.performance.TestConstants;
+import se.umu.cs.ads.sp.performance.TestLogger;
 import se.umu.cs.ads.sp.util.AppSettings;
 import se.umu.cs.ads.sp.util.Constants;
 import se.umu.cs.ads.sp.util.Position;
@@ -34,7 +36,7 @@ public class BotController implements Runnable {
             System.out.println("\t Force-Flag: " + ff + " Bots: " + nrBots + " MapIndex: " + mapIndex + " Testing: " + testing);
             if (createLobby(nrBots, mapIndex)) {
                 System.out.println("\t Lobby created, spawning bots...");
-                BotHandler.initBots(modelManager.getLobbyHandler().getLobby().id, nrBots - 1, forceFlag, testAll);
+                BotHandler.initBots(modelManager.getLobbyHandler().getLobby().id, nrBots - 1, forceFlag, testAll, false);
                 updateLobbyTimer.start();
             } else {
                 System.out.println("[Leader Bot] Could not create a lobby, shutting down...");
@@ -173,7 +175,7 @@ public class BotController implements Runnable {
         boolean testAll = Boolean.parseBoolean(args[6]);
 
         AppSettings.RUN_PERFORMANCE_TEST = runTests;
-
+        AppSettings.NUM_BOTS = nrBots;
         if (forceFlag.equals("-l1")) {
             AppSettings.FORCE_L1 = true;
         } else if (forceFlag.equals("-l2")) {

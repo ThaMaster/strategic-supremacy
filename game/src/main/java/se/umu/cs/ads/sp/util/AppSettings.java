@@ -13,6 +13,7 @@ public class AppSettings {
     public static boolean FORCE_L2 = false;
     public static boolean FORCE_L3 = false;
 
+    public static int NUM_BOTS = 2;
     public static void SetGameConfig() {
         InputStream settingsUrl = AppSettings.class.getClassLoader().getResourceAsStream("AppSettings.cfg");
 

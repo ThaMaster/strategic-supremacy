@@ -36,25 +36,6 @@ public class Main {
             forceFlag = "-l3";
         }
 
-        boolean runTests = false;
-        if (parser.hasFlag(("-t"))) {
-            AppSettings.RUN_PERFORMANCE_TEST = true;
-            runTests = true;
-            TestLogger.init(parser.getValue("-t"));
-        } else if (parser.hasFlag(("--test"))) {
-            AppSettings.RUN_PERFORMANCE_TEST = true;
-            runTests = true;
-            TestLogger.init(parser.getValue("--test"));
-        }
-
-        boolean testAll = false;
-        if (parser.hasFlag("--testAll")) {
-            AppSettings.RUN_PERFORMANCE_TEST = true;
-            runTests = true;
-            testAll = true;
-            TestLogger.init(parser.getValue("--testAll"));
-        }
-
         int nrBots = 2; // DEFAULT BOTS ARE 2
         if (parser.hasFlag("-b")) {
             nrBots = Integer.parseInt(parser.getValue("-b"));
@@ -62,6 +43,27 @@ public class Main {
             nrBots = Integer.parseInt(parser.getValue("--bots"));
         } else {
             startGameController = true;
+        }
+
+        AppSettings.NUM_BOTS = nrBots;
+
+        boolean runTests = false;
+        if (parser.hasFlag(("-t"))) {
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            runTests = true;
+            TestLogger.init(nrBots);
+        } else if (parser.hasFlag(("--test"))) {
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            runTests = true;
+            TestLogger.init(nrBots);
+        }
+
+        boolean testAll = false;
+        if (parser.hasFlag("--testAll")) {
+            AppSettings.RUN_PERFORMANCE_TEST = true;
+            runTests = true;
+            testAll = true;
+            TestLogger.init(nrBots);
         }
 
         long lobbyId = -1;
@@ -98,7 +100,7 @@ public class Main {
         }
 
         AppSettings.PrintSettings();
-
+        System.out.println(1);
         if (startGameController) {
             Runnable startApp = () -> {
                 try {
@@ -127,7 +129,7 @@ public class Main {
 
             BotHandler.startLeaderBot(nrBots, forceFlag, mapIndex, runTests, testAll);
         } else {
-            BotHandler.initBots(lobbyId, nrBots, forceFlag, runTests);
+            BotHandler.initBots(lobbyId, nrBots, forceFlag, runTests, true);
         }
     }
 
@@ -138,7 +140,7 @@ public class Main {
         System.out.println("  -b, --bots    <nrBots>        The number of bots to initialize.");
         System.out.println("  -i  --ip      <ipAddress>     The ip address for the naming service.");
         System.out.println("  -p, --port    <port>          The port for the naming service.");
-        System.out.println("  -t, --test    <path>          Run performance test.");
+        System.out.println("  -t, --test                    Run performance test.");
         System.out.println("  -l1, -l2, -l3                 Force clients to only update the game using l1, l2, or l3.");
         System.out.println("  -a, --auto                    Creates a leader bot that will create a new lobby and start.");
         System.out.println("                                the number of bots specified and start the game automatically.");

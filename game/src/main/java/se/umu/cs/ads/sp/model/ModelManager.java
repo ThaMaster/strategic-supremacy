@@ -544,7 +544,7 @@ public class ModelManager {
         objectHandler.clearGameObjects();
         lobbyHandler.leaveLobby();
         started = false;
-        if(AppSettings.RUN_PERFORMANCE_TEST){
+        if(AppSettings.RUN_PERFORMANCE_TEST && iAmLeader()){
             TestLogger.outputPerformance();
         }
     }

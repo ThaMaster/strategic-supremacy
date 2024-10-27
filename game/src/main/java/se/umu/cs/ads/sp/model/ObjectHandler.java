@@ -46,7 +46,16 @@ public class ObjectHandler {
         this.user = user;
         consistencyTestId = Util.generateId();
         ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
-        TestLogger.newEntry("Consistency", TestLogger.CONSISTENCY, consistencyTest);
+        String forceString = "";
+        if (AppSettings.FORCE_L1) {
+            forceString = "-F-L1";
+        } else if (AppSettings.FORCE_L2) {
+            forceString = "-F-L2";
+        } else if (AppSettings.FORCE_L3) {
+            forceString = "-F-L3";
+        }
+
+        TestLogger.newEntry("Consistency", TestLogger.CONSISTENCY+"-"+AppSettings.NUM_BOTS + forceString+".txt", consistencyTest);
     }
 
     public void update(Map map) {

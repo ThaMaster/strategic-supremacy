@@ -107,7 +107,7 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST){
+                if(AppSettings.RUN_PERFORMANCE_TEST && perfId != -1) {
                     TestLogger.setFinished(perfId);
                 }
             }
@@ -145,7 +145,7 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST){
+                if(AppSettings.RUN_PERFORMANCE_TEST  && perfId != -1){
                     TestLogger.setFinished(perfId);
                 }
             }
@@ -166,7 +166,7 @@ public class GameClient {
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
             public void onSuccess(@Nullable Empty result) {
-                if(AppSettings.RUN_PERFORMANCE_TEST){
+                if(AppSettings.RUN_PERFORMANCE_TEST  && perfId != -1){
                     TestLogger.setFinished(perfId);
                 }
             }
