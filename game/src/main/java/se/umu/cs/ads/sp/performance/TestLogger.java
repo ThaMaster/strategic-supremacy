@@ -38,25 +38,12 @@ public class TestLogger {
                 Files.createDirectories(basePath);
             }
 
-            // Loop through subdirectories, create them, and add files to the map
+            // Loop through subdirectories, create them
             for (int i = 0; i < subDirs.length; i++) {
                 Path subDirPath = basePath.resolve(subDirs[i]);
 
                 if (Files.notExists(subDirPath)) {
                     Files.createDirectory(subDirPath);
-                }
-
-                // Map each required file to its path in the fileMap
-                for (String fileName : files) {
-                    if (fileName.startsWith(subDirs[i])) {
-                        Path filePath = subDirPath.resolve(fileName);
-                        fileMap.put(fileName, filePath);
-
-                        // Create the file if it does not exist
-                        if (Files.notExists(filePath)) {
-                            Files.createFile(filePath);
-                        }
-                    }
                 }
             }
 

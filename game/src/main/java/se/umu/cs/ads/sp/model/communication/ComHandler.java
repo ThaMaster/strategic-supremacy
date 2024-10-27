@@ -87,7 +87,7 @@ public class ComHandler {
             User leader = modelManager.getLobbyHandler().getLobby().leader;
             if (l3Clients.containsKey(leader.id)) {
                 GameClient client = l3Clients.get(leader.id);
-                client.sendL3Message(message, -1);
+                client.sendL3Message(message, id);
             }
         }
     }
@@ -182,8 +182,6 @@ public class ComHandler {
         if (!modelManager.hasGameStarted()) {
             modelManager.loadMap(updatedLobby.selectedMap);
             modelManager.getLobbyHandler().setLobby(updatedLobby);
-        } else {
-            this.numPlayers = updatedLobby.currentPlayers;
         }
     }
 
@@ -200,11 +198,13 @@ public class ComHandler {
     }
 
     public void sendStartGameRequest(StartGameRequestDTO req, User user) {
+        numPlayers = l3Clients.size() + 1;
         GameClient client = l3Clients.get(user.id);
         client.startGame(req);
     }
 
     public void startGame(StartGameRequestDTO req) {
+        numPlayers = l3Clients.size() + 1;
         modelManager.startGameReq(req);
     }
 

@@ -63,7 +63,6 @@ public class Main {
         } else {
             startGameController = true;
         }
-        AppSettings.NR_BOTS = nrBots;
 
         long lobbyId = -1;
         if (parser.hasFlag("-l")) {

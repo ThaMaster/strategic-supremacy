@@ -228,7 +228,6 @@ public class ModelManager {
         this.fov = new FovModel(new ArrayList<>(objectHandler.getMyUnits().values()));
         currentScoreHolderId = lobbyHandler.getLobby().leader.id;
 
-        l3Timer = new Timer();
         startL3Timer(Constants.L3_UPDATE_TIME / 2);
         startL2Timer();
 
