@@ -34,6 +34,6 @@ public class ConsistencyTest extends ITest {
 
     @Override
     public void output() throws IOException {
-        Files.writeString(targetFile, "Total: " + errors + " clients " + numClients + ": " + errors / numClients + "," + System.lineSeparator(), StandardOpenOption.APPEND);
+        Files.writeString(targetFile, errors / numClients + "," + System.lineSeparator(), StandardOpenOption.APPEND);
     }
 }

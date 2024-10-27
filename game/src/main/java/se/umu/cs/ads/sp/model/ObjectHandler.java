@@ -535,7 +535,6 @@ public class ObjectHandler {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             if (AppSettings.RUN_PERFORMANCE_TEST) {
                 if (Position.distance(enemyUnit.getPosition(), update.position()) > TestConstants.POSITION_ERROR_MARGIN) {
-                    System.out.println("ERROR OCCURRED IN OBJECT HANDLER");
                     errorOccurred = true;
                 }
             }

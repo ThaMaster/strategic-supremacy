@@ -253,13 +253,17 @@ public class ComHandler {
         if (l1Clients.containsKey(userId)) {
             l1Clients.get(userId).destroy();
             l1Clients.remove(userId);
-        } else if (l2Clients.containsKey(userId)) {
+        }
+
+        if (l2Clients.containsKey(userId)) {
             l2Clients.get(userId).destroy();
             l2Clients.remove(userId);
         }
 
-        l3Clients.get(userId).destroy();
-        l3Clients.remove(userId);
+        if(l3Clients.containsKey(userId)) {
+            l3Clients.get(userId).destroy();
+            l3Clients.remove(userId);
+        }
     }
 
     public void requestVote() {

@@ -78,9 +78,6 @@ public class GameServer {
         @Override
         public void l1Update(L1Message request, StreamObserver<ErrorOccurred> responseObserver) {
             boolean errorOccurred = comHandler.handleReceiveL1Msg(GrpcUtil.fromGrpcL1Message(request));
-            if(errorOccurred) {
-                System.out.println("ERROR OCCURRED");
-            }
             responseObserver.onNext(proto.ErrorOccurred.newBuilder().setError(errorOccurred).build());
             responseObserver.onCompleted();
         }
