@@ -30,14 +30,6 @@ public class TestLogger {
 
     public synchronized static void init(int numPlayers) {
         basePath = Paths.get("spTests");
-        String ff = "";
-        if(AppSettings.FORCE_L1) {
-            ff = "-F-L1";
-        } else if(AppSettings.FORCE_L2) {
-            ff = "-F-L2";
-        } else if(AppSettings.FORCE_L3) {
-            ff = "-F-L3";
-        }
         try {
             // Create the "performance test" base directory if it doesn't exist
             if (Files.notExists(basePath)) {
@@ -52,10 +44,10 @@ public class TestLogger {
                     Files.createDirectory(subDirPath);
                 }
 
-                for(int j = 0; j < files.length; j++){
-                    String fileName = files[i] + "-" + numPlayers + ff + ".txt";
+                for (int j = 0; j < files.length; j++) {
+                    String fileName = getTestName(files[i]);
 
-                    if(fileName.startsWith(subDirs[i])){
+                    if (fileName.startsWith(subDirs[i])) {
                         Path filePath = subDirPath.resolve(fileName);
                         System.out.println("\t Adding Test-File -> " + fileName + " to folder -> " + subDirPath);
                         fileMap.put(fileName, filePath);
@@ -76,18 +68,18 @@ public class TestLogger {
     }
 
     public static void setFinished(long testId) {
-        if(test.containsKey(testId)){
+        if (test.containsKey(testId)) {
             test.get(testId).finish();
-        }else{
+        } else {
             System.out.println("\tCould find test");
         }
     }
 
-    public static void newEntry(String folder, String fileName, ITest test) {
-        if(fileMap.containsKey(fileName)){
+    public static void newEntry(String fileName, ITest test) {
+        if (fileMap.containsKey(fileName)) {
             test.targetFile = fileMap.get(fileName);
             TestLogger.test.put(test.getId(), test);
-        }else{
+        } else {
             init(AppSettings.NUM_BOTS);
             test.targetFile = fileMap.get(fileName);
             TestLogger.test.put(test.getId(), test);
@@ -98,6 +90,7 @@ public class TestLogger {
         return test.get(id);
     }
 
+
     public static void outputPerformance() {
         for (ITest perf : test.values()) {
             try {
@@ -106,5 +99,18 @@ public class TestLogger {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String getTestName(String testType) {
+        String ff = "";
+        if (AppSettings.FORCE_L1) {
+            ff = "-F-L1";
+        } else if (AppSettings.FORCE_L2) {
+            ff = "-F-L2";
+        } else if (AppSettings.FORCE_L3) {
+            ff = "-F-L3";
+        }
+        int nrBots = AppSettings.NUM_BOTS;
+        return testType + "-" + nrBots + ff + ".txt";
     }
 }

@@ -42,20 +42,10 @@ public class ObjectHandler {
     private Long consistencyTestId;
 
     public ObjectHandler(User user) {
-
         this.user = user;
         consistencyTestId = Util.generateId();
         ConsistencyTest consistencyTest = new ConsistencyTest(consistencyTestId);
-        String forceString = "";
-        if (AppSettings.FORCE_L1) {
-            forceString = "-F-L1";
-        } else if (AppSettings.FORCE_L2) {
-            forceString = "-F-L2";
-        } else if (AppSettings.FORCE_L3) {
-            forceString = "-F-L3";
-        }
-
-        TestLogger.newEntry("Consistency", TestLogger.CONSISTENCY+"-"+AppSettings.NUM_BOTS + forceString+".txt", consistencyTest);
+        TestLogger.newEntry(TestLogger.getTestName(TestLogger.CONSISTENCY), consistencyTest);
     }
 
     public void update(Map map) {
@@ -542,7 +532,7 @@ public class ObjectHandler {
     public void updateEnemyUnits(ArrayList<UnitDTO> updates) {
         for (UnitDTO update : updates) {
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
-            if(AppSettings.RUN_PERFORMANCE_TEST){
+            if (AppSettings.RUN_PERFORMANCE_TEST) {
                 ((ConsistencyTest) TestLogger.getTest(consistencyTestId)).checkData(enemyUnit.getPosition(), update.position());
             }
             enemyUnit.setPosition(update.position());

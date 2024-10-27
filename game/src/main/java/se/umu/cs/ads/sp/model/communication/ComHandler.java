@@ -27,7 +27,6 @@ public class ComHandler {
     public final ConcurrentHashMap<Long, GameClient> l2Clients;
     public final ConcurrentHashMap<Long, GameClient> l1Clients;
     private Long timeSinceL3Update;
-    private int numPlayers;
 
     public ComHandler(int port, ModelManager modelManager) {
         l3Clients = new ConcurrentHashMap<>();
@@ -37,7 +36,6 @@ public class ComHandler {
         nsClient = new NsClient();
         this.modelManager = modelManager;
         new GameServer(port, this).start();
-        numPlayers = AppSettings.NUM_BOTS;
     }
 
     public void sendDefeatUpdate(long userId) {
@@ -75,7 +73,7 @@ public class ComHandler {
         if (fromLeader) {
             Long id = -1L;
             if (AppSettings.RUN_PERFORMANCE_TEST) {
-                id = init_latency_perf_test("L3", "L3-Leader-Latency", l3Clients.size());
+                id = init_latency_perf_test(TestLogger.L3_LEADER_LATENCY, l3Clients.size());
             }
             for (GameClient client : l3Clients.values()) {
                 client.sendL3Message(message, id);
@@ -113,7 +111,7 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test("L2", TestLogger.L2_LATENCY, l2Clients.size());
+            id = init_latency_perf_test(TestLogger.L2_LATENCY, l2Clients.size());
         }
         for (GameClient client : l2Clients.values()) {
             // Send l2 update only to those in the zone
@@ -131,7 +129,7 @@ public class ComHandler {
         }
         Long id = -1L;
         if (AppSettings.RUN_PERFORMANCE_TEST) {
-            id = init_latency_perf_test("L1", TestLogger.L1_LATENCY, l1Clients.size());
+            id = init_latency_perf_test(TestLogger.L1_LATENCY, l1Clients.size());
         }
         for (GameClient client : l1Clients.values()) {
             // Send l1 update only to those in the zone
@@ -365,21 +363,11 @@ public class ComHandler {
     }
 
     //Returns the id for the performance test
-    private Long init_latency_perf_test(String folder, String testName, int numClientsToWaitFor) {
-        String forceString = "";
-        if (AppSettings.FORCE_L1) {
-            forceString = "-F-L1";
-        } else if (AppSettings.FORCE_L2) {
-            forceString = "-F-L2";
-        } else if (AppSettings.FORCE_L3) {
-            forceString = "-F-L3";
-        }
-
-        testName += "-" + numPlayers + forceString + ".txt";
+    private Long init_latency_perf_test(String testName, int numClientsToWaitFor) {
         Long performanceTestId = Util.generateId();
         LatencyTest latencyTest = new LatencyTest(performanceTestId);
         latencyTest.setNumClients(numClientsToWaitFor);
-        TestLogger.newEntry(folder, testName, latencyTest);
+        TestLogger.newEntry(TestLogger.getTestName(testName), latencyTest);
         return performanceTestId;
     }
 }
