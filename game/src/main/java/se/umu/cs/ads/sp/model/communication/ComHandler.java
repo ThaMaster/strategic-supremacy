@@ -371,7 +371,16 @@ public class ComHandler {
 
     //Returns the id for the performance test
     private Long init_latency_perf_test(String folder, String testName) {
-        testName += "-" + numPlayers + ".txt";
+        String forceString = "";
+        if (AppSettings.FORCE_L1) {
+            forceString = "-F-L1";
+        } else if (AppSettings.FORCE_L2) {
+            forceString = "-F-L2";
+        } else if (AppSettings.FORCE_L3) {
+            forceString = "-F-L3";
+        }
+
+        testName += "-" + numPlayers + forceString + ".txt";
         Long performanceTestId = Util.generateId();
         LatencyTest latencyTest = new LatencyTest(performanceTestId);
         latencyTest.setNumClients(modelManager.getLobbyHandler().getLobby().currentPlayers - 1);
