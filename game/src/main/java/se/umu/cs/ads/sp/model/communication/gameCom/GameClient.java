@@ -66,7 +66,7 @@ public class GameClient {
 
     public void startGame(StartGameRequestDTO req) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .startGame(GrpcUtil.toGrpcStartGameReq(req));
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -86,7 +86,7 @@ public class GameClient {
 
     public void sendDefeatUpdate(long userId) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .defeatUpdate(GrpcUtil.toGrpcUserId(userId));
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -104,7 +104,7 @@ public class GameClient {
 
     public void sendL3Message(L3UpdateDTO msg, long perfId) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .l3Update(GrpcUtil.toGrpcL3Message(msg));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -124,7 +124,7 @@ public class GameClient {
 
     public void updateEntityState(EntityStateDTO dto) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .updateEntityState(GrpcUtil.toGrpcEntityState(dto));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -142,7 +142,7 @@ public class GameClient {
 
     public void sendL2Message(L2UpdateDTO msg, Long perfId) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .l2Update(GrpcUtil.toGrpcL2Message(msg));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -162,7 +162,7 @@ public class GameClient {
 
     public void sendL1Message(L1UpdateDTO msg, Long perfId, Long cId) {
         ListenableFuture<ErrorOccurred> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .l1Update(GrpcUtil.toGrpcL1Message(msg));
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -192,7 +192,7 @@ public class GameClient {
     public void updateLobby(Lobby updatedLobby, User currentUser) {
         System.out.println("[Client] Trying to update client " + currentUser.ip + ":" + currentUser.port);
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .updateLobby(GrpcUtil.toGrpcLobby(updatedLobby));
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -211,7 +211,7 @@ public class GameClient {
 
     public void removePlayerUnits(UserSkeletonsDTO entitySkeletons) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .removePlayerUnits(GrpcUtil.toGrpcUserSkeletons(entitySkeletons));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -231,7 +231,7 @@ public class GameClient {
 
     public void requestVote(LeaderRequestDto request) {
         ListenableFuture<CandidateLeaderResponse> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .requestVote(GrpcUtil.toGrpcLeaderRequest(request));
         Futures.addCallback(future, new FutureCallback<CandidateLeaderResponse>() {
 
@@ -251,7 +251,7 @@ public class GameClient {
 
     public void notifyNewLeader(proto.UserId user) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .notifyNewLeader(user);
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -268,7 +268,7 @@ public class GameClient {
 
     public void sendNextRoundRequest(StartGameRequestDTO message) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .nextRound(GrpcUtil.toGrpcStartGameReq(message));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override
@@ -285,7 +285,7 @@ public class GameClient {
 
     public void sendEndGameMessage(UserScoreDTO message) {
         ListenableFuture<Empty> future = stub
-                .withDeadlineAfter(2000, TimeUnit.MILLISECONDS)
+                .withDeadlineAfter(4000, TimeUnit.MILLISECONDS)
                 .endGameMessage(GrpcUtil.toGrpcUserScore(message));
         Futures.addCallback(future, new FutureCallback<>() {
             @Override

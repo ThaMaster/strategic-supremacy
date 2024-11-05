@@ -1,23 +1,25 @@
 package se.umu.cs.ads.sp.events;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameEvents {
 
     private static GameEvents instance;
-    private ArrayList<GameEvent> events;
-    private ArrayList<GameEvent> history;
+    private List<GameEvent> events;
+    private List<GameEvent> history;
 
     private GameEvents() {
-        events = new ArrayList<>();
-        history = new ArrayList<>();
+        events = Collections.synchronizedList(new ArrayList<GameEvent>());
+        history = Collections.synchronizedList(new ArrayList<GameEvent>());
     }
 
     public void addEvent(GameEvent event) {
         this.events.add(event);
     }
 
-    public ArrayList<GameEvent> getEvents() {
+    public List<GameEvent> getEvents() {
         return events;
     }
 
@@ -32,7 +34,7 @@ public class GameEvents {
         return instance;
     }
 
-    public ArrayList<GameEvent> getHistory(){
+    public List<GameEvent> getHistory(){
         return history;
     }
 

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static se.umu.cs.ads.sp.util.UtilModel.getRandomSuccess;
 
@@ -133,8 +134,8 @@ public class Map {
         return minePosition;
     }
 
-    public HashMap<Long, Collectable> generateCollectables() {
-        HashMap<Long, Collectable> collectables = new HashMap<>();
+    public ConcurrentHashMap<Long, Collectable> generateCollectables() {
+        ConcurrentHashMap<Long, Collectable> collectables = new ConcurrentHashMap<>();
         for (int row = 0; row < map.size(); row++) {
             for (int col = 0; col < map.get(row).size(); col++) {
                 if (!inBounds(row, col) || getModelMap().get(row).get(col).hasCollision()) {

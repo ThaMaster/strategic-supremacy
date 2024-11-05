@@ -42,6 +42,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
@@ -311,7 +312,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g2d.drawRect(x, y, width, height);
     }
 
-    public void setEntities(HashMap<Long, PlayerUnit> myUnits, HashMap<Long, PlayerUnit> enemyUnits) {
+    public void setEntities(ConcurrentHashMap<Long, PlayerUnit> myUnits, ConcurrentHashMap<Long, PlayerUnit> enemyUnits) {
         this.gameEntitiesView.clear();
 
         for (PlayerUnit unit : myUnits.values()) {
@@ -332,7 +333,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void setCollectables(HashMap<Long, Collectable> collectables) {
+    public void setCollectables(ConcurrentHashMap<Long, Collectable> collectables) {
         this.collectables.clear();
         for (Collectable collectable : collectables.values()) {
             addCollectable(collectable);
@@ -356,7 +357,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void setEnvironments(HashMap<Long, Environment> environments) {
+    public void setEnvironments(ConcurrentHashMap<Long, Environment> environments) {
         this.environments.clear();
         EnvironmentView newEnvironmentView = null;
         for (Environment environment : environments.values()) {
@@ -466,8 +467,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     private void collectEvents() {
-        ArrayList<GameEvent> events = GameEvents.getInstance().getHistory();
-        for (GameEvent event : events) {
+        for (GameEvent event : GameEvents.getInstance().getHistory()) {
             switch (event.getType()) {
                 case STATE_CHANGE:
                     break;

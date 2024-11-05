@@ -22,12 +22,13 @@ import se.umu.cs.ads.sp.util.enums.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ObjectHandler {
-    private final HashMap<Long, PlayerUnit> myUnits = new HashMap<>();
-    private final HashMap<Long, PlayerUnit> enemyUnits = new HashMap<>();
-    private final HashMap<Long, Environment> environments = new HashMap<>();
-    private HashMap<Long, Collectable> collectables = new HashMap<>();
+    private final ConcurrentHashMap<Long, PlayerUnit> myUnits = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, PlayerUnit> enemyUnits = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Environment> environments = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, Collectable> collectables = new ConcurrentHashMap<>();
 
     private final ArrayList<Long> pickedUpCollectableIds = new ArrayList<>();
     private final ArrayList<Long> spawnedCollectables = new ArrayList<>();
@@ -158,15 +159,15 @@ public class ObjectHandler {
         collectables.put(collectable.getId(), collectable);
     }
 
-    public HashMap<Long, PlayerUnit> getEnemyUnits() {
+    public ConcurrentHashMap<Long, PlayerUnit> getEnemyUnits() {
         return enemyUnits;
     }
 
-    public HashMap<Long, PlayerUnit> getMyUnits() {
+    public ConcurrentHashMap<Long, PlayerUnit> getMyUnits() {
         return myUnits;
     }
 
-    public HashMap<Long, Collectable> getCollectables() {
+    public ConcurrentHashMap<Long, Collectable> getCollectables() {
         return collectables;
     }
 
@@ -174,7 +175,7 @@ public class ObjectHandler {
         return new ArrayList<>(collectables.values());
     }
 
-    public HashMap<Long, Environment> getEnvironments() {
+    public ConcurrentHashMap<Long, Environment> getEnvironments() {
         return environments;
     }
 
@@ -530,6 +531,9 @@ public class ObjectHandler {
     public boolean updateEnemyUnits(ArrayList<UnitDTO> updates) {
         boolean errorOccurred = false;
         for (UnitDTO update : updates) {
+            if(!this.enemyUnits.contains(update.unitId())){
+                return errorOccurred;
+            }
             PlayerUnit enemyUnit = this.enemyUnits.get(update.unitId());
             if (AppSettings.RUN_PERFORMANCE_TEST) {
                 if (Position.distance(enemyUnit.getPosition(), update.position()) > TestConstants.POSITION_ERROR_MARGIN) {
