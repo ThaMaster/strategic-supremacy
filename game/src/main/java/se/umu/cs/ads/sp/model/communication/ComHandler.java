@@ -235,9 +235,10 @@ public class ComHandler {
             return;
         }
 
-        for (User user : modelManager.getLobbyHandler().getLobby().users) {
+        ArrayList<User> users = new ArrayList<>(modelManager.getLobbyHandler().getLobby().users);
+        for (User user : users) {
             //No need to send the update to ourselves
-            if (user.id == modelManager.getPlayer().id) {
+            if (user.id == modelManager.getPlayer().id || !l3Clients.containsKey(user.id)) {
                 continue;
             }
             l3Clients.get(user.id).removePlayerUnits(modelManager.createMySkeletonList());
@@ -260,7 +261,7 @@ public class ComHandler {
             l2Clients.remove(userId);
         }
 
-        if(l3Clients.containsKey(userId)) {
+        if (l3Clients.containsKey(userId)) {
             l3Clients.get(userId).destroy();
             l3Clients.remove(userId);
         }
@@ -394,11 +395,11 @@ public class ComHandler {
     }
 
     public void setupForceLayer() {
-        if(AppSettings.FORCE_L1) {
+        if (AppSettings.FORCE_L1) {
             l1Clients = l3Clients;
         }
 
-        if(AppSettings.FORCE_L2) {
+        if (AppSettings.FORCE_L2) {
             l2Clients = l3Clients;
         }
     }
